@@ -1,0 +1,10 @@
+{
+  "method": "RandomForest",
+  "precision_illicit": 0.9458128078817734,
+  "recall_illicit": 0.47058823529411764,
+  "f1_illicit": 0.6284779050736498,
+  "f1_macro": 0.8075902500589385,
+  "pr_auc": 0.6316069948508697,
+  "support_illicit": 408,
+  "support_licit": 8433
+}

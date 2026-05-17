@@ -1,0 +1,10 @@
+{
+  "method": "KMeans",
+  "precision_illicit": 0.04618519357029658,
+  "recall_illicit": 1.0,
+  "f1_illicit": 0.08829257736420688,
+  "f1_macro": 0.04497567256835937,
+  "pr_auc": 0.0,
+  "support_illicit": 408,
+  "support_licit": 8433
+}

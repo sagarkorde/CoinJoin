@@ -1,0 +1,10 @@
+{
+  "method": "KNN",
+  "precision_illicit": 0.49869451697127937,
+  "recall_illicit": 0.4681372549019608,
+  "f1_illicit": 0.4829329962073325,
+  "f1_macro": 0.7293594588519937,
+  "pr_auc": 0.4157341228805186,
+  "support_illicit": 408,
+  "support_licit": 8433
+}
