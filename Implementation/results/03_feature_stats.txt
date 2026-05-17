@@ -1,0 +1,22 @@
+=================================================================
+MixTrace — Novel Feature Statistics  (Step 3)
+=================================================================
+
+── Author Dataset Novel Features
+   denomination_entropy           mean=0.0000  std=0.0000  [0.0000, 0.0000]
+   mixing_index                   mean=8.7885  std=689.2696  [0.5000, 569244.5000]
+   temporal_irregularity          mean=-0.0000  std=0.9990  [-0.6354, 200.0490]
+   utxo_concentration             mean=0.9998  std=0.0126  [0.0000, 1.0000]
+   coinjoin_proximity_score       mean=0.2663  std=0.1307  [0.2000, 0.8500]
+
+── Elliptic Dataset Novel Features
+   graph_in_degree                mean=1.1501  std=3.9111  [0.0000, 284.0000]
+   graph_out_degree               mean=1.1501  std=1.8947  [0.0000, 472.0000]
+   illicit_neighbor_ratio         mean=0.0201  std=0.1248  [0.0000, 1.0000]
+   shortest_path_to_illicit       mean=5.6984  std=1.2037  [0.0000, 6.0000]
+
+── Elliptic Novel Feature Correlation with Label (labeled nodes)
+   graph_in_degree                r = -0.0266
+   graph_out_degree               r = -0.0426
+   illicit_neighbor_ratio         r = +0.4159
+   shortest_path_to_illicit       r = -0.9182

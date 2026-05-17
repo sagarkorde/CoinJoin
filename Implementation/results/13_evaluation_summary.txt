@@ -1,0 +1,59 @@
+=================================================================
+MixTrace — Evaluation Summary  (Step 13)
+=================================================================
+
+  Random Forest
+    Precision           : 0.9458
+    Recall              : 0.4706
+    F1 (illicit)        : 0.6285
+    F1 (macro)          : 0.8076
+    PR-AUC              : 0.6316
+
+  KNN
+    Precision           : 0.4987
+    Recall              : 0.4681
+    F1 (illicit)        : 0.4829
+    F1 (macro)          : 0.7294
+    PR-AUC              : 0.4157
+
+  K-Means
+    Precision           : 0.0462
+    Recall              : 1.0000
+    F1 (illicit)        : 0.0883
+    F1 (macro)          : 0.0450
+
+  GAT (no DGI)
+    Precision           : 0.1135
+    Recall              : 0.9951
+    F1 (illicit)        : 0.2037
+    F1 (macro)          : 0.4860
+    PR-AUC              : 0.2687
+    ROC-AUC             : 0.9319
+
+  MixTrace (DGI+GAT) ★
+    Precision           : 0.7094
+    Recall              : 0.7598
+    F1 (illicit)        : 0.7337
+    F1 (macro)          : 0.8602
+    PR-AUC              : 0.7167
+    ROC-AUC             : 0.9868
+
+  1D-Chamfer (timestamp)
+    Precision           : 0.1446
+    Recall              : 0.9555
+    F1 (illicit)        : 0.2512
+
+  MD-Chamfer (d=4)
+    Precision           : 0.1408
+    Recall              : 0.9543
+    F1 (illicit)        : 0.2454
+
+  Naive CIOH
+    Precision           : 0.7700
+    Recall              : 1.0000
+    F1 (illicit)        : 0.8700
+
+  Taproot-Aware DBSCAN
+    Precision           : 0.8326
+    Recall              : 0.3000
+    F1 (illicit)        : 0.4410

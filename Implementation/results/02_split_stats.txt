@@ -1,0 +1,19 @@
+=================================================================
+MixTrace — Preprocessing Statistics  (Step 2)
+=================================================================
+
+── Author Dataset Split
+   Train  : 4,119,070    CJ=77,246  (1.88 %)
+   Val    :  587,850    CJ=11,024  (1.88 %)
+   Test   : 1,177,467    CJ=22,082  (1.88 %)
+
+── Elliptic Dataset Split (chronological by time_step)
+   Train nodes  (steps  1–34) :  136,265
+   Val   nodes  (steps 35–41) :   30,680
+   Test  nodes  (steps 42–49) :   36,824
+
+── Elliptic Labeled Subset
+   Total labeled : 46,564
+   Illicit (1)   : 4,545
+   Licit   (0)   : 42,019
+   Imbalance     : 9.2 : 1

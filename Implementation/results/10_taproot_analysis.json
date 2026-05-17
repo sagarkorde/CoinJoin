@@ -1,0 +1,30 @@
+{
+  "analysis_scope": "Multi-input transactions (general CIOH proxy)",
+  "naive_cioh": {
+    "method": "Naive CIOH",
+    "tp": 22169,
+    "tn": 171208,
+    "fp": 6623,
+    "fn": 0,
+    "false_positive_rate": 0.0372,
+    "false_negative_rate": 0.0,
+    "precision": 0.77,
+    "recall": 1.0,
+    "f1_score": 0.87
+  },
+  "taproot_aware_dbscan": {
+    "method": "Taproot-Aware DBSCAN",
+    "tp": 6650,
+    "tn": 176494,
+    "fp": 1337,
+    "fn": 15519,
+    "false_positive_rate": 0.0075,
+    "false_negative_rate": 0.7,
+    "precision": 0.8326,
+    "recall": 0.3,
+    "f1_score": 0.441,
+    "silhouette_score": 0.973
+  },
+  "fpr_reduction_absolute": 0.0297,
+  "n_transactions_analyzed": 200000
+}

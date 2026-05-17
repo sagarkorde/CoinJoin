@@ -1,0 +1,16 @@
+=================================================================
+MixTrace — Graph Statistics  (Step 6)
+=================================================================
+
+  Nodes          : 203,769
+  Edges (bidir.) : 468,710
+  Feature dim    : 169
+  Illicit        : 4,545
+  Licit          : 42,019
+  Unknown        : 157,205
+
+  Train mask     : 136,265  nodes
+  Val   mask     : 30,680  nodes
+  Test  mask     : 36,824  nodes
+
+  Avg node degree: 2.30

@@ -1,0 +1,24 @@
+\begin{table}[!ht]
+\centering
+\caption{Comparison of MixTrace against baseline methods on the Elliptic Dataset (test set, chronological split).}
+\label{tab:main_results}
+\begin{tabular}{lrrrrr}
+\toprule
+Method & Precision & Recall & F1 (illicit) & F1 (macro) & PR-AUC \\
+\midrule
+Random Forest & 0.9458 & 0.4706 & 0.6285 & 0.8076 & 0.6316 \\
+KNN & 0.4987 & 0.4681 & 0.4829 & 0.7294 & 0.4157 \\
+K-Means & 0.0462 & 1.0000 & 0.0883 & 0.0450 & 0.0000 \\
+\midrule
+GAT (no DGI) & 0.1135 & 0.9951 & 0.2037 & 0.4860 & 0.2687 \\
+\midrule
+MixTrace (DGI+GAT) ★ & 0.7094 & 0.7598 & 0.7337 & 0.8602 & 0.7167 \\
+\midrule
+1D-Chamfer (timestamp) & 0.1446 & 0.9555 & 0.2512 & 0.0000 & 0.0000 \\
+MD-Chamfer (d=4) & 0.1408 & 0.9543 & 0.2454 & 0.0000 & 0.0000 \\
+\midrule
+Naive CIOH & 0.7700 & 1.0000 & 0.8700 & 0.0000 & 0.0000 \\
+Taproot-Aware DBSCAN & 0.8326 & 0.3000 & 0.4410 & 0.0000 & 0.0000 \\
+\bottomrule
+\end{tabular}
+\end{table}

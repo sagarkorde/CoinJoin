@@ -1,0 +1,27 @@
+{
+  "chamfer_1d": {
+    "method": "1D-Chamfer (timestamp)",
+    "best_threshold": 2.008220408661856,
+    "f1_score": 0.2512342292923752,
+    "precision": 0.14463157894736842,
+    "recall": 0.9554937413073713,
+    "dimensions": 1
+  },
+  "chamfer_md": {
+    "method": "MD-Chamfer (d=4)",
+    "dimensions": 4,
+    "dimension_names": [
+      "timestamp_unix",
+      "fee_rate_sat_per_vbyte",
+      "input_count",
+      "output_count"
+    ],
+    "best_threshold": 3.3838106643190664,
+    "f1_score": 0.24536271808999083,
+    "precision": 0.14077976817702845,
+    "recall": 0.9542857142857143
+  },
+  "f1_absolute_improvement": -0.005871511202384383,
+  "f1_relative_improvement_pct": -2.337066576844264,
+  "step4_baseline_f1": 0.2512342292923752
+}

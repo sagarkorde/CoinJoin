@@ -1,0 +1,27 @@
+=================================================================
+MixTrace — Dataset Statistics  (Step 1)
+=================================================================
+
+── Author Dataset
+   Rows              : 5,884,387
+   Columns           : 53
+   CoinJoin-like     : 110,352  (1.88 %)
+   Taproot txs       : 0  (0.00 %)
+   P2WPKH txs        : 0
+   P2SH txs          : 0
+   Memory (MB)       : 5137.7
+
+── Elliptic Dataset
+   Total nodes       : 203,769
+   Labeled nodes     : 46,564
+     Illicit (1)     : 4,545  (9.76 %)
+     Licit   (0)     : 42,019  (90.24 %)
+     Unknown         : 157,205
+   Total edges       : 234,355
+   Time steps        : 49
+   Feature dim       : 165
+     Local features  : 93
+     Aggregated      : 72
+
+── Class Imbalance Ratio (Elliptic)
+   Licit : Illicit   : 9.2 : 1
