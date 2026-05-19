@@ -120,9 +120,8 @@ The present study introduces MixTrace, a multi-modal framework
 addressing all three limitations. A structural DBSCAN clustering
 strategy, evaluated on multi-input P2WPKH transactions as a
 pre-Taproot proxy, reduces the false-positive rate by 79.8
-percent in relative terms (absolute: 2.97 percentage points,
-from 3.72 percent to 0.75 percent) across 200,000 transactions,
-eliminating over 5,200 unjustified attributions. This gain
+percent across 200,000 transactions, eliminating over 5,200
+unjustified attributions. This gain
 carries a false-negative rate of 70.0 percent, a deliberate
 high-precision operating point suited to contexts where erroneous
 attributions trigger account freezes or Suspicious Activity
@@ -571,7 +570,7 @@ in the final feature set.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.85\linewidth]{fig07_feature_importance.png}
+  \includegraphics[width=0.85\linewidth]{fig01_feature_importance.png}
   \caption{Top feature importance scores from the Random
     Forest classifier trained on the augmented 169-dimensional
     feature set. This figure shows that the novel
@@ -836,7 +835,7 @@ ADASYN diagnostic implemented in the MixTrace pipeline.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.75\linewidth]{fig01_class_distribution.png}
+  \includegraphics[width=0.75\linewidth]{fig03_class_distribution.png}
   \caption{Class distribution of labelled nodes in the
     Elliptic Bitcoin Dataset. This figure shows the
     4,545 illicit and 42,019 licit labelled transactions
@@ -1035,7 +1034,7 @@ without overfitting under early stopping.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.85\linewidth]{fig03_training_curves.png}
+  \includegraphics[width=0.85\linewidth]{fig07_training_curves.png}
   \caption{GAT fine-tuning training curves showing training
     F1-score, validation F1-score, and learning rate
     schedule across fine-tuning epochs. This figure shows
@@ -1152,7 +1151,7 @@ regulatory consequences.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.85\linewidth]{fig10_taproot_analysis.png}
+  \includegraphics[width=0.85\linewidth]{fig09_taproot_analysis.png}
   \caption{Structural clustering analysis comparing naive
     CIOH and structural DBSCAN on 200,000 multi-input
     P2WPKH Bitcoin transactions (pre-Taproot proxy corpus).
@@ -1207,7 +1206,7 @@ reported in Table~\ref{tab:chamfer}.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.85\linewidth]{fig09_chamfer_comparison.png}
+  \includegraphics[width=0.85\linewidth]{fig10_chamfer_comparison.png}
   \caption{Chamfer distance threshold sweep comparison
     between the 1-D timestamp-only baseline and the
     four-dimensional MD-CD formulation. This figure shows
@@ -1519,30 +1518,37 @@ virtual asset service providers.
 
 This study presents MixTrace, a multi-modal graph attention
 framework for Bitcoin CoinJoin transaction deanonymization
-that simultaneously addresses three research gaps documented
-in the current literature.
+that simultaneously addresses three research gaps in the
+current literature.
 
 The structural DBSCAN clustering strategy, evaluated on
-multi-input P2WPKH proxies, achieves a 79.8 percent
-relative reduction in false-positive clustering rate over
-naive CIOH (absolute: 2.97 percentage points), eliminating
-over 5,200 incorrect attributions per 200,000 analysed
-transactions at a false-negative rate of 70.0 percent,
-with silhouette score 0.973 on the clustered subsample
-confirming separable cluster geometry. The Multi-Dimensional
-Chamfer Distance formulation in Equation~\eqref{eq:chamfer}
-extends CST linking to four structural dimensions; on the
-present dataset this extension shows no measurable F1
-improvement over the one-dimensional temporal baseline,
-establishing the boundary condition under which additional
-structural dimensions yield benefit. The DGI plus GAT architecture
-achieves illicit-class F1-score of 0.7337, ROC-AUC of 0.9868,
-and a 10.5 percentage-point F1 improvement over Random Forest.
-The ablation study confirms that the DGI skip connection in
-Equation~\eqref{eq:fused} contributes 36 percentage points
-of the final F1, establishing self-supervised pre-training
-on unlabelled blockchain nodes as the primary performance
-driver.
+multi-input P2WPKH proxies, reduces the false-positive rate
+by 79.8 percent (absolute: 2.97 percentage points, from
+3.72 to 0.75 percent) over naive CIOH, eliminating over
+5,200 incorrect attributions per 200,000 analysed
+transactions. This gain is achieved at a false-negative rate
+of 70.0 percent, a conservative precision-focused operating
+point appropriate for forensic attribution contexts where
+erroneous identifications carry regulatory consequences.
+
+The Multi-Dimensional Chamfer Distance formulation extends
+CST linking to four structural dimensions; on the present
+dataset this extension shows no measurable F1 improvement
+over the one-dimensional temporal baseline, identifying the
+boundary condition under which additional structural
+dimensions would yield benefit.
+
+The DGI and GAT pipeline achieves an illicit-class F1-score
+of 0.7337 and ROC-AUC of 0.9868, a 10.5 percentage-point
+F1 improvement over Random Forest (F1: 0.628), all results
+from a single fixed-seed run (seed~42). The ablation study
+confirms that the DGI skip connection contributes 36
+percentage points of the final F1-score, establishing
+self-supervised pre-training on unlabelled blockchain nodes
+as the primary performance driver. The policy implications
+for FATF-compliant transaction monitoring, proportionality
+under GDPR Article~22, and admissibility under the Daubert
+and Frye evidentiary standards are analysed in Section~5.
 
 Three directions for future research are identified. First,
 inductive DGI variants supporting mini-batch processing
