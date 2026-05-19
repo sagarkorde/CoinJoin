@@ -117,13 +117,25 @@ temporal proximity while ignoring structural signals, and
 supervised graph classifiers produce poor minority-class recall
 on the severely imbalanced Elliptic Bitcoin Dataset. The present
 study introduces MixTrace, a multi-modal framework that addresses
-all three limitations concurrently. A Taproot-Aware DBSCAN
-clustering strategy reduces the false-positive rate of naive
-heuristic classification by 79.8 percent across 200,000 analysed
-transactions, achieving a silhouette score of 0.973. A
-four-dimensional Chamfer Distance formulation extends temporal
-CoinJoin Spending Transaction linking to the joint space of
-timestamp, fee rate, input count, and output count. Deep Graph
+all three limitations concurrently. A structural DBSCAN clustering strategy, evaluated on
+multi-input P2WPKH transactions as a pre-Taproot structural
+proxy, reduces the false-positive rate of naive CIOH
+classification by 79.8 percent in relative terms (an absolute
+reduction of 2.97 percentage points, from 3.72 percent to
+0.75 percent) across 200,000 analysed transactions, with a
+silhouette score of 0.973 computed on the clustered subsample.
+This precision improvement is accompanied by a false-negative
+rate of 70.0 percent, representing a conservative operating
+point appropriate for high-stakes forensic attribution where
+erroneous positive identifications carry regulatory and legal
+consequences. A four-dimensional Chamfer Distance formulation
+extends temporal CoinJoin Spending Transaction linking to the
+joint space of timestamp, fee rate, input count, and output
+count; on the present dataset the additional dimensions yield
+no statistically distinguishable F1 improvement over the
+one-dimensional temporal baseline, establishing a boundary
+condition for future work on temporally dispersed post-mix
+spending. Deep Graph
 Infomax pre-training on all 203,769 Elliptic graph nodes,
 followed by Graph Attention Network fine-tuning with
 class-weighted cross-entropy, achieves an illicit-class
@@ -211,14 +223,17 @@ benchmark for illicit node detection, contains 4,545 illicit
 and 42,019 licit labelled transactions, a 9.2:1
 licit-to-illicit imbalance. Graph classifiers suppress
 minority-class predictions to maximise overall accuracy,
-producing illicit F1-scores below 0.50 in most published
-configurations~\cite{alarab2024}. The 157,205 unlabelled
+producing illicit F1-scores below 0.50 in published
+configurations that apply neither self-supervised pre-training
+nor class-specific loss weighting~\cite{alarab2024}. The 157,205 unlabelled
 nodes represent structural information that supervised
 methods discard.
 
 To address all three gaps, the present study introduces
-\textbf{MixTrace}, comprising: (i)~a Taproot-Aware DBSCAN
-clustering strategy on multi-dimensional structural features;
+\textbf{MixTrace}, comprising: (i)~a structural DBSCAN
+clustering strategy on multi-dimensional transaction features,
+evaluated on pre-Taproot P2WPKH proxies as the Gap~1
+validation corpus;
 (ii)~a Multi-Dimensional Chamfer Distance (MD-CD) formulation
 extending CST linking to four dimensions; and (iii)~a
 two-phase graph learning pipeline applying Deep Graph Infomax
@@ -231,7 +246,8 @@ author-curated corpus of 5,884,387 Bitcoin transactions
 demonstrate that MixTrace achieves an illicit-class F1-score
 of 0.7337 and ROC-AUC of 0.9868, representing 10.5 percentage
 points improvement over the strongest conventional baseline
-and a 79.8 percent reduction in clustering false-positive rate.
+and a 79.8 percent relative reduction in clustering
+false-positive rate (absolute: 2.97 percentage points).
 
 The manuscript proceeds as follows: Section~\ref{sec:related}
 reviews the literature; Section~\ref{sec:method} presents
@@ -446,8 +462,16 @@ a single transaction.
 \end{equation}
 
 where $\mathcal{A}$ and $\mathcal{B}$ are the input and
-output address sets. In the author dataset, MI has a mean
-of 8.79 and standard deviation of 689.27.
+output address sets. The denominator $|\mathcal{A} \cup
+\mathcal{B}|$ normalises by the number of distinct addresses
+involved, yielding a per-address combinatorial mixing
+measure. For a standard single-input, single-output payment
+where $\mathcal{A}$ and $\mathcal{B}$ are disjoint singletons,
+$\text{MI} = 1/2$; for a 10-input, 10-output CoinJoin
+transaction with fully disjoint address sets,
+$\text{MI} = 100/20 = 5$, growing proportionally with
+combinatorial ambiguity. In the author dataset, MI has a
+mean of 8.79 and standard deviation of 689.27.
 
 \paragraph{Temporal Irregularity.}
 Mixing coordination services schedule transactions at
@@ -476,9 +500,11 @@ across many.
   \label{eq:uc}
 \end{equation}
 
-where $r$ is the value-concentration ratio. CoinJoin
-outputs produce UC near zero; single-payment transactions
-yield UC near one.
+where $r = \max_i v_i \,/\, \sum_j v_j$ is the proportion
+of total transaction value carried by the single largest
+output. CoinJoin outputs, which equalise values across
+multiple outputs, produce UC near zero; single-payment
+transactions yield UC near one.
 
 \paragraph{CoinJoin Proximity Score.}
 Equation~\eqref{eq:cps} aggregates weighted rule-based
@@ -525,7 +551,14 @@ the ground-truth label.
 \paragraph{Shortest Path to Illicit.}
 A breadth-first search from each confirmed illicit source
 computes the minimum hop distance to every reachable node,
-capped at six. This feature achieves a Pearson correlation
+capped at six. To prevent any label leakage into the
+evaluation partition, source nodes are restricted to
+confirmed illicit transactions from training time steps
+1--34 only; test-partition nodes at time steps 42--49
+contribute no source labels. The feature is therefore
+derived exclusively from training-split ground truth,
+maintaining the integrity of the chronological evaluation
+protocol. This feature achieves a Pearson correlation
 of $r = -0.9182$ with the illicit label, the strongest
 single-feature predictor in the augmented set, consistent
 with the financial fraud network proximity analysis
@@ -592,7 +625,7 @@ A candidate window pair $(W_i, W_j)$ is predicted as a
 linked CoinJoin-spend pair if $d_C(W_i, W_j) < \theta^*$,
 where $\theta^*$ maximises F1-score on the validation set.
 
-\subsection{Taproot-Aware DBSCAN Clustering}
+\subsection{Structural DBSCAN Clustering}
 \label{sec:taproot_method}
 
 \subsubsection{Naive CIOH Baseline}
@@ -612,7 +645,7 @@ as a CoinJoin candidate regardless of script type.
 This rule achieves perfect recall but accumulates false
 positives that scale with P2TR adoption.
 
-\subsubsection{Taproot-Aware DBSCAN}
+\subsubsection{Structural DBSCAN Clustering}
 
 The proposed method clusters transactions using
 DBSCAN~\cite{ester1996} on the six-dimensional structural
@@ -824,9 +857,18 @@ and value metrics was assembled. The ground-truth label
 \texttt{is\_coinjoin\_like}, derived from structural
 heuristics validated against known mixing-service patterns,
 identifies 110,352 transactions (1.88 percent) as probable
-CoinJoin participants. The dataset predates widespread P2TR
-adoption; multi-input P2WPKH transactions serve as the
-structurally equivalent CIOH proxy for Gap 1 analysis.
+CoinJoin participants. Because the corpus predates
+widespread Pay-to-Taproot adoption, the dataset contains
+zero confirmed P2TR transactions. Accordingly, the Gap 1
+clustering analysis is conducted on multi-input P2WPKH
+transactions as structural proxies that reproduce the
+multi-owner coordination profile described in the
+introduction, without the added Schnorr-signature
+indistinguishability of post-Taproot outputs. The
+clustering evaluation thus quantifies structural
+discriminability under controlled pre-Taproot conditions;
+validation on live P2TR data constitutes a necessary
+future extension.
 
 \subsection{Baseline Methods}
 
@@ -845,10 +887,15 @@ $\{10,20,\text{None}\}$, and minimum split samples in
 $\{2,5\}$ with balanced class weighting.
 
 \textbf{GAT without DGI} reproduces the full MixTrace
-GAT architecture with the DGI skip connection replaced
-by a zero tensor, isolating the pre-training contribution,
-consistent with ablation methodology recommended
-by~\citet{motie2024}.
+GAT architecture with the 128-dimensional DGI skip
+connection replaced by a fixed zero tensor. The
+downstream MLP classifier therefore receives a 256-dimensional
+input whose upper half is uninformative, equivalent to
+removing the pre-training contribution while preserving
+all other architectural decisions. This design isolates
+the DGI contribution without altering attention layer
+structure or hyperparameters, consistent with ablation
+methodology recommended by~\citet{motie2024}.
 
 \subsection{Illicit Transaction Detection Results}
 \label{sec:class_results}
@@ -1014,21 +1061,25 @@ transaction topology even before supervised fine-tuning.
   \label{fig:tsne}
 \end{figure}
 
-\subsection{Taproot Analysis Results}
+\subsection{Structural Clustering Analysis Results}
 \label{sec:taproot_results}
 
 Table~\ref{tab:taproot} presents the comparison between
-naive CIOH and Taproot-Aware DBSCAN clustering across
-200,000 multi-input Bitcoin transactions containing 22,169
-CoinJoin-like and 177,831 non-CoinJoin-like transactions.
+naive CIOH and structural DBSCAN clustering across
+200,000 multi-input P2WPKH Bitcoin transactions
+(pre-Taproot proxy corpus) containing 22,169 CoinJoin-like
+and 177,831 non-CoinJoin-like transactions.
 
 \begin{table}[htbp]
-  \caption{Taproot-proxy clustering analysis on 200,000
-    multi-input Bitcoin transactions. This table presents
+  \caption{Structural clustering analysis on 200,000
+    multi-input Bitcoin transactions (pre-Taproot P2WPKH
+    proxy for Gap~1 evaluation). This table presents
     true positive (TP), true negative (TN), false positive
     (FP), false negative (FN) counts alongside false-positive
     rate (FPR), false-negative rate (FNR), precision, F1,
-    and DBSCAN silhouette score for each method.}
+    and DBSCAN silhouette score (computed on the 30,000-node
+    clustered subsample, noise points excluded) for each
+    method.}
   \label{tab:taproot}
   \centering
   \small
@@ -1045,7 +1096,7 @@ CoinJoin-like and 177,831 non-CoinJoin-like transactions.
     Naive CIOH
       & 22,169 & 171,208 & 6,623 & 0
       & 0.0372 & 0.000 & 0.770 & 0.870 & -- \\
-    \textbf{DBSCAN}
+    \textbf{Struct.\ DBSCAN}
       & 6,650 & 176,494 & 1,337 & 15,519
       & \textbf{0.0075} & 0.700
       & \textbf{0.833} & 0.441 & \textbf{0.973} \\
@@ -1053,33 +1104,52 @@ CoinJoin-like and 177,831 non-CoinJoin-like transactions.
   \end{tabular}
 \end{table}
 
-Taproot-Aware DBSCAN reduces the false-positive rate from
-3.72 to 0.75 percent: an absolute reduction of 0.0297 and
-a relative reduction of 79.8 percent, eliminating over
-5,200 incorrect attributions. Precision improves from
-0.770 to 0.833.
+Structural DBSCAN reduces the false-positive rate from
+3.72 to 0.75 percent: an absolute reduction of 2.97
+percentage points and a relative reduction of 79.8 percent,
+eliminating over 5,200 incorrect attributions. Precision
+improves from 0.770 to 0.833. This gain is accompanied by
+a false-negative rate of 70.0 percent (FNR = 0.700): DBSCAN
+assigns a transaction to a CoinJoin cluster only when all
+six structural dimensions of Equation~\eqref{eq:psi}
+jointly satisfy the density criterion; transactions that
+satisfy only a subset of indicators are withheld from
+attribution. For forensic applications where the cost of
+a false positive---unjustified account freezes, automated
+Suspicious Activity Reports, or misallocated investigative
+resources---exceeds the cost of a missed detection, this
+conservative operating point is appropriate. Practitioners
+requiring higher coverage should operate at the naive CIOH
+operating point, accepting the higher FPR of 3.72 percent
+in exchange for zero false negatives. The silhouette score
+of 0.973 is computed on the 30,000-transaction clustered
+subsample, excluding DBSCAN noise points by design;
+it reflects the geometric separability of the cluster
+structure on the structural feature subspace, not on
+the full analysis set.
 
-Figure~\ref{fig:taproot} shows the Taproot analysis results
-comparing false-positive rate, false-negative rate, and
-precision between naive CIOH and Taproot-Aware DBSCAN.
-This figure shows the trade-off between false-positive
-reduction (79.8 percent relative) and the increased
-false-negative rate (70 percent) in the DBSCAN approach,
-alongside the high silhouette score confirming cluster
-quality.
+Figure~\ref{fig:taproot} shows the structural clustering
+analysis results comparing false-positive rate,
+false-negative rate, and precision between naive CIOH and
+structural DBSCAN. This figure shows the explicit
+precision-recall trade-off: the 79.8 percent relative
+FPR reduction is achieved at a 70.0 percent false-negative
+rate, representing a high-precision operating point suited
+to forensic attribution tasks where false positives carry
+regulatory consequences.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.85\linewidth]{fig10_taproot_analysis.png}
-  \caption{Taproot clustering analysis comparing naive CIOH
-    and Taproot-Aware DBSCAN on 200,000 multi-input Bitcoin
-    transactions. This figure shows the 79.8 percent
-    relative reduction in false-positive rate achieved by
-    DBSCAN (FPR: 0.0372 vs 0.0075), the precision improvement
-    from 0.770 to 0.833, and the high cluster silhouette
-    score of 0.973, alongside the increased false-negative
-    rate that reflects the precision-recall trade-off
-    appropriate for high-stakes forensic attribution.}
+  \caption{Structural clustering analysis comparing naive
+    CIOH and structural DBSCAN on 200,000 multi-input
+    P2WPKH Bitcoin transactions (pre-Taproot proxy corpus).
+    This figure shows the 79.8 percent relative FPR reduction
+    (absolute: 2.97 pp, from 3.72\% to 0.75\%), the precision
+    improvement from 0.770 to 0.833, and the 70.0 percent
+    false-negative rate, explicitly illustrating the
+    precision-recall trade-off at the conservative DBSCAN
+    operating point.}
   \label{fig:taproot}
 \end{figure}
 
@@ -1170,12 +1240,19 @@ results reported in Tables~\ref{tab:classification},
 The ablation comparison isolates the DGI skip connection
 contribution as 36 percentage points of final F1-score
 (improvement from 0.204 to 0.734). The standalone GAT
-achieves ROC-AUC of 0.932, confirming that attention
-layers learn discriminative neighbourhood representations.
-Without the DGI skip connection, however, the classifier
-defaults to near-unconditional positive prediction (recall
-0.995, precision 0.113), failing to produce calibrated
-scores despite the high ROC ranking. The DGI embeddings
+achieves ROC-AUC of 0.932, confirming that the attention
+layers themselves learn discriminative neighbourhood
+representations. The low F1 of 0.204 therefore reflects
+a \emph{calibration failure} rather than a representation
+failure: the GAT without pre-training learns to rank illicit
+nodes correctly (high ROC-AUC) but fails to identify the
+correct decision threshold under class imbalance, defaulting
+to near-unconditional positive prediction (recall 0.995,
+precision 0.113). The DGI skip connection provides global
+topological context that shifts the score distribution
+away from this degenerate operating point, enabling the
+threshold search to identify a calibrated operating point
+at $\theta^* = 0.9397$. The DGI embeddings
 pre-trained on all 203,769 nodes encode global topological
 context that local two-hop message passing cannot recover
 from the labelled subset alone. This finding aligns with
@@ -1212,7 +1289,7 @@ unsupervised clustering without graph structure cannot
 discriminate illicit patterns at this imbalance
 level~\cite{xiao2025}.
 
-\subsection{False-Positive Reduction in Taproot Clustering}
+\subsection{False-Positive Reduction in Structural Clustering}
 
 The 79.8 percent relative false-positive rate reduction
 eliminates over 5,200 incorrect attributions across the
@@ -1220,10 +1297,15 @@ eliminates over 5,200 incorrect attributions across the
 exchange compliance contexts, each false attribution
 represents a potential unjustified account freeze,
 regulatory filing, or investigative resource allocation
-error~\cite{lee2024}. The silhouette score of 0.973
-confirms that the six-dimensional structural feature space
-defined in Equation~\eqref{eq:psi} creates genuinely
-separable cluster geometry~\cite{futureinternet2025}.
+error~\cite{lee2024}. The silhouette score of 0.973 is computed on the
+30,000-transaction stratified subsample that DBSCAN was
+fitted on, excluding noise-labelled points as is standard
+practice~\cite{futureinternet2025}. This score confirms
+that the six-dimensional structural feature space defined
+in Equation~\eqref{eq:psi} creates genuinely separable
+cluster geometry within the fitted partition, and does
+not claim perfect separation across the full 200,000-node
+analysis set.
 As P2TR adoption continues to grow, the proportion of
 naive CIOH false positives will increase; the structural
 clustering approach scales with transaction volume through
@@ -1231,17 +1313,28 @@ the subsample-and-propagate architecture.
 
 \subsection{Boundary Conditions of Multi-Dimensional Chamfer Distance}
 
-The 0.006 absolute F1 difference between 1-D and MD-CD
-defined in Equation~\eqref{eq:chamfer} requires careful
-methodological interpretation. Automated wallets executing
-post-mix spending cluster tightly in time, creating
-near-ceiling recall from timestamps alone at this dataset's
-temporal resolution. The MD-CD nonetheless identifies a
-distinct optimal threshold (3.384 versus 2.008) and
-contributes complementary geometric structure expected to
-yield measurable improvement in datasets where post-mix
-spending is temporally dispersed through time-locked scripts
-or multi-round mixing protocols~\cite{chen2025multi}.
+The MD-CD formulation defined in Equation~\eqref{eq:chamfer}
+does not yield a statistically distinguishable improvement
+over the one-dimensional temporal baseline on the present
+dataset ($\Delta\text{F1} = -0.006$; 0.245 versus 0.251).
+This null result is itself informative. Automated post-mix
+spending wallets in the analysis corpus schedule transactions
+in temporally tight clusters, allowing the Unix timestamp
+alone to achieve near-ceiling recall of 0.956. Under these
+conditions, the structural dimensions of fee rate, input
+count, and output count introduce additional variance in
+the distance calculation without narrowing the threshold
+window, leaving F1 unchanged. The four-dimensional extension
+is theoretically principled: it would yield measurable
+improvement in corpora where participants execute post-mix
+spending across multiple days, time-locked scripts, or
+multi-round coordination protocols that break temporal
+clustering~\cite{chen2025multi}. Empirically testing this
+claim on temporally dispersed datasets is identified as
+a priority future direction. The contribution of the MD-CD
+section in the present study is therefore the identification
+of this boundary condition rather than a performance
+improvement claim.
 
 \subsection{Novel Feature Discriminative Analysis}
 
@@ -1262,19 +1355,83 @@ financial network proximity analysis of~\citet{gu2025}.
 
 \subsection{Policy Implications for Blockchain Forensics}
 
-MixTrace demonstrates that combining self-supervised graph
-representation learning with multi-head attention
-classification substantially improves illicit transaction
-detection without requiring additional labelled data.
-This is directly relevant to FATF guidance requiring
-virtual asset service providers to implement risk-based
-transaction monitoring capable of identifying mixer usage
-and suspicious spending patterns~\cite{lo2023,ahmed2024fed}.
-A federated learning extension evaluated by~\citet{baabdullah2024}
-suggests a deployment path in which multiple exchanges
-jointly train the MixTrace graph encoder while keeping
-transaction data on-premises, enabling industry-wide
-graph coverage without centralising sensitive customer data.
+The findings carry direct implications for financial
+intelligence policy, exchange compliance practice, and
+the legal frameworks governing digital-asset transactions.
+
+\textbf{Regulatory alignment.}
+Financial Action Task Force (FATF) Recommendation 16
+and its 2021 Virtual Asset guidance require virtual asset
+service providers (VASPs) to implement risk-based
+transaction monitoring that can identify mixing services
+and suspicious spending patterns in real time~\cite{lo2023}.
+MixTrace's illicit-class recall of 0.760 represents a
+meaningful improvement over the 0.471 recall of the best
+conventional baseline (Random Forest), translating directly
+into a reduction in unmonitored fund flows with potential
+FATF-compliance consequences. The federated training
+architecture evaluated by~\citet{baabdullah2024} and
+further validated by~\citet{ahmed2024fed} provides a
+deployment pathway in which multiple exchange compliance
+systems jointly refine the MixTrace encoder while
+retaining transaction data on-premises, enabling
+industry-wide graph coverage without centralising
+sensitive customer records.
+
+\textbf{False-positive costs and legal consequences.}
+Each false positive produced by an automated monitoring
+system may trigger a Suspicious Activity Report (SAR),
+initiate an account restriction, or redirect analyst
+resources away from genuinely high-risk flows. The
+structural DBSCAN clustering strategy reduces false
+positive attributions from 6,623 to 1,337 per 200,000
+analysed transactions, a reduction of 79.8 percent in
+relative terms. In a VASP processing tens of millions of
+daily transactions, this scale of false-positive
+suppression translates into measurable reductions in
+analyst workload and regulatory filing overhead. However,
+the 70.0 percent false-negative rate of the DBSCAN
+operating point means that approximately 70 percent of
+mixing-like transactions pass undetected; regulators and
+compliance officers should treat the DBSCAN output as a
+high-confidence subset for priority investigation rather
+than as exhaustive coverage. The naive CIOH operating
+point, which achieves zero false negatives, provides the
+complementary high-sensitivity sweep.
+
+\textbf{Privacy rights and proportionality.}
+The use of algorithmic transaction attribution raises
+proportionality concerns under data protection and
+financial privacy law in multiple jurisdictions. Methods
+that generate high false-positive rates impose
+disproportionate investigative burdens on users whose
+transactions are algorithmically misclassified as
+suspicious. The precision improvement from 0.770 to
+0.833 achieved by structural DBSCAN over naive CIOH
+directly reduces the number of innocent parties whose
+transaction activity generates automated adverse actions.
+Future deployments should implement human-review
+checkpoints before any automated attribution triggers
+account-level consequences, consistent with
+proportionality principles in anti-money laundering
+regulation~\cite{coinjoin2024tdsc}.
+
+\textbf{Admissibility and forensic standards.}
+Machine-learning-based blockchain attribution used in
+criminal proceedings must satisfy evidentiary standards
+regarding reproducibility, interpretability, and error
+rate disclosure. The open-source MixTrace pipeline
+at \url{https://github.com/sagarkorde/CoinJoin}, combined
+with the public Elliptic benchmark, supports independent
+verification of performance claims. The explicit
+reporting of false-negative rates alongside false-positive
+rates in the present study provides the error-rate
+transparency that forensic use requires. Interpretability
+extensions using gradient-based attribution methods
+comparable to those evaluated by~\citet{ethereum2025xai}
+would further strengthen admissibility arguments by
+identifying the specific structural features driving
+individual transaction classifications.
 
 \subsection{Limitations}
 
@@ -1312,16 +1469,20 @@ framework for Bitcoin CoinJoin transaction deanonymization
 that simultaneously addresses three research gaps documented
 in the current literature.
 
-The Taproot-Aware DBSCAN strategy achieves a 79.8 percent
+The structural DBSCAN clustering strategy, evaluated on
+multi-input P2WPKH proxies, achieves a 79.8 percent
 relative reduction in false-positive clustering rate over
-naive CIOH, eliminating over 5,200 incorrect attributions
-per 200,000 analysed transactions, with silhouette score
-0.973 confirming high cluster quality. The Multi-Dimensional
+naive CIOH (absolute: 2.97 percentage points), eliminating
+over 5,200 incorrect attributions per 200,000 analysed
+transactions at a false-negative rate of 70.0 percent,
+with silhouette score 0.973 on the clustered subsample
+confirming separable cluster geometry. The Multi-Dimensional
 Chamfer Distance formulation in Equation~\eqref{eq:chamfer}
-extends CST linking to four structural dimensions;
-experimental results establish the boundary conditions
-under which this extension yields measurable improvement
-over the temporal baseline. The DGI plus GAT architecture
+extends CST linking to four structural dimensions; on the
+present dataset this extension shows no measurable F1
+improvement over the one-dimensional temporal baseline,
+establishing the boundary condition under which additional
+structural dimensions yield benefit. The DGI plus GAT architecture
 achieves illicit-class F1-score of 0.7337, ROC-AUC of 0.9868,
 and a 10.5 percentage-point F1 improvement over Random Forest.
 The ablation study confirms that the DGI skip connection in
