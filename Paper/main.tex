@@ -654,17 +654,17 @@ This equation represents the combined structural behaviour
 profile of a transaction, encoding UTXO topology,
 fee-rate positioning, and mixing-related indicators.
 
-\begin{equation}
+\begin{multline}
   \psi(t) = \bigl[
     \text{input\_count},\;
     \text{output\_count},\;
-    \text{fee\_rate},\;
+    \text{fee\_rate},\\
     \text{value\_concentration},\;
     \text{address\_reuse},\;
     \text{mixing\_index}
   \bigr]^\top.
   \label{eq:psi}
-\end{equation}
+\end{multline}
 
 All features are standardised before clustering. DBSCAN
 is configured with $\varepsilon = 0.6$ and
