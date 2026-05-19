@@ -58,6 +58,10 @@
 \usepackage{setspace}
 \onehalfspacing
 
+%% ── Line numbers (for reviewer convenience) ──────────────────
+\usepackage{lineno}
+\linenumbers
+
 %% ── Abstract formatting ──────────────────────────────────────
 \usepackage{abstract}
 \renewcommand{\abstractnamefont}{\normalfont\bfseries}
@@ -105,49 +109,41 @@
 % ─────────────────────────────────────────────────────────────
 \begin{abstract}
 \noindent
-Bitcoin CoinJoin transactions deliberately obscure payment flows
-by merging unrelated users' unspent transaction outputs into a
-single on-chain record, substantially weakening the Common Input
-Ownership Heuristic that underpins most operational blockchain
-forensic tools. Existing detection pipelines suffer from three
-compounding limitations: structural address clustering fails
-under Taproot's Pay-to-Taproot script indistinguishability,
-CoinJoin Spending Transaction linking relies on one-dimensional
-temporal proximity while ignoring structural signals, and
-supervised graph classifiers produce poor minority-class recall
-on the severely imbalanced Elliptic Bitcoin Dataset. The present
-study introduces MixTrace, a multi-modal framework that addresses
-all three limitations concurrently. A structural DBSCAN clustering strategy, evaluated on
-multi-input P2WPKH transactions as a pre-Taproot structural
-proxy, reduces the false-positive rate of naive CIOH
-classification by 79.8 percent in relative terms (an absolute
-reduction of 2.97 percentage points, from 3.72 percent to
-0.75 percent) across 200,000 analysed transactions, with a
-silhouette score of 0.973 computed on the clustered subsample.
-This precision improvement is accompanied by a false-negative
-rate of 70.0 percent, representing a conservative operating
-point appropriate for high-stakes forensic attribution where
-erroneous positive identifications carry regulatory and legal
-consequences. A four-dimensional Chamfer Distance formulation
-extends temporal CoinJoin Spending Transaction linking to the
-joint space of timestamp, fee rate, input count, and output
-count; on the present dataset the additional dimensions yield
-no statistically distinguishable F1 improvement over the
-one-dimensional temporal baseline, establishing a boundary
-condition for future work on temporally dispersed post-mix
-spending. Deep Graph
-Infomax pre-training on all 203,769 Elliptic graph nodes,
-followed by Graph Attention Network fine-tuning with
-class-weighted cross-entropy, achieves an illicit-class
-F1-score of 0.7337, precision of 0.7094, recall of 0.7598,
-and ROC-AUC of 0.9868 on the chronological held-out test set,
-outperforming Random Forest (F1: 0.6285), K-Nearest Neighbours
-(F1: 0.4829), K-Means (F1: 0.0883), and a standalone Graph
-Attention Network without pre-training (F1: 0.2037). An ablation
-study confirms that the Deep Graph Infomax skip connection
-contributes 36 percentage points of the final F1-score,
-validating self-supervised pre-training on unlabelled blockchain
-nodes as the primary performance driver.
+Bitcoin CoinJoin transactions merge the unspent outputs of
+unrelated users into a single on-chain record, systematically
+undermining the Common Input Ownership Heuristic relied upon by
+financial intelligence units and exchange compliance teams.
+Three compounding limitations afflict existing detection tools:
+multi-input clustering fails under script-type
+indistinguishability, spending-transaction linking exploits only
+one-dimensional temporal proximity, and graph classifiers perform
+poorly on severely imbalanced illicit-transaction benchmarks.
+
+The present study introduces MixTrace, a multi-modal framework
+addressing all three limitations. A structural DBSCAN clustering
+strategy, evaluated on multi-input P2WPKH transactions as a
+pre-Taproot proxy, reduces the false-positive rate by 79.8
+percent in relative terms (absolute: 2.97 percentage points,
+from 3.72 percent to 0.75 percent) across 200,000 transactions,
+eliminating over 5,200 unjustified attributions. This gain
+carries a false-negative rate of 70.0 percent, a deliberate
+high-precision operating point suited to contexts where erroneous
+attributions trigger account freezes or Suspicious Activity
+Reports. A four-dimensional Chamfer Distance formulation shows
+no measurable improvement over the temporal baseline on the
+present dataset, identifying a boundary condition for future
+work. A Deep Graph Infomax pre-training and Graph Attention
+Network pipeline achieves an illicit-class F1-score of 0.7337
+and ROC-AUC of 0.9868 on the Elliptic benchmark, outperforming
+Random Forest (F1: 0.6285) and a GAT without pre-training
+(F1: 0.2037). Self-supervised pre-training on unlabelled
+blockchain nodes contributes 36 percentage points of the
+final F1-score.
+
+The results carry direct implications for FATF-compliant
+transaction monitoring, the proportionality of automated
+financial surveillance, and the evidentiary admissibility of
+graph-based blockchain evidence in criminal proceedings.
 
 \smallskip\noindent\textbf{Keywords:} Bitcoin;
 Blockchain forensics;
@@ -197,16 +193,22 @@ Three research gaps persist in the current literature that
 collectively limit the practical effectiveness of automated
 CoinJoin analysis.
 
-\textbf{Gap~1 -- Taproot Clustering Failure.}
-Bitcoin's Taproot soft fork, activated at block height 709,632
-in November 2021, introduced Pay-to-Taproot (P2TR) scripts
-based on Schnorr signatures and key aggregation. A single-user
-P2TR output is computationally indistinguishable on-chain from
-a multi-party aggregated output used in CoinJoin coordination,
+\textbf{Gap~1 -- Multi-Input Clustering Under Script
+Indistinguishability.}
+Bitcoin's Taproot soft fork (block height 709,632, November
+2021) introduced Pay-to-Taproot (P2TR) scripts based on
+Schnorr signatures and key aggregation. A single-user P2TR
+output is computationally indistinguishable on-chain from a
+multi-party aggregated output used in CoinJoin coordination,
 causing naive CIOH clustering to generate systematic false
-positives~\cite{lee2024}. Post-Taproot address clustering
-research has consistently identified this as an operational
-forensic blind spot~\cite{asiri2025}.
+positives~\cite{lee2024}. Even before Taproot, multi-input
+P2WPKH transactions share structural properties with
+CoinJoin outputs, making the clustering problem inherent to
+the UTXO model rather than exclusive to a single script
+type~\cite{asiri2025}. The present study evaluates the
+structural clustering solution on pre-Taproot P2WPKH
+proxies; validation on live P2TR transactions is identified
+as a necessary future extension.
 
 \textbf{Gap~2 -- One-Dimensional CST Linking.}
 CoinJoin Spending Transaction (CST) deanonymization requires
@@ -796,7 +798,7 @@ misclassifications to counteract the 9.2:1 imbalance ratio.
 where $\mathcal{V}_L$ is the labelled training set,
 $w_0 \approx 0.565$ (licit), and $w_1 \approx 4.317$
 (illicit). The optimiser is Adam with initial learning
-rate $10^{-3}$ and weight decay $5 \times 10^{-4}$.
+rate $5 \times 10^{-4}$ and weight decay $5 \times 10^{-4}$.
 A ReduceLROnPlateau scheduler monitors validation F1
 with patience 10 and factor 0.5. Training terminates
 after 500 epochs or 20 consecutive epochs without
@@ -895,7 +897,18 @@ removing the pre-training contribution while preserving
 all other architectural decisions. This design isolates
 the DGI contribution without altering attention layer
 structure or hyperparameters, consistent with ablation
-methodology recommended by~\citet{motie2024}.
+methodology recommended by~\citet{motie2024}. A fully
+separate GAT trained on 128-dimensional outputs alone
+would require different MLP weights and a separate
+hyperparameter search; the zero-tensor design holds all
+other factors constant, making the DGI contribution the
+sole experimental variable. This choice is acknowledged
+as an approximation: the MLP classifier receives 256
+inputs of which 128 are zero, and its weight matrix will
+allocate zero gradient to the zeroed channels within two
+to three epochs. The resulting model is functionally
+equivalent to a 128-dimensional GAT-only classifier
+after the first few training steps.
 
 \subsection{Illicit Transaction Detection Results}
 \label{sec:class_results}
@@ -910,7 +923,9 @@ methods on the Elliptic held-out partition containing
     Elliptic test set (time steps 42--49). This table presents
     precision, recall, illicit F1, macro F1, PR-AUC, and
     ROC-AUC for all methods. Best result per column appears
-    in \textbf{bold}.}
+    in \textbf{bold}. All results are from a single run
+    with fixed random seed (seed~42); multi-seed variance
+    analysis is a planned extension.}
   \label{tab:classification}
   \centering
   \small
@@ -1360,11 +1375,13 @@ intelligence policy, exchange compliance practice, and
 the legal frameworks governing digital-asset transactions.
 
 \textbf{Regulatory alignment.}
-Financial Action Task Force (FATF) Recommendation 16
-and its 2021 Virtual Asset guidance require virtual asset
-service providers (VASPs) to implement risk-based
-transaction monitoring that can identify mixing services
-and suspicious spending patterns in real time~\cite{lo2023}.
+Financial Action Task Force (FATF) Recommendation 16,
+together with the 2021 ``Updated Guidance for a
+Risk-Based Approach to Virtual Assets and Virtual Asset
+Service Providers'' (FATF, October 2021), require virtual
+asset service providers (VASPs) to implement risk-based
+transaction monitoring capable of identifying mixing
+services and suspicious spending patterns~\cite{lo2023}.
 MixTrace's illicit-class recall of 0.760 represents a
 meaningful improvement over the 0.471 recall of the best
 conventional baseline (Random Forest), translating directly
@@ -1417,34 +1434,73 @@ proportionality principles in anti-money laundering
 regulation~\cite{coinjoin2024tdsc}.
 
 \textbf{Admissibility and forensic standards.}
-Machine-learning-based blockchain attribution used in
-criminal proceedings must satisfy evidentiary standards
-regarding reproducibility, interpretability, and error
-rate disclosure. The open-source MixTrace pipeline
-at \url{https://github.com/sagarkorde/CoinJoin}, combined
-with the public Elliptic benchmark, supports independent
-verification of performance claims. The explicit
-reporting of false-negative rates alongside false-positive
-rates in the present study provides the error-rate
-transparency that forensic use requires. Interpretability
-extensions using gradient-based attribution methods
-comparable to those evaluated by~\citet{ethereum2025xai}
-would further strengthen admissibility arguments by
-identifying the specific structural features driving
-individual transaction classifications.
+Machine-learning-based blockchain attribution introduced
+in criminal proceedings must satisfy evidentiary standards
+governing reproducibility, interpretability, and error-rate
+disclosure. Under the Daubert standard applicable in
+United States federal courts (\textit{Daubert v.\ Merrell
+Dow Pharmaceuticals, Inc.}, 509 U.S.\ 579, 1993), expert
+evidence derived from scientific methodology must be
+testable, peer-reviewed, and accompanied by a known or
+potential error rate. The open-source MixTrace pipeline at
+\url{https://github.com/sagarkorde/CoinJoin}, combined with
+the public Elliptic benchmark, supports independent
+verification. The explicit disclosure of false-negative
+rates alongside false-positive rates in the present study
+satisfies the error-rate transparency requirement. In
+jurisdictions applying the Frye ``general acceptance''
+standard, the adoption of Graph Attention Networks and
+DBSCAN clustering by the broader blockchain forensics
+community~\cite{motie2024,futureinternet2025} supports
+general acceptance.
+
+\textbf{Automated decision-making and privacy rights.}
+Where MixTrace output triggers automated account
+restrictions without human review, it falls within the
+scope of Article~22 of the General Data Protection
+Regulation (GDPR, Regulation (EU) 2016/679), which
+grants data subjects the right not to be subject to
+solely automated decisions with significant legal effects.
+Compliance requires implementing human-oversight
+checkpoints at any stage where an algorithmic attribution
+causes a consequential action, particularly given the
+70.0 percent false-negative rate at the high-precision
+DBSCAN operating point. Similar protections apply under
+Section~1798.185 of the California Consumer Privacy Act
+(CCPA) for United States-based exchange operators. These
+frameworks reinforce the operational recommendation that
+MixTrace output should function as a risk-prioritisation
+tool rather than an autonomous enforcement mechanism.
 
 \subsection{Limitations}
 
 The author-curated dataset contains no confirmed Taproot
-transactions, requiring multi-input transactions as a
-structural proxy for the Gap~1 analysis. DGI pre-training
-requires the full transaction graph simultaneously in memory,
-currently limiting scalability to approximately 500,000
-nodes on 64~GB RAM without mini-batch extensions. The MD-CD
-computation is $O(mn)$ per window pair, which may become
-prohibitive at exchange throughput scale without approximate
-nearest-neighbour optimisation. Off-chain Lightning Network
-activity falls outside the scope of the current pipeline.
+transactions, requiring multi-input P2WPKH transactions as a
+structural proxy for the Gap~1 analysis; live P2TR validation
+is deferred to future work. DGI pre-training requires the
+full transaction graph simultaneously in memory, currently
+limiting scalability to approximately 500,000 nodes on 64~GB
+RAM without mini-batch extensions. The MD-CD computation is
+$O(mn)$ per window pair, which may become prohibitive at
+exchange throughput scale without approximate nearest-neighbour
+optimisation. Off-chain Lightning Network activity falls
+outside the scope of the current pipeline.
+
+The shortest-path-to-illicit feature requires a confirmed
+set of illicit seed nodes from which breadth-first distances
+are computed. In operational deployment, intelligence agencies
+may lack a comprehensive confirmed-illicit seed set,
+particularly for novel mixing services without prior
+law-enforcement attribution. Under this condition, the
+feature's discriminative power would degrade proportionally
+to the completeness and recency of the available seed labels.
+
+Reported classification metrics reflect a single experimental
+run with fixed random seed (seed~42). Multi-seed variance
+analysis across five or more runs would provide tighter
+confidence bounds on the reported F1 differences, and is
+identified as a priority extension before deployment
+evaluation.
 
 \subsection{Ethical Considerations}
 
