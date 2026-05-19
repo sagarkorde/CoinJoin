@@ -54,6 +54,7 @@
             pdfauthor={Sagar Korde et al.}]{hyperref}
 \usepackage{url}
 \usepackage{xurl}          % allows line-breaks anywhere in URLs/DOIs
+\usepackage[authoryear,round]{natbib}  % author-year citations: \citet / \citep
 
 %% ── Line spacing ─────────────────────────────────────────────
 \usepackage{setspace}
@@ -160,19 +161,19 @@ has placed blockchain forensics at the centre of contemporary
 financial intelligence practice. Anti-money laundering
 researchers have documented systematic weaknesses in current
 blockchain monitoring tools that struggle with large-scale
-illicit fund tracing~\cite{lo2023}, and the integration of
+illicit fund tracing~\citep{lo2023}, and the integration of
 federated learning approaches for cryptocurrency fraud
 detection has identified similar gaps in distributed
-forensic systems~\cite{ahmed2024fed}. A systematic review of
+forensic systems~\citep{ahmed2024fed}. A systematic review of
 machine learning methods for financial fraud detection
 covering 94 primary studies identifies class imbalance,
 temporal graph evolution, and exploitation of unlabelled data
-as the three most critical open challenges~\cite{motie2024}.
+as the three most critical open challenges~\citep{motie2024}.
 
 Bitcoin operates on a transparent public ledger through a
 pseudonymous unspent transaction output (UTXO) model in
 which every transaction maps a set of input addresses to
-output addresses. CoinJoin~\cite{ouyang2024btc} disrupts the
+output addresses. CoinJoin~\citep{ouyang2024btc} disrupts the
 primary clustering heuristic used by investigators by enabling
 multiple independent parties to collaboratively construct a
 single transaction that merges their UTXOs, severing the
@@ -180,7 +181,7 @@ fund-flow trail that the Common Input Ownership Heuristic
 (CIOH) relies upon. Quantitative analysis of CoinJoin
 participation in the Bitcoin network confirms that multi-round
 mixing substantially reduces CIOH clustering
-confidence~\cite{coinjoin2024tdsc}. Privacy-focused wallets
+confidence~\citep{coinjoin2024tdsc}. Privacy-focused wallets
 including Wasabi and JoinMarket have processed hundreds of
 millions of dollars through CoinJoin coordination, making
 automated deanonymization a statutory priority for financial
@@ -198,11 +199,11 @@ Schnorr signatures and key aggregation. A single-user P2TR
 output is computationally indistinguishable on-chain from a
 multi-party aggregated output used in CoinJoin coordination,
 causing naive CIOH clustering to generate systematic false
-positives~\cite{lee2024}. Even before Taproot, multi-input
+positives~\citep{lee2024}. Even before Taproot, multi-input
 P2WPKH transactions share structural properties with
 CoinJoin outputs, making the clustering problem inherent to
 the UTXO model rather than exclusive to a single script
-type~\cite{asiri2025}. The present study evaluates the
+type~\citep{asiri2025}. The present study evaluates the
 structural clustering solution on pre-Taproot P2WPKH
 proxies; validation on live P2TR transactions is identified
 as a necessary future extension.
@@ -212,19 +213,19 @@ CoinJoin Spending Transaction (CST) deanonymization requires
 linking the outputs of a mixing event to the subsequent
 spending transactions of participants. The only published
 similarity metric for this task applies a Chamfer distance
-over timestamps alone~\cite{chen2025multi}, leaving fee-rate
+over timestamps alone~\citep{chen2025multi}, leaving fee-rate
 behaviour, input multiplicity, and output cardinality as
 unexploited structural signals.
 
 \textbf{Gap~3 -- Class Imbalance in Graph-Based Detection.}
-The Elliptic Bitcoin Dataset~\cite{fan2024gnn}, the canonical
+The Elliptic Bitcoin Dataset~\citep{fan2024gnn}, the canonical
 benchmark for illicit node detection, contains 4,545 illicit
 and 42,019 licit labelled transactions, a 9.2:1
 licit-to-illicit imbalance. Graph classifiers suppress
 minority-class predictions to maximise overall accuracy,
 producing illicit F1-scores below 0.50 in published
 configurations that apply neither self-supervised pre-training
-nor class-specific loss weighting~\cite{alarab2024}. The 157,205 unlabelled
+nor class-specific loss weighting~\citep{alarab2024}. The 157,205 unlabelled
 nodes represent structural information that supervised
 methods discard.
 
@@ -337,7 +338,7 @@ dependencies that local message-passing GNNs miss.
 
 \subsection{Self-Supervised Graph Representation Learning}
 
-Deep Graph Infomax (DGI)~\cite{velickovic2019dgi} frames
+Deep Graph Infomax (DGI)~\citep{velickovic2019dgi} frames
 graph representation learning as a mutual information
 maximisation problem between local node embeddings and a
 global graph summary, enabling pre-training on unlabelled
@@ -647,7 +648,7 @@ positives that scale with P2TR adoption.
 \subsubsection{Structural DBSCAN Clustering}
 
 The proposed method clusters transactions using
-DBSCAN~\cite{ester1996} on the six-dimensional structural
+DBSCAN~\citep{ester1996} on the six-dimensional structural
 feature vector defined in Equation~\eqref{eq:psi}.
 This equation represents the combined structural behaviour
 profile of a transaction, encoding UTXO topology,
@@ -682,7 +683,7 @@ majority vote over ground-truth labels of cluster members.
 
 \subsubsection{Phase 1: Deep Graph Infomax Pre-Training}
 
-The MixTrace graph encoder~\cite{velickovic2019dgi} is a
+The MixTrace graph encoder~\citep{velickovic2019dgi} is a
 two-layer GCN that maps the node feature matrix to an
 embedding space. Equation~\eqref{eq:gcn1} represents the
 first-layer GCN transformation, applying the normalised
@@ -755,7 +756,7 @@ confirming stable learning throughout pre-training.
 
 \subsubsection{Phase 2: Graph Attention Network Fine-Tuning}
 
-The MixTrace GAT architecture~\cite{velickovic2018gat}
+The MixTrace GAT architecture~\citep{velickovic2018gat}
 processes the full 169-dimensional feature matrix through
 two attention layers. The first layer uses eight parallel
 attention heads with concatenated outputs; the second
@@ -813,7 +814,7 @@ synthesis protocol documented by~\citet{tekkali2024}.
 \label{sec:data}
 
 \paragraph{Elliptic Bitcoin Dataset.}
-The Elliptic dataset~\cite{weber2019} comprises 203,769
+The Elliptic dataset~\citep{weber2019} comprises 203,769
 Bitcoin transaction nodes across 49 weekly time steps with
 165 features: 93 local transaction features and 72
 aggregated one-hop neighbourhood features. Class
@@ -957,7 +958,7 @@ exhibits degenerate high-recall, low-precision behaviour
 (recall 0.995, precision 0.113, F1 0.204), confirming that
 graph attention layers alone collapse to near-unconditional
 positive prediction without structural pre-training context
-under the 9.2:1 imbalance ratio~\cite{alarab2024}.
+under the 9.2:1 imbalance ratio~\citep{alarab2024}.
 
 Figure~\ref{fig:pr_curves} shows the precision-recall curves
 for all methods, demonstrating that MixTrace maintains
@@ -1299,7 +1300,7 @@ of~\citet{fan2024gnn}. K-Means exhibits a degenerate
 all-positive bias with precision of 0.046, confirming that
 unsupervised clustering without graph structure cannot
 discriminate illicit patterns at this imbalance
-level~\cite{xiao2025}.
+level~\citep{xiao2025}.
 
 \subsection{False-Positive Reduction in Structural Clustering}
 
@@ -1309,10 +1310,10 @@ eliminates over 5,200 incorrect attributions across the
 exchange compliance contexts, each false attribution
 represents a potential unjustified account freeze,
 regulatory filing, or investigative resource allocation
-error~\cite{lee2024}. The silhouette score of 0.973 is computed on the
+error~\citep{lee2024}. The silhouette score of 0.973 is computed on the
 30,000-transaction stratified subsample that DBSCAN was
 fitted on, excluding noise-labelled points as is standard
-practice~\cite{futureinternet2025}. This score confirms
+practice~\citep{futureinternet2025}. This score confirms
 that the six-dimensional structural feature space defined
 in Equation~\eqref{eq:psi} creates genuinely separable
 cluster geometry within the fitted partition, and does
@@ -1341,7 +1342,7 @@ is theoretically principled: it would yield measurable
 improvement in corpora where participants execute post-mix
 spending across multiple days, time-locked scripts, or
 multi-round coordination protocols that break temporal
-clustering~\cite{chen2025multi}. Empirically testing this
+clustering~\citep{chen2025multi}. Empirically testing this
 claim on temporally dispersed datasets is identified as
 a priority future direction. The contribution of the MD-CD
 section in the present study is therefore the identification
@@ -1378,7 +1379,7 @@ Risk-Based Approach to Virtual Assets and Virtual Asset
 Service Providers'' (FATF, October 2021), require virtual
 asset service providers (VASPs) to implement risk-based
 transaction monitoring capable of identifying mixing
-services and suspicious spending patterns~\cite{lo2023}.
+services and suspicious spending patterns~\citep{lo2023}.
 MixTrace's illicit-class recall of 0.760 represents a
 meaningful improvement over the 0.471 recall of the best
 conventional baseline (Random Forest), translating directly
@@ -1428,7 +1429,7 @@ Future deployments should implement human-review
 checkpoints before any automated attribution triggers
 account-level consequences, consistent with
 proportionality principles in anti-money laundering
-regulation~\cite{coinjoin2024tdsc}.
+regulation~\citep{coinjoin2024tdsc}.
 
 \textbf{Admissibility and forensic standards.}
 Machine-learning-based blockchain attribution introduced
@@ -1448,7 +1449,7 @@ satisfies the error-rate transparency requirement. In
 jurisdictions applying the Frye ``general acceptance''
 standard, the adoption of Graph Attention Networks and
 DBSCAN clustering by the broader blockchain forensics
-community~\cite{motie2024,futureinternet2025} supports
+community~\citep{motie2024,futureinternet2025} supports
 general acceptance.
 
 \textbf{Automated decision-making and privacy rights.}
@@ -1505,7 +1506,7 @@ The analysis is conducted entirely on publicly available
 pseudonymous on-chain data. No personally identifiable
 information is processed or stored. Elliptic dataset labels
 were provided by a regulated blockchain analytics provider
-whose methodology has been independently reviewed~\cite{weber2019}.
+whose methodology has been independently reviewed~\citep{weber2019}.
 The methodology is intended to support financial intelligence,
 exchange compliance, and law-enforcement practitioners in
 identifying potential illicit flows, consistent with
@@ -1554,7 +1555,7 @@ and Frye evidentiary standards are analysed in Section~5.
 Three directions for future research are identified. First,
 inductive DGI variants supporting mini-batch processing
 would extend the framework to streaming blockchain data at
-exchange scale~\cite{chithanuru2025}. Second, integration
+exchange scale~\citep{chithanuru2025}. Second, integration
 with Lightning Network routing graphs would enable off-chain
 mixing detection alongside on-chain analysis. Third,
 federated graph training across multiple exchange compliance
@@ -1598,21 +1599,21 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
 % ─────────────────────────────────────────────────────────────
 \begin{thebibliography}{30}
 
-\bibitem{lo2023}
+\bibitem[Lo et~al.(2023)]{lo2023}
   Lo, S.K., Xu, X., Chiam, Y.K., Lu, Q.:
   Inspection of Machine Learning Methods Applied to
   Blockchain-Based Anti-Money Laundering.
   \textit{IEEE Access} \textbf{11}, 15114--15129 (2023).
   \url{https://doi.org/10.1109/ACCESS.2023.3244700}
 
-\bibitem{ahmed2024fed}
+\bibitem[Ahmed and Alabi(2024)]{ahmed2024fed}
   Ahmed, A.A., Alabi, O.O.:
   Secure and Scalable Blockchain-Based Federated Learning
   for Cryptocurrency Fraud Detection: A Systematic Review.
   \textit{IEEE Access} \textbf{12}, 102219--102241 (2024).
   \url{https://doi.org/10.1109/ACCESS.2024.3453288}
 
-\bibitem{motie2024}
+\bibitem[Motie and Raahemi(2024)]{motie2024}
   Motie, S., Raahemi, B.:
   Financial Fraud Detection Using Graph Neural Networks:
   A Systematic Review.
@@ -1620,14 +1621,14 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   122156 (2024).
   \url{https://doi.org/10.1016/j.eswa.2023.122156}
 
-\bibitem{ouyang2024btc}
+\bibitem[Ouyang et~al.(2024)]{ouyang2024btc}
   Ouyang, S., Bai, Q., Feng, H., Hu, B.:
   Bitcoin Money Laundering Detection via Subgraph
   Contrastive Learning.
   \textit{Entropy} \textbf{26}(3), 211 (2024).
   \url{https://doi.org/10.3390/e26030211}
 
-\bibitem{coinjoin2024tdsc}
+\bibitem[Kappos et~al.(2024)]{coinjoin2024tdsc}
   Kappos, G., Yousaf, H., Piotrowska, A.M., Kanjalkar, S.,
   Noether, S., Miller, A., Meiklejohn, S.:
   Reducing Privacy of CoinJoin Transactions: Quantitative
@@ -1636,21 +1637,21 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   (2024).
   \url{https://doi.org/10.1109/TDSC.2024.3353803}
 
-\bibitem{lee2024}
+\bibitem[Lee et~al.(2024)]{lee2024}
   Lee, S., Kim, J., Park, C., Jung, W.:
   CENSor: Detecting Illicit Bitcoin Operation via
   GCN-Based Hyperedge Classification.
   \textit{IEEE Access} \textbf{12} (2024).
   \url{https://doi.org/10.1109/ACCESS.2024.3466650}
 
-\bibitem{asiri2025}
+\bibitem[Asiri and Somasundaram(2025)]{asiri2025}
   Asiri, A., Somasundaram, K.:
   Graph Convolution Network for Fraud Detection in
   Bitcoin Transactions.
   \textit{Scientific Reports} \textbf{15}, 11076 (2025).
   \url{https://doi.org/10.1038/s41598-025-95672-w}
 
-\bibitem{chen2025multi}
+\bibitem[Chen et~al.(2025)]{chen2025multi}
   Chen, S., Li, M., Zhang, T., Yang, F.:
   Multi-Distance Spatial-Temporal Graph Neural Network
   for Anomaly Detection in Blockchain Transactions.
@@ -1658,7 +1659,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   (2025).
   \url{https://doi.org/10.1002/aisy.202400898}
 
-\bibitem{fan2024gnn}
+\bibitem[Fan et~al.(2024)]{fan2024gnn}
   Fan, Z., Xu, G., Li, C., Mao, J.:
   Graph Neural Networks for Financial Fraud Detection:
   A Review.
@@ -1666,7 +1667,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   409007 (2024).
   \url{https://doi.org/10.1007/s11704-024-40474-y}
 
-\bibitem{alarab2024}
+\bibitem[Alarab and Prakoonwit(2024)]{alarab2024}
   Alarab, I., Prakoonwit, S.:
   Robust Recurrent Graph Convolutional Network Approach
   Based Sequential Prediction of Illicit Transactions in
@@ -1675,14 +1676,14 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   58449--58464 (2024).
   \url{https://doi.org/10.1007/s11042-023-17323-4}
 
-\bibitem{globalloc2025}
+\bibitem[Li et~al.(2025)]{globalloc2025}
   Li, Z., Wang, Y., Zhang, S., Chen, H.:
   Global-Local Graph Attention with Cyclic Pseudo-Labels
   for Bitcoin Anti-Money Laundering Detection.
   \textit{Scientific Reports} (2025).
   \url{https://doi.org/10.1038/s41598-025-08365-9}
 
-\bibitem{xiao2025}
+\bibitem[Xiao and Yin(2025)]{xiao2025}
   Xiao, B., Yin, W.:
   Balanced-BiEGCN: A Bidirectional EvolveGCN with a
   Class-Balanced Learning Network for Dynamic Anomaly
@@ -1690,7 +1691,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Entropy} \textbf{27}(10), 1045 (2025).
   \url{https://doi.org/10.3390/e27101045}
 
-\bibitem{futureinternet2025}
+\bibitem[Hassija et~al.(2025)]{futureinternet2025}
   Hassija, V., Chamola, V., Bajpai, B.C., Saxena, V.:
   Fraud Detection in Cryptocurrency Networks: An
   Exploration Using Anomaly Detection and Heterogeneous
@@ -1698,7 +1699,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Future Internet} \textbf{17}(1), 44 (2025).
   \url{https://doi.org/10.3390/fi17010044}
 
-\bibitem{kiani2024}
+\bibitem[Kiani and Sheng(2024)]{kiani2024}
   Kiani, R., Sheng, V.S.:
   Ethereum Smart Contract Vulnerability Detection and
   Machine Learning-Driven Solutions: A Systematic
@@ -1706,7 +1707,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Electronics} \textbf{13}(12), 2295 (2024).
   \url{https://doi.org/10.3390/electronics13122295}
 
-\bibitem{chen2024}
+\bibitem[Chen et~al.(2024)]{chen2024}
   Chen, Z., Liu, S.-Z., Huang, J., Xiu, Y.-H., Zhang, H.,
   Long, H.-X.:
   Ethereum Phishing Scam Detection Based on Data
@@ -1715,7 +1716,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Sensors} \textbf{24}(12), 4022 (2024).
   \url{https://doi.org/10.3390/s24124022}
 
-\bibitem{choi2024}
+\bibitem[Choi and Buu(2024)]{choi2024}
   Choi, J., Buu, H.-J.:
   Learning to Traverse Cryptocurrency Transaction Graphs
   Based on Transformer Network for Phishing Scam
@@ -1723,7 +1724,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Electronics} \textbf{13}(7), 1298 (2024).
   \url{https://doi.org/10.3390/electronics13071298}
 
-\bibitem{velickovic2019dgi}
+\bibitem[Veli\v{c}kovi\'{c} et~al.(2019)]{velickovic2019dgi}
   Veli\v{c}kovi\'{c}, P., Fedus, W., Hamilton, W.L.,
   Li\`{o}, P., Bengio, Y., Hjelm, R.D.:
   Deep Graph Infomax.
@@ -1731,7 +1732,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   Representations (ICLR)} (2019).
   \url{https://openreview.net/forum?id=rklz9iAcKQ}
 
-\bibitem{graphanomaly2024}
+\bibitem[Wang et~al.(2024)]{graphanomaly2024}
   Wang, Z., Liu, S., Guo, X., Tian, Y.:
   Graph Anomaly Detection with Disentangled Prototypical
   Autoencoder for Phishing Scam Detection in
@@ -1739,7 +1740,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{IEEE Access} \textbf{12} (2024).
   \url{https://doi.org/10.1109/ACCESS.2024.3571963}
 
-\bibitem{wei2025}
+\bibitem[Wei and Lee(2025)]{wei2025}
   Wei, S., Lee, S.:
   Internet Fraud Transaction Detection Based on
   Temporal-Aware Heterogeneous Graph Oversampling and
@@ -1747,7 +1748,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{PLOS ONE} \textbf{20}(12), e0337208 (2025).
   \url{https://doi.org/10.1371/journal.pone.0337208}
 
-\bibitem{baabdullah2024}
+\bibitem[Baabdullah et~al.(2024)]{baabdullah2024}
   Baabdullah, T., Alzahrani, A., Rawat, D.B., Liu, C.:
   Efficiency of Federated Learning and Blockchain in
   Preserving Privacy and Enhancing Performance of
@@ -1755,7 +1756,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Future Internet} \textbf{16}(6), 196 (2024).
   \url{https://doi.org/10.3390/fi16060196}
 
-\bibitem{tekkali2024}
+\bibitem[Tekkali and Natarajan(2024)]{tekkali2024}
   Tekkali, C.G., Natarajan, K.:
   An Advancement in AdaSyn for Imbalanced Learning:
   An Application to Fraud Detection in Digital
@@ -1764,7 +1765,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textbf{46}(4), 9061--9073 (2024).
   \url{https://doi.org/10.3233/JIFS-236392}
 
-\bibitem{creditadasyn2024}
+\bibitem[Patel et~al.(2024)]{creditadasyn2024}
   Patel, D., Shah, R., Mehta, K.:
   Credit Card Fraud Detection with ADASYN Oversampling
   and SHAP-Based Interpretability: A Comparative
@@ -1773,7 +1774,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   Communication and Control (ICCCR)} (2024).
   \url{https://doi.org/10.1109/ICCCR61385.2024.10726779}
 
-\bibitem{albalawi2025}
+\bibitem[Albalawi and Dardouri(2025)]{albalawi2025}
   Albalawi, T., Dardouri, S.:
   Enhancing Credit Card Fraud Detection Using Traditional
   and Deep Learning Models with Class Imbalance
@@ -1781,7 +1782,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Frontiers in Artificial Intelligence} (2025).
   \url{https://doi.org/10.3389/frai.2025.1643292}
 
-\bibitem{chithanuru2025}
+\bibitem[Chithanuru and Ramaiah(2025)]{chithanuru2025}
   Chithanuru, V., Ramaiah, M.:
   Proactive Detection of Anomalous Behaviour in Ethereum
   Accounts Using XAI-Enabled Ensemble Stacking with
@@ -1789,21 +1790,21 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{PeerJ Computer Science} (2025).
   \url{https://doi.org/10.7717/peerj-cs.2630}
 
-\bibitem{gu2025}
+\bibitem[Gu and Dib(2025)]{gu2025}
   Gu, Z., Dib, O.:
   Enhancing Fraud Detection in the Ethereum Blockchain
   Using Ensemble Learning.
   \textit{PeerJ Computer Science} (2025).
   \url{https://doi.org/10.7717/peerj-cs.2716}
 
-\bibitem{ethereum2025xai}
+\bibitem[Nguyen et~al.(2025)]{ethereum2025xai}
   Nguyen, M.H., Le, T.T.H., Nguyen, D.L., Tran, T.N.:
   Near Real-Time Ethereum Fraud Detection Using
   Explainable AI in Blockchain Networks.
   \textit{Applied Sciences} \textbf{15}(19), 10841 (2025).
   \url{https://doi.org/10.3390/app151910841}
 
-\bibitem{ester1996}
+\bibitem[Ester et~al.(1996)]{ester1996}
   Ester, M., Kriegel, H.-P., Sander, J., Xu, X.:
   A Density-Based Algorithm for Discovering Clusters in
   Large Spatial Databases with Noise.
@@ -1811,7 +1812,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   Conference on Knowledge Discovery and Data Mining
   (KDD)}, pp.\ 226--231. AAAI Press (1996).
 
-\bibitem{velickovic2018gat}
+\bibitem[Veli\v{c}kovi\'{c} et~al.(2018)]{velickovic2018gat}
   Veli\v{c}kovi\'{c}, P., Cucurull, G., Casanova, A.,
   Romero, A., Li\`{o}, P., Bengio, Y.:
   Graph Attention Networks.
@@ -1819,7 +1820,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   Representations (ICLR)} (2018).
   \url{https://openreview.net/forum?id=rJXMpikCZ}
 
-\bibitem{weber2019}
+\bibitem[Weber et~al.(2019)]{weber2019}
   Weber, M., Domeniconi, G., Chen, J., Weidele, D.K.I.,
   Bellei, C., Robinson, T., Leiserson, C.E.:
   Anti-Money Laundering in Bitcoin: Experimenting with
@@ -1828,7 +1829,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   Finance} (2019).
   arXiv:1908.02591
 
-\bibitem{bellei2024}
+\bibitem[Bellei et~al.(2024)]{bellei2024}
   Bellei, C., Ruiz, M., Robinson, T., Saunders, M.,
   Weber, M.:
   The Shape of Money Laundering: Subgraph Representation
