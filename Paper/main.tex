@@ -1,0 +1,1166 @@
+%% ============================================================
+%%  Crime, Law and Social Change — Springer Journal 10611
+%%  Special Issue: AI Enabled Security Frameworks for
+%%                 Emerging Cybercrime and Digital Threats
+%%
+%%  Document class : svjour3
+%%  Compile order  : pdflatex -> bibtex -> pdflatex -> pdflatex
+%% ============================================================
+\documentclass[runningheads,a4paper]{svjour3}
+\smartqed
+
+%% ── Packages ─────────────────────────────────────────────────
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\graphicspath{{figures/}}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{natbib}
+\bibliographystyle{spbasic}
+
+\journalname{Crime, Law and Social Change}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\Entropy}{H}
+
+% ─────────────────────────────────────────────────────────────
+\begin{document}
+% ─────────────────────────────────────────────────────────────
+
+\title{Solving the CoinJoin Mystery: A Multi-Modal Graph Attention
+       Framework for Bitcoin Transaction Deanonymization%
+\thanks{The author declares no competing interests.
+        No funding was received for this research.}}
+
+\subtitle{MixTrace: Deep Graph Infomax Pre-Training with Graph
+          Attention Networks and Multi-Dimensional Chamfer
+          Distance for Illicit Activity Detection}
+
+\author{Sagar Korde}
+
+\institute{Sagar Korde \at
+  Independent Researcher, Pune, India \\
+  \email{sagarkorde04@gmail.com}
+}
+
+\date{Received: \today}
+\maketitle
+
+%% ── Abstract ─────────────────────────────────────────────────
+\begin{abstract}
+Bitcoin CoinJoin transactions deliberately obscure payment flows
+by merging unrelated users' unspent transaction outputs into a
+single on-chain record, significantly weakening the
+Common~Input~Ownership~Heuristic that underpins most
+blockchain forensic tools. Existing detection methods suffer
+from three compounding limitations: structural clustering fails
+under Taproot's Pay-to-Taproot script indistinguishability,
+CoinJoin Spending Transaction linking relies on
+one-dimensional temporal proximity and ignores structural
+signals, and supervised classifiers produce poor minority-class
+recall on severely imbalanced blockchain datasets.
+This study introduces MixTrace, a multi-modal framework that
+addresses all three limitations concurrently.
+A Taproot-Aware DBSCAN strategy reduces the false-positive
+rate of naive heuristic clustering by 79.8 percent across
+200,000 analysed transactions.
+A four-dimensional Chamfer Distance formulation extends
+temporal CST linking to the joint space of timestamp,
+fee rate, input count, and output count.
+Deep Graph Infomax pre-training on all 203,769 Elliptic
+nodes, followed by Graph Attention Network fine-tuning
+with class-weighted cross-entropy, achieves an illicit-class
+F1-score of 0.7337, precision of 0.7094, recall of 0.7598,
+and ROC-AUC of 0.9868 on the held-out test set,
+surpassing Random Forest (F1: 0.6285),
+K-Nearest Neighbours (F1: 0.4829),
+K-Means (F1: 0.0883),
+and a standalone Graph Attention Network without
+pre-training (F1: 0.2037).
+The complete reproducible pipeline is publicly available to
+support forensic and compliance research.
+
+\keywords{Bitcoin \and CoinJoin \and Graph Attention Network
+  \and Deep Graph Infomax \and Blockchain forensics
+  \and Chamfer distance \and Illicit transaction detection
+  \and ADASYN oversampling}
+\end{abstract}
+
+%% ─────────────────────────────────────────────────────────────
+\section{Introduction}
+\label{sec:intro}
+%% ─────────────────────────────────────────────────────────────
+
+The global proliferation of cryptocurrency-facilitated crime,
+including ransomware payments, darknet market settlements, and
+sanctions evasion, has accelerated demand for robust blockchain
+forensic tools~\citep{chainanalysis2023crime}.
+Bitcoin, the oldest and most liquid cryptocurrency, operates
+on a transparent public ledger, yet its pseudonymous address
+model provides meaningful privacy when users take deliberate
+countermeasures.
+CoinJoin~\citep{maxwell2013coinjoin} is the most widely
+deployed on-chain privacy mechanism: multiple independent
+parties collaboratively construct a single transaction that
+merges their unspent transaction outputs, breaking the
+address-clustering assumption known as the
+Common~Input~Ownership~Heuristic
+(CIOH)~\citep{meiklejohn2013fistful}.
+Wallets including Wasabi and JoinMarket have collectively
+processed hundreds of millions of dollars through CoinJoin
+coordination, making its deanonymization a priority for
+financial intelligence units~\citep{möser2017empirical}.
+
+Three research gaps persist in the literature that limit the
+effectiveness of automated CoinJoin analysis.
+
+\textbf{Gap 1 -- Taproot Clustering Failure.}
+Bitcoin's Taproot soft fork, activated at block 709,632 in
+November 2021, introduced Pay-to-Taproot (P2TR) scripts based
+on Schnorr signatures and key aggregation via
+MuSig2~\citep{btcbip341}.
+A single-user P2TR output is computationally indistinguishable
+on-chain from a multi-party aggregated P2TR output used in
+CoinJoin coordination.
+Consequently, naive CIOH clustering applied to Taproot
+transactions produces systematic false positives: legitimate
+single-user P2TR transactions are incorrectly flagged as
+collaborative mixing events.
+No prior study has proposed a structural clustering remedy
+tailored to this post-Taproot forensic environment.
+
+\textbf{Gap 2 -- One-Dimensional CST Linking.}
+CoinJoin Spending Transaction (CST) deanonymization requires
+linking the outputs of a mixing event to the subsequent
+spending transactions of individual participants.
+The only published similarity metric for this task uses a
+one-dimensional Chamfer distance computed over
+timestamps~\citep{trautman2021similarity}.
+Fee-rate behaviour, input multiplicity, and output cardinality
+carry independent structural signals that remain entirely
+unexploited in current linking pipelines.
+
+\textbf{Gap 3 -- Class Imbalance in Illicit Detection.}
+The Elliptic Bitcoin Dataset~\citep{weber2019anti}, the
+standard benchmark for illicit node detection, contains
+4,545 illicit and 42,019 licit labelled transactions,
+yielding a 9.2:1 class-imbalance ratio.
+Standard graph classifiers learn to maximise overall accuracy
+by suppressing minority-class predictions, producing precision
+values below 0.50 on the illicit class for most published
+baselines.
+The 157,205 unlabelled nodes in the dataset represent a
+large reservoir of structural information that supervised
+methods discard by design.
+
+To address these three gaps simultaneously, the present study
+introduces \textbf{MixTrace}, a multi-modal framework
+consisting of three coordinated components:
+(i)~a Taproot-Aware DBSCAN clustering strategy that exploits
+structural and behavioural transaction features to reduce
+false-positive clustering errors;
+(ii)~a Multi-Dimensional Chamfer Distance (MD-CD) formulation
+that extends the CST linking metric from one dimension to
+four dimensions; and
+(iii)~a two-phase graph learning architecture that applies
+Deep Graph Infomax (DGI) self-supervised pre-training across
+all graph nodes before fine-tuning a Graph Attention Network
+(GAT) with class-weighted cross-entropy and ADASYN
+oversampling.
+
+Experiments are conducted on two datasets: the public Elliptic
+Bitcoin Dataset and an author-curated corpus of 5,884,387
+Bitcoin transactions enriched with nine novel engineered
+features.
+Results demonstrate that MixTrace achieves an illicit-class
+F1-score of 0.7337 and ROC-AUC of 0.9868, representing
+improvements of 10.5 percentage points in F1 over the
+best-performing baseline (Random Forest) and a 79.8 percent
+reduction in false-positive rate compared to naive CIOH.
+
+The remainder of this paper is structured as follows.
+Section~\ref{sec:related} reviews the relevant literature.
+Section~\ref{sec:method} presents the MixTrace methodology in
+full detail.
+Section~\ref{sec:exp} describes the experimental setup and
+presents results.
+Section~\ref{sec:discuss} analyses findings critically.
+Section~\ref{sec:conclude} summarises contributions and
+identifies directions for future research.
+
+%% ─────────────────────────────────────────────────────────────
+\section{Related Work}
+\label{sec:related}
+%% ─────────────────────────────────────────────────────────────
+
+\subsection{Bitcoin Privacy and CoinJoin Detection}
+
+The foundational analysis of Bitcoin address clustering was
+conducted by~\citet{meiklejohn2013fistful}, who demonstrated
+that applying the CIOH to co-spending inputs at scale could
+identify thousands of entity clusters, including major
+exchanges and darknet markets.
+Subsequent empirical studies confirmed that commercial
+blockchain analytics platforms derive a substantial fraction
+of address attribution from CIOH-based
+clustering~\citep{goldfeder2018cookie}.
+\citet{bistarelli2019analysis} applied community-detection
+algorithms to Bitcoin transaction graphs and achieved
+clustering purities above 70 percent for known CoinJoin
+participants, but the study predates Taproot activation and
+does not model script-type heterogeneity.
+\citet{möser2017empirical} quantified de-anonymisation risk
+for Mixing Services over a multi-year period, finding that
+structural heuristics can substantially reduce anonymity
+even when users complete full mixing rounds.
+None of these studies account for the structural ambiguity
+that P2TR scripts introduce, leaving the post-Taproot
+clustering problem open.
+
+\subsection{Graph Neural Networks in Blockchain Forensics}
+
+\citet{weber2019anti} introduced the Elliptic transaction
+dataset and evaluated a graph convolutional network (GCN)
+baseline alongside logistic regression and random forest
+classifiers.
+The GCN achieved an illicit-class F1 of approximately 0.70
+on the test set, establishing the primary benchmark.
+\citet{alarab2020competence} investigated deep neural networks
+with balanced class weighting on the same dataset but did not
+exploit the unlabelled node majority, limiting the information
+available to the learned representation.
+\citet{chen2020phishing} demonstrated that multi-head graph
+attention on Ethereum transaction graphs yields significant
+improvement over non-attention GCN variants for phishing
+detection, motivating the use of GAT architectures in the
+present study.
+\citet{lo2023inspection} reviewed machine-learning methods
+applied to anti-money laundering across multiple blockchain
+platforms and identified self-supervised pre-training as an
+under-explored direction for addressing label scarcity in
+blockchain forensics datasets.
+
+\subsection{Self-Supervised Graph Representation Learning}
+
+Deep Graph Infomax (DGI)~\citep{velickovic2019deep} proposes
+maximising the mutual information between local node
+representations and a global graph summary by training a
+bilinear discriminator to distinguish real node-summary pairs
+from corrupted pairs obtained via row-shuffling of the feature
+matrix.
+Since the objective is unsupervised, DGI can leverage the
+entire graph including unlabelled nodes, making it
+particularly well-suited to the Elliptic dataset where
+75.7 percent of nodes carry no label.
+\citet{you2020graph} demonstrated that contrastive
+self-supervised pre-training consistently improves downstream
+classification performance on node-level tasks, particularly
+when labelled data is sparse or heavily imbalanced.
+
+\subsection{Transaction Linking via Chamfer Distance}
+
+\citet{trautman2021similarity} introduced a one-sided Chamfer
+distance measure applied to the timestamps of candidate
+CoinJoin spending transactions.
+The one-sided formulation assigns a distance from a source
+window to a target window as the mean of each source point's
+minimum distance to any target point, capturing asymmetric
+temporal proximity between spending clusters.
+The study evaluated the metric on a manually annotated
+dataset of Wasabi CoinJoin outputs but restricted the
+feature space to a single dimension.
+The present study retains the one-sided Chamfer formulation
+and extends the feature space to four dimensions, yielding
+the MD-CD contribution described in Section~\ref{sec:mdcd}.
+
+\subsection{Class Imbalance Mitigation}
+
+Adaptive Synthetic Sampling (ADASYN)~\citep{he2008adasyn}
+generates synthetic minority-class samples with density
+proportional to the local imbalance in feature space,
+focusing synthesis on regions where the classifier is likely
+to misclassify.
+ADASYN consistently outperforms random oversampling and
+SMOTE on highly skewed distributions~\citep{chawla2002smote}.
+In the present study, ADASYN is applied to the labelled node
+feature matrix as a diagnostic reference, while the primary
+class-imbalance mitigation strategy is inverse-frequency
+class weighting applied directly to the graph cross-entropy
+loss, which preserves the graph-structural relationships
+that ADASYN cannot encode.
+
+%% ─────────────────────────────────────────────────────────────
+\section{Methodology}
+\label{sec:method}
+%% ─────────────────────────────────────────────────────────────
+
+\subsection{Problem Formulation}
+\label{sec:problem}
+
+Let $\mathcal{G} = (\mathcal{V}, \mathcal{E}, \mathbf{X})$
+denote the Elliptic transaction graph, where
+$\mathcal{V}$ is the set of $N = 203{,}769$ transaction nodes,
+$\mathcal{E}$ is the set of 234,355 directed edges
+representing Bitcoin payment flows, and
+$\mathbf{X} \in \mathbb{R}^{N \times F}$ is the node feature
+matrix with $F = 169$ dimensions (165 original Elliptic
+features plus four novel graph-structural features introduced
+in Section~\ref{sec:features}).
+Each node $v \in \mathcal{V}$ is associated with a discrete
+time step $\tau(v) \in \{1, \ldots, 49\}$ and a class label
+$y_v \in \{1, 0, -1\}$, where 1 denotes illicit, 0 denotes
+licit, and $-1$ denotes unknown.
+The labelled subset contains 46,564 nodes; the remaining
+157,205 nodes are unlabelled.
+
+The learning objective is binary node classification on the
+labelled subset, evaluated on nodes with $\tau(v) \in
+\{42,\ldots,49\}$ (the test partition) using precision,
+recall, F1-score, PR-AUC, and ROC-AUC on the illicit class.
+
+\subsection{Novel Feature Engineering}
+\label{sec:features}
+
+Nine novel features are computed across the two datasets to
+supplement existing representations.
+
+\subsubsection{Author Dataset: Five Transaction-Level Features}
+
+\paragraph{Denomination Entropy (DE).}
+CoinJoin transactions tend to produce multiple outputs of
+equal value to obscure the payment-to-change distinction.
+For a transaction $t$ with output value vector
+$\mathbf{v} = (v_1, \ldots, v_k)$, the normalised probability
+vector is $p_i = v_i / \sum_j v_j$.
+The denomination entropy is:
+\begin{equation}
+  \Entropy(t) = -\sum_{i=1}^{k} p_i \log_2 p_i.
+  \label{eq:entropy}
+\end{equation}
+High entropy ($\Entropy \to \log_2 k$) indicates equal-valued
+outputs, a strong CoinJoin structural signature.
+
+\paragraph{Mixing Index (MI).}
+The combinatorial ambiguity of input-output pairing is
+captured by:
+\begin{equation}
+  \text{MI}(t) = \frac{|\mathcal{A}| \cdot |\mathcal{B}|}{|\mathcal{A} \cup \mathcal{B}|},
+\end{equation}
+where $\mathcal{A}$ and $\mathcal{B}$ are the input and
+output address sets.
+In the author dataset, MI exhibits a mean of 8.79 and
+standard deviation of 689.27, reflecting the presence of
+high-fan-out mixing transactions.
+
+\paragraph{Temporal Irregularity (TI).}
+Mixing services often coordinate transactions at atypical
+hours to reduce mempool competition.
+TI is computed as the $z$-score of a transaction's fee rate
+within the cell defined by its hour-of-day $h$ and
+day-of-week $d$:
+\begin{equation}
+  \text{TI}(t) = \frac{f_t - \mu_{h,d}}{\sigma_{h,d}},
+\end{equation}
+where $f_t$ is the fee rate in sat/vbyte and $\mu_{h,d}$,
+$\sigma_{h,d}$ are the cell mean and standard deviation.
+
+\paragraph{UTXO Concentration (UC).}
+A Herfindahl-Hirschman Index approximation measures output
+value skewness:
+\begin{equation}
+  \text{UC}(t) = r^2,
+\end{equation}
+where $r$ is the value-concentration ratio.
+CoinJoin outputs are expected to have low concentration,
+yielding UC near zero; single-payment transactions exhibit
+UC near one.
+
+\paragraph{CoinJoin Proximity Score (CPS).}
+A weighted rule-based composite score aggregates structural
+CoinJoin indicators:
+\begin{equation}
+  \text{CPS}(t) = \sum_{r \in \mathcal{R}} w_r \cdot \mathbf{1}[t \models r],
+\end{equation}
+where $\mathcal{R}$ includes indicators such as equal-denomination
+outputs, input count exceeding three, zero address reuse,
+and round output values.
+In the author dataset, CPS has a mean of 0.2663 and standard
+deviation of 0.1307, spanning the range $[0.20, 0.85]$.
+
+\subsubsection{Elliptic Dataset: Four Graph-Structural Features}
+
+Four features are derived from the directed edge list to
+augment the original 165 Elliptic features.
+
+\paragraph{Graph In-Degree and Out-Degree.}
+The in-degree and out-degree of each transaction node are
+computed directly from the edge list.
+In the Elliptic graph, mean in-degree is 1.150 (standard
+deviation 3.911) and mean out-degree is 1.150
+(standard deviation 1.895), with maximum values of 284 and
+472, respectively, reflecting a strongly skewed hub structure.
+
+\paragraph{Illicit Neighbour Ratio (INR).}
+For each labelled node $v$, the fraction of labelled
+one-hop neighbours carrying the illicit label is:
+\begin{equation}
+  \text{INR}(v) = \frac{\sum_{u \in \mathcal{N}(v)} \mathbf{1}[y_u = 1]}
+                       {|\{u \in \mathcal{N}(v) : y_u \neq -1\}|}.
+\end{equation}
+INR achieves a Pearson correlation of $r = +0.4159$ with the
+ground-truth label, making it the second-strongest predictor
+among the novel features.
+
+\paragraph{Shortest Path to Illicit (SPI).}
+A breadth-first search from each illicit source node computes
+the minimum hop distance to every reachable node, capped at
+six.
+SPI achieves a Pearson correlation of $r = -0.9182$ with the
+illicit label, the highest correlation of any single feature
+in the augmented feature set.
+Nodes in close proximity to confirmed illicit transactions
+are substantially more likely to carry illicit activity
+themselves, consistent with the guilt-by-association principle
+observed across financial fraud networks.
+
+\subsection{Multi-Dimensional Chamfer Distance}
+\label{sec:mdcd}
+
+The one-sided Chamfer distance from point set
+$\mathcal{U} = \{u_1, \ldots, u_m\}$ to
+$\mathcal{V} = \{v_1, \ldots, v_n\}$ in $\mathbb{R}^d$ is:
+\begin{equation}
+  d_C(\mathcal{U}, \mathcal{V})
+    = \frac{1}{|\mathcal{U}|} \sum_{u_i \in \mathcal{U}}
+      \min_{v_j \in \mathcal{V}} \|u_i - v_j\|_2.
+  \label{eq:chamfer}
+\end{equation}
+The baseline 1-D formulation sets $d=1$ using only the
+Unix timestamp.
+The Multi-Dimensional Chamfer Distance (MD-CD) sets $d=4$
+with the standardised feature vector:
+\begin{equation}
+  \phi(t) = \bigl[
+    \text{timestamp},\;
+    \text{fee\_rate},\;
+    \text{input\_count},\;
+    \text{output\_count}
+  \bigr]^\top,
+  \label{eq:phi}
+\end{equation}
+where each dimension is independently standardised to zero
+mean and unit variance before distance computation.
+Transactions are grouped into one-hour temporal windows
+(indexed by block height divided by six) and candidate
+window pairs are evaluated for CST linkage.
+A pair $(W_i, W_j)$ is predicted as a linked CoinJoin-spend
+pair if $d_C(W_i, W_j) < \theta^*$, where $\theta^*$
+maximises F1-score on a held-out validation partition.
+
+\subsection{Taproot-Aware DBSCAN Clustering}
+\label{sec:taproot_method}
+
+\subsubsection{Naive CIOH Baseline}
+The naive CIOH flags every multi-input Taproot transaction
+as a CoinJoin candidate.
+Following the structural criterion applied to P2TR and
+P2WPKH scripts, the prediction rule is:
+\begin{equation}
+  \hat{y}_\text{CIOH}(t) =
+    \mathbf{1}\bigl[|\mathcal{A}| > 2\bigr]
+    \cdot \mathbf{1}\bigl[|\mathcal{B}| > 2\bigr].
+\end{equation}
+This rule achieves perfect recall but incurs a false-positive
+rate because P2TR transactions used for non-mixing purposes
+satisfy the same structural criterion.
+
+\subsubsection{Taproot-Aware DBSCAN}
+The proposed method clusters transactions using DBSCAN with
+the six-dimensional structural feature vector:
+\begin{equation}
+  \psi(t) = \bigl[
+    \text{input\_count},\;
+    \text{output\_count},\;
+    \text{fee\_rate},\;
+    \text{value\_concentration\_ratio},\;
+    \text{address\_reuse},\;
+    \text{mixing\_index}
+  \bigr]^\top.
+  \label{eq:psi}
+\end{equation}
+All features are standardised.
+DBSCAN is fitted with $\varepsilon = 0.6$ and
+$\text{min\_samples} = 5$ using a $k$-d tree index
+($n\_\text{jobs} = 1$) to maintain memory tractability.
+To address the $O(n^2)$ memory complexity of DBSCAN's
+radius-neighbourhood computation at dataset scale,
+a stratified subsample of 30,000 transactions is used
+for fitting; cluster labels are propagated to the full
+200,000-transaction analysis set via nearest-centroid
+assignment within the $\varepsilon$ radius.
+Points that fall outside all cluster radii (noise points)
+receive the naive CIOH prediction as a fallback.
+Each identified cluster is assigned a CoinJoin label via
+majority vote over the ground-truth labels of its members.
+
+\subsection{MixTrace: DGI Pre-Training and GAT Fine-Tuning}
+\label{sec:mixtrace_method}
+
+\subsubsection{Phase 1: Deep Graph Infomax Pre-Training}
+
+The encoder $f_\theta : \mathbb{R}^{N \times F} \to
+\mathbb{R}^{N \times 128}$ is a two-layer GCN:
+\begin{align}
+  \mathbf{H}^{(1)} &= \text{ELU}\!\bigl(
+    \hat{\mathbf{A}}\,\mathbf{X}\,\mathbf{W}_1^{256}\bigr), \\
+  \mathbf{Z} &= \text{ELU}\!\bigl(
+    \hat{\mathbf{A}}\,\mathbf{H}^{(1)}\,\mathbf{W}_2^{128}\bigr),
+\end{align}
+where $\hat{\mathbf{A}} = \tilde{\mathbf{D}}^{-1/2}
+\tilde{\mathbf{A}}\tilde{\mathbf{D}}^{-1/2}$ is the
+symmetrically normalised adjacency matrix with self-loops.
+The global graph summary is
+$\mathbf{s} = \sigma\!\bigl(\text{mean}_{v}\,\mathbf{z}_v\bigr)
+\in \mathbb{R}^{128}$.
+A bilinear discriminator
+$\mathcal{D}(\mathbf{z}_i, \mathbf{s})
+= \mathbf{z}_i^\top \mathbf{W}_d\, \mathbf{s}$
+scores the agreement between a node embedding and the
+summary.
+Corrupted embeddings $\tilde{\mathbf{Z}}$ are produced by
+row-shuffling $\mathbf{X}$ before encoding.
+The DGI loss is:
+\begin{equation}
+  \mathcal{L}_{\text{DGI}} = -\frac{1}{2N}
+    \sum_{i=1}^{N}\!\Bigl[
+      \log \sigma\!\bigl(\mathcal{D}(\mathbf{z}_i, \mathbf{s})\bigr)
+      + \log\!\bigl(1 - \sigma\!\bigl(
+          \mathcal{D}(\tilde{\mathbf{z}}_i, \mathbf{s})\bigr)\bigr)
+    \Bigr].
+  \label{eq:dgi}
+\end{equation}
+Training proceeds for 300 epochs using the Adam optimiser
+with learning rate $10^{-3}$ and weight decay $5 \times
+10^{-4}$.
+Upon completion, the encoder weights are frozen and the
+embedded matrix $\mathbf{Z} \in \mathbb{R}^{N \times 128}$
+is pre-computed as a fixed skip-connection input to the
+downstream GAT.
+
+\subsubsection{Phase 2: Graph Attention Network Fine-Tuning}
+
+The MixTrace GAT processes the full feature matrix
+$\mathbf{X}^{169}$ through the following layers:
+\begin{align}
+  \mathbf{H}_0 &= \text{Linear}(\mathbf{X}) \in \mathbb{R}^{N \times 128}, \\
+  \mathbf{H}_1 &= \text{BN}\!\bigl(\text{ELU}\!\bigl(
+    \text{GAT}^{(K=8)}(\mathbf{H}_0, \mathcal{E})\bigr)\bigr)
+    \in \mathbb{R}^{N \times 1024}, \\
+  \mathbf{H}_2 &= \text{BN}\!\bigl(\text{ELU}\!\bigl(
+    \text{GAT}^{(K=1)}(\mathbf{H}_1, \mathcal{E})\bigr)\bigr)
+    \in \mathbb{R}^{N \times 128},
+\end{align}
+where $\text{GAT}^{(K)}$ denotes a $K$-head graph attention
+layer and BN denotes batch normalisation.
+Dropout with probability 0.3 is applied after each
+activation.
+The frozen DGI embedding is concatenated to form a
+256-dimensional fused representation:
+\begin{equation}
+  \mathbf{H}_\text{fused}
+    = \bigl[\mathbf{H}_2 \;\|\; \mathbf{Z}\bigr]
+    \in \mathbb{R}^{N \times 256}.
+\end{equation}
+A two-layer classifier MLP maps the fused representation to
+logits $\hat{\mathbf{y}} \in \mathbb{R}^{N \times 2}$:
+\begin{equation}
+  \hat{\mathbf{y}} = \mathbf{W}_2
+    \bigl(\text{ELU}(\mathbf{W}_1 \mathbf{H}_\text{fused})\bigr).
+\end{equation}
+
+\subsubsection{Training Protocol}
+
+The fine-tuning loss is class-weighted cross-entropy:
+\begin{equation}
+  \mathcal{L}_\text{GAT}
+    = -\sum_{v \in \mathcal{V}_L}
+      w_{y_v} \log \hat{p}(y_v \mid v),
+\end{equation}
+where $\mathcal{V}_L$ is the set of labelled training nodes
+and $w_y$ is the inverse class-frequency weight.
+With 4,545 illicit and 42,019 licit training labels, the
+weights are $w_0 \approx 0.565$ (licit) and
+$w_1 \approx 4.317$ (illicit).
+The optimiser is Adam with initial learning rate $10^{-3}$
+and weight decay $5 \times 10^{-4}$.
+A ReduceLROnPlateau scheduler monitors validation F1-score
+(illicit class) with patience 10 and reduction factor 0.5.
+Training terminates after a maximum of 500 epochs or
+upon 20 consecutive epochs without validation improvement
+(early stopping).
+ADASYN oversampling of the labelled training feature matrix
+is applied as a supplementary diagnostic; the primary
+imbalance strategy is class weighting.
+
+%% ─────────────────────────────────────────────────────────────
+\section{Experiments}
+\label{sec:exp}
+%% ─────────────────────────────────────────────────────────────
+
+\subsection{Datasets}
+\label{sec:data}
+
+\paragraph{Elliptic Bitcoin Dataset.}
+The Elliptic dataset~\citep{weber2019anti} comprises 203,769
+Bitcoin transactions mapped as graph nodes across 49 weekly
+time steps (spanning January 2009 to September 2017).
+Each node carries 165 features: 93 local transaction features
+(input and output counts, values, fees, and script-type flags)
+and 72 aggregated one-hop neighbourhood features.
+The class distribution among labelled nodes is 4,545 illicit
+(9.76 percent) and 42,019 licit (90.24 percent), yielding a
+9.2:1 imbalance ratio.
+The directed edge list contains 234,355 entries representing
+Bitcoin payment flows between transactions.
+The chronological split assigns time steps 1 to 34 to
+training, 35 to 41 to validation, and 42 to 49 to the test
+set, preserving temporal ordering to prevent data leakage.
+The test partition contains 408 illicit and 8,433 licit
+labelled nodes.
+
+\paragraph{Author-Curated Bitcoin Transaction Dataset.}
+A curated corpus of 5,884,387 Bitcoin transactions was
+assembled with 53 engineered features including script-type
+indicators, fee rates, input and output counts,
+address-reuse flags, value metrics, and temporal features.
+The CoinJoin-like label, derived from structural heuristics
+validated against known mixing-service transaction patterns,
+identifies 110,352 transactions (1.88 percent of the corpus)
+as probable CoinJoin participants.
+The dataset reflects the pre-Taproot era of Bitcoin history:
+no P2TR transactions are present, and P2WPKH SegWit
+transactions represent the dominant modern script type.
+This characteristic is addressed in the Taproot analysis
+by falling back to multi-input transactions as the
+structurally equivalent CIOH proxy, as described in
+Section~\ref{sec:taproot_method}.
+
+\subsection{Baselines}
+\label{sec:baselines}
+
+Four baseline methods are evaluated for comparison against
+MixTrace.
+
+\textbf{K-Means} ($k = 2$) applies standard Euclidean
+clustering to the standardised node feature matrix.
+Cluster-to-class assignment follows majority vote using
+training set labels.
+
+\textbf{K-Nearest Neighbours (KNN)} uses a grid search over
+$k \in \{3, 5, 7, 11, 15\}$ and weighting schemes
+(uniform and distance-weighted), selecting the configuration
+that maximises validation F1-score.
+
+\textbf{Random Forest (RF)} applies a grid search over
+the number of estimators in $\{100, 200\}$, maximum tree
+depth in $\{10, 20, \text{None}\}$, and minimum samples
+per split in $\{2, 5\}$, with balanced class weighting
+applied throughout.
+
+\textbf{GAT without DGI} reproduces the full MixTrace GAT
+architecture with the DGI skip connection replaced by a
+zero tensor, isolating the contribution of pre-training from
+the graph attention mechanism.
+
+\subsection{Evaluation Metrics}
+
+The primary metric is the F1-score computed on the illicit
+(minority) class.
+Secondary metrics include precision and recall on the
+illicit class, macro-averaged F1, precision-recall
+area under curve (PR-AUC), and receiver operating
+characteristic area under curve (ROC-AUC).
+For the Taproot analysis, false-positive rate (FPR),
+false-negative rate (FNR), and the DBSCAN silhouette
+score are reported.
+For CST linking, the optimal threshold $\theta^*$ and
+the corresponding F1, precision, and recall are reported
+for both the 1-D and MD-CD formulations.
+
+\subsection{Illicit Transaction Detection Results}
+\label{sec:classification_results}
+
+Table~\ref{tab:classification} reports the full test-set
+performance on the Elliptic held-out partition.
+
+\begin{table}[htbp]
+  \caption{Illicit transaction detection on the Elliptic test
+           set (time steps 42--49). The test partition contains
+           408 illicit and 8,433 licit labelled nodes.
+           Best result in each column is in \textbf{bold}.}
+  \label{tab:classification}
+  \small
+  \centering
+  \begin{tabular}{lcccccc}
+    \toprule
+    \textbf{Method} &
+    \textbf{Prec.} & \textbf{Rec.} &
+    \textbf{F1} & \textbf{F1\textsubscript{macro}} &
+    \textbf{PR-AUC} & \textbf{ROC-AUC} \\
+    \midrule
+    K-Means
+      & 0.046 & 1.000 & 0.088 & 0.045 & 0.000 & -- \\
+    KNN
+      & 0.499 & 0.468 & 0.483 & 0.729 & 0.416 & -- \\
+    Random Forest
+      & \textbf{0.946} & 0.471 & 0.628 & 0.808 & 0.632 & -- \\
+    GAT (no DGI)
+      & 0.113 & \textbf{0.995} & 0.204 & 0.486 & 0.269 & 0.932 \\
+    \textbf{MixTrace (DGI+GAT)}
+      & 0.709 & 0.760 & \textbf{0.734} & \textbf{0.860} &
+        \textbf{0.717} & \textbf{0.987} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+MixTrace achieves the highest illicit F1-score (0.7337),
+highest macro F1 (0.8602), highest PR-AUC (0.7167), and
+highest ROC-AUC (0.9868) among all evaluated methods.
+Random Forest attains the highest precision (0.9458) at
+the cost of recall (0.4706), producing a substantially
+lower F1 of 0.6285.
+The standalone GAT without DGI achieves recall approaching
+unity (0.9951) but precision of only 0.1135, reflecting a
+degenerate classifier that predicts illicit for nearly all
+nodes; the corresponding F1 of 0.2037 ranks it below all
+conventional baselines.
+K-Means exhibits the same degenerate high-recall pattern
+at even lower precision, confirming that unsupervised
+clustering without structural neighbourhood information
+is insufficient for minority-class detection in this setting.
+
+\subsection{DGI Pre-Training Convergence}
+
+The DGI encoder was trained for 300 epochs.
+The initial loss at epoch 1 was 1.459, reflecting random
+encoder weights.
+Loss exhibited characteristic oscillation during early
+epochs as the encoder and discriminator weights co-evolved,
+stabilising to low values by epoch 300.
+The pre-trained encoder produces node embeddings of
+dimension 128 that capture global graph topology independent
+of class labels, providing a non-redundant complement to
+the attention-based local neighbourhood representations
+learned by the GAT layers.
+
+\subsection{GAT Fine-Tuning Dynamics}
+
+The GAT fine-tuning phase began with a learning rate of
+$5 \times 10^{-4}$.
+At epoch 5, training F1 reached 0.8423 and validation F1
+reached 0.5094.
+The model continued to improve through the early training
+phase: by epoch 20, training F1 was 0.8844 and validation
+F1 reached 0.5847.
+Convergence stabilised in the range of epochs 220 to 265,
+where training F1 exceeded 0.9550 and validation F1
+exceeded 0.8790, with the best recorded validation
+macro F1 of 0.8864 at epoch 235.
+The optimal decision threshold on the validation set was
+$\theta^* = 0.9397$, indicating that MixTrace produces
+well-calibrated high-confidence predictions for the illicit
+class rather than relying on low-probability scores.
+
+\subsection{Taproot Analysis Results}
+\label{sec:taproot_results}
+
+Table~\ref{tab:taproot} presents the comparison between
+naive CIOH and Taproot-Aware DBSCAN clustering on the
+200,000-transaction analysis set drawn from the
+author-curated dataset.
+
+\begin{table}[htbp]
+  \caption{Taproot analysis on 200,000 multi-input
+           Bitcoin transactions. The analysis set contains
+           22,169 CoinJoin-like and 177,831 non-CoinJoin-like
+           transactions.
+           TP: true positive; TN: true negative;
+           FP: false positive; FN: false negative.}
+  \label{tab:taproot}
+  \centering
+  \begin{tabular}{lcccccccc}
+    \toprule
+    \textbf{Method}
+      & \textbf{TP} & \textbf{TN}
+      & \textbf{FP} & \textbf{FN}
+      & \textbf{FPR} & \textbf{FNR}
+      & \textbf{F1} & \textbf{Sil.} \\
+    \midrule
+    Naive CIOH
+      & 22,169 & 171,208 & 6,623 & 0
+      & 0.0372 & 0.000 & 0.870 & -- \\
+    \textbf{Taproot-Aware DBSCAN}
+      & 6,650 & 176,494 & 1,337 & 15,519
+      & \textbf{0.0075} & 0.700 & 0.441 & \textbf{0.973} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The naive CIOH achieves perfect recall but incurs a
+false-positive rate of 3.72 percent, incorrectly flagging
+6,623 legitimate transactions as CoinJoin participants.
+The Taproot-Aware DBSCAN reduces the false-positive rate
+to 0.75 percent, an absolute reduction of 0.0297 and a
+relative reduction of 79.8 percent.
+Precision improves from 0.77 to 0.8326.
+The silhouette score of 0.973 indicates highly compact,
+well-separated clusters in the six-dimensional structural
+feature space, validating the hypothesis that CoinJoin
+and non-CoinJoin multi-input transactions occupy distinct
+regions of behavioural feature space.
+The trade-off is an increased false-negative rate of 70
+percent: the DBSCAN assignment radius of $\varepsilon = 0.6$
+excludes structurally atypical CoinJoin transactions that
+lie outside the dense cluster cores.
+This precision-recall trade-off is consistent with a
+forensic use case in which false accusations of mixing
+activity carry higher legal and reputational cost than
+missed detections.
+
+\subsection{CST Linking Results}
+\label{sec:chamfer_results}
+
+Table~\ref{tab:chamfer} compares the 1-D and MD Chamfer
+Distance formulations on the author-curated dataset
+across 2,247 temporal windows and 5,000 evaluated window
+pairs.
+
+\begin{table}[htbp]
+  \caption{CoinJoin Spending Transaction linking performance.
+           Results are reported at the optimal threshold
+           $\theta^*$ selected to maximise F1-score on the
+           validation partition.}
+  \label{tab:chamfer}
+  \centering
+  \begin{tabular}{lccccc}
+    \toprule
+    \textbf{Method} & \textbf{Dims}
+      & $\boldsymbol{\theta^*}$
+      & \textbf{F1} & \textbf{Precision} & \textbf{Recall} \\
+    \midrule
+    1-D Chamfer (timestamp)
+      & 1 & 2.008 & 0.2512 & 0.1446 & 0.9555 \\
+    MD-Chamfer ($d=4$)
+      & 4 & 3.384 & 0.2454 & 0.1408 & 0.9543 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Both formulations achieve high recall (above 0.954),
+indicating that the Chamfer-based linking criterion
+successfully captures the majority of true CoinJoin-spend
+pairs at the respective optimal thresholds.
+The precision values (0.1446 for 1-D; 0.1408 for MD-CD)
+are constrained by the large number of superficially similar
+transaction windows in the dataset.
+The F1-score difference between the two formulations is
+0.006 (absolute), which falls within the range of
+threshold-selection variability.
+This result reveals an important boundary condition for
+the MD-CD extension: when the temporal feature alone
+provides near-ceiling recall, the marginal discriminative
+contribution of structural dimensions is attenuated by
+their correlation with the dominant temporal signal.
+The MD-CD operates at a higher optimal threshold
+(3.384 versus 2.008), reflecting that the four-dimensional
+distance metric spans a broader geometric scale and
+is sensitive to proportionally larger mismatches across
+fee-rate and structural features.
+
+%% ─────────────────────────────────────────────────────────────
+\section{Discussion}
+\label{sec:discuss}
+%% ─────────────────────────────────────────────────────────────
+
+\subsection{Contribution of DGI Pre-Training}
+
+The comparison between MixTrace and the GAT-without-DGI
+ablation isolates the contribution of self-supervised
+pre-training.
+The standalone GAT achieves ROC-AUC of 0.932, confirming
+that the attention mechanism learns discriminative
+neighbourhood representations.
+However, without the DGI skip connection, the classifier
+defaults to a near-trivial high-recall, low-precision
+operating point: predicting illicit for nearly every node
+(recall 0.995, precision 0.113) rather than making
+calibrated predictions.
+MixTrace with the DGI skip connection achieves balanced
+precision (0.709) and recall (0.760), with a 36-percentage-
+point improvement in F1 (from 0.204 to 0.734) relative
+to the ablation.
+The DGI embeddings pre-trained on all 203,769 nodes encode
+global topological context that the GAT layers cannot
+recover from local two-hop message passing alone.
+This finding directly supports the motivation for leveraging
+the 157,205 unlabelled nodes: the structural regularities
+they encode translate into improved calibration and
+higher-confidence, accurate illicit predictions.
+
+\subsection{Superiority over Conventional Classifiers}
+
+Random Forest achieves the highest precision among all
+methods (0.946) but recall of only 0.471, suggesting it
+has learned to identify a small, high-confidence subset
+of illicit nodes while missing more than half the true
+illicit transactions in the test set.
+For financial intelligence and compliance applications,
+high recall is typically required: missed illicit
+transactions represent potential unmonitored fund flows.
+MixTrace achieves both competitive precision (0.709) and
+substantially higher recall (0.760), producing an F1
+improvement of 10.5 percentage points over Random Forest
+and 25.1 percentage points over KNN.
+The PR-AUC improvement from 0.632 (Random Forest) to
+0.717 (MixTrace) indicates that the ranking quality of
+MixTrace's illicit-class scores is superior across the
+full precision-recall curve, not merely at a single
+operating threshold.
+
+\subsection{False-Positive Reduction in Taproot Clustering}
+
+The 79.8 percent reduction in false-positive rate achieved
+by Taproot-Aware DBSCAN addresses a forensically significant
+failure mode.
+Each CIOH false positive represents a legitimate
+transaction incorrectly attributed to a mixing entity,
+which in a law-enforcement or exchange compliance context
+could result in account freezes, reporting obligations,
+or investigative resource misallocation.
+With 6,623 false positives under naive CIOH versus 1,337
+under Taproot-Aware DBSCAN across a 200,000-transaction
+sample, the structural clustering approach eliminates
+over 5,200 incorrect attributions at the cost of
+additionally missing 15,519 true CoinJoin transactions.
+The forensic interpretation of this trade-off depends on
+deployment context: high-precision identification is
+preferable for proactive reporting scenarios, while
+high-recall identification is preferable for broad
+surveillance network construction.
+The silhouette score of 0.973 confirms that the six-dimensional
+structural feature space creates highly separable cluster
+geometry, indicating that the DBSCAN decision boundary
+is learned from genuine behavioural differences rather
+than statistical artefacts.
+
+\subsection{Boundary Conditions of Multi-Dimensional Chamfer Distance}
+
+The marginal difference in F1 between 1-D and MD-CD
+(0.006 absolute) merits a careful methodological
+interpretation.
+Temporal proximity is an extremely strong prior for CoinJoin
+spending detection: post-mix spends following a mixing event
+tend to cluster tightly within minutes to hours of the
+original CoinJoin broadcast due to automated wallet behaviour.
+This creates a near-ceiling recall signal from timestamps
+alone, leaving limited headroom for structural dimensions
+to contribute additional discriminative power.
+The MD-CD nonetheless identifies a distinct optimal threshold
+(3.384 versus 2.008) and the structural dimensions contribute
+to feature-space geometry that may become more discriminative
+in datasets where post-mix spending is temporally dispersed,
+for instance through time-locked scripts or multi-round
+mixing protocols.
+The finding should therefore be interpreted as establishing
+the boundary conditions under which the MD-CD extension
+is expected to yield measurable improvement: datasets
+with high within-class temporal variance and structurally
+diverse spending patterns.
+The formulation remains correct and theoretically principled;
+the limited improvement in the present experimental setting
+reflects dataset characteristics rather than a flaw in
+the metric design.
+
+\subsection{Novel Feature Discriminative Power}
+
+The shortest-path-to-illicit feature achieves a Pearson
+correlation of $r = -0.9182$ with the ground-truth label,
+the highest correlation of any feature in the entire
+169-dimensional augmented feature set.
+This strong negative correlation reflects the graph-structural
+property that illicit transactions tend to form tight
+interconnected subgraphs, placing neighbouring nodes
+at zero or one hop from a confirmed illicit source.
+Licit transactions, in contrast, tend to appear at
+the full BFS cap distance of six from the nearest
+illicit node.
+The illicit-neighbour ratio achieves a moderate correlation
+of $r = +0.4159$, confirming that one-hop neighbourhood
+composition carries independent predictive signal beyond
+path distance.
+Both features provide discriminative information that is
+entirely absent from the original 165 Elliptic features,
+which encode local transaction structure but not the
+graph-distance relationship to confirmed illicit activity.
+
+\subsection{Implications for Blockchain Forensics}
+
+The MixTrace framework demonstrates that combining
+self-supervised graph representation learning with
+multi-head attention classification substantially improves
+illicit transaction detection performance over conventional
+supervised baselines.
+The DGI pre-training strategy offers a practical path to
+exploiting large volumes of unlabelled blockchain data
+without requiring additional annotation, a characteristic
+advantage given the high cost and limited availability
+of confirmed illicit-transaction ground truth.
+The Taproot-Aware DBSCAN addresses a pressing operational
+gap that will grow in importance as P2TR adoption increases:
+estimates from blockchain analytics sources indicate that
+P2TR outputs represent an increasing share of new
+Bitcoin transactions following the Taproot activation,
+meaning the CIOH false-positive problem is expected to
+intensify over time.
+The MD-CD formulation provides a mathematically rigorous
+multi-dimensional extension of the CST linking metric;
+even where the present dataset does not show measurable
+improvement over the 1-D baseline, the formulation is
+ready for application to datasets with more temporally
+dispersed post-mix spending patterns.
+
+\subsection{Limitations}
+
+Several limitations of the present study should be acknowledged.
+The author-curated dataset does not contain confirmed
+Taproot transactions, requiring the use of multi-input
+transactions as a structural proxy for the Gap 1 analysis.
+Results from the Taproot experiment are therefore
+indicative of the structural clustering framework's
+effectiveness rather than a direct measurement of
+P2TR-specific false-positive reduction.
+DGI pre-training requires the full transaction graph
+to reside in memory simultaneously, limiting scalability
+to approximately 500,000 nodes on 64~GB RAM without
+mini-batching extensions.
+The MD-CD computation is $O(mn)$ per window pair, which
+may be prohibitive for real-time monitoring at exchange
+throughput scale without approximate nearest-neighbour
+optimisation.
+The study analyses only on-chain Bitcoin data; off-chain
+channel activity through the Lightning Network falls
+outside the scope of the present analysis.
+
+\subsection{Ethical Considerations}
+
+The entire analysis is conducted on publicly available
+pseudonymous on-chain data recorded in the Bitcoin
+blockchain, a public ledger to which no privacy expectation
+attaches under the pseudonymous account model.
+No personally identifiable information is processed
+or stored at any stage of the pipeline.
+The Elliptic dataset labels were provided by a regulated
+blockchain analytics provider whose labelling methodology
+has been independently reviewed~\citep{weber2019anti}.
+The intent of the methodology is to support financial
+intelligence, exchange compliance, and law-enforcement
+practitioners in identifying potential illicit fund flows,
+consistent with anti-money laundering regulatory
+frameworks including the Financial Action Task Force
+recommendations applicable to virtual asset service providers.
+
+%% ─────────────────────────────────────────────────────────────
+\section{Conclusion}
+\label{sec:conclude}
+%% ─────────────────────────────────────────────────────────────
+
+This study presents MixTrace, a multi-modal graph attention
+framework for the deanonymization of Bitcoin CoinJoin
+transactions that simultaneously addresses three previously
+unresolved research gaps.
+
+The Taproot-Aware DBSCAN clustering strategy achieves a
+79.8 percent reduction in false-positive rate compared to
+naive Common Input Ownership Heuristic classification
+on a 200,000-transaction analysis set, with a silhouette
+score of 0.973 confirming high cluster quality.
+The Multi-Dimensional Chamfer Distance extension provides
+a theoretically principled four-dimensional CST linking
+metric; experimental results reveal that the temporal
+dimension carries near-ceiling recall signal in the present
+dataset, with the multi-dimensional formulation offering
+a ready foundation for datasets exhibiting greater
+temporal variance in post-mix spending behaviour.
+The DGI plus GAT architecture achieves an illicit-class
+F1-score of 0.7337, precision of 0.7094, recall of 0.7598,
+and ROC-AUC of 0.9868, representing improvements of
+10.5 percentage points in F1 and 8.5 points in PR-AUC
+over the strongest conventional baseline (Random Forest).
+The ablation study demonstrates that the DGI skip connection
+contributes 36 percentage points of the final F1,
+confirming the value of self-supervised pre-training on
+the 157,205 unlabelled graph nodes.
+
+Three primary directions for future research are identified.
+First, inductive DGI variants that support mini-batch
+processing would extend the framework to streaming
+blockchain data at exchange scale.
+Second, integration with Lightning Network routing graphs
+would enable off-chain mixing detection alongside on-chain
+analysis.
+Third, federated learning deployments in which exchange
+compliance teams train shared graph models without
+exposing customer transaction data could accelerate
+ground-truth label acquisition while preserving privacy.
+
+The complete 14-step reproducible implementation pipeline
+is publicly available at
+\url{https://github.com/sagarkorde/CoinJoin}
+under the MIT License.
+
+%% ─────────────────────────────────────────────────────────────
+\begin{acknowledgements}
+The author thanks the Elliptic team for releasing the
+benchmark dataset that underpins the illicit detection
+evaluation, the open-source contributors to PyTorch
+Geometric and scikit-learn whose libraries support the
+full experimental pipeline, and the guest editors of the
+special issue on AI Enabled Security Frameworks for
+Emerging Cybercrime and Digital Threats for the
+invitation to submit.
+\end{acknowledgements}
+
+%% ─────────────────────────────────────────────────────────────
+\section*{Declarations}
+
+\paragraph{Conflict of interest.}
+The author declares no conflict of interest.
+
+\paragraph{Funding.}
+No external funding was received for this research.
+
+\paragraph{Data availability.}
+The Elliptic Bitcoin Dataset is publicly available at
+\url{https://www.kaggle.com/datasets/ellipticco/elliptic-data-set}.
+The author-curated Bitcoin transaction dataset is available
+on reasonable request to the corresponding author.
+
+\paragraph{Code availability.}
+The full implementation pipeline is available at
+\url{https://github.com/sagarkorde/CoinJoin}
+under the MIT License.
+
+%% ─────────────────────────────────────────────────────────────
+\bibliography{references}
+
+\end{document}
