@@ -69,6 +69,15 @@
 %% ── Footnote for affiliations ────────────────────────────────
 \usepackage{authblk}
 
+%% ── Algorithm pseudo-code ────────────────────────────────────
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+
+%% ── SVG figures ──────────────────────────────────────────────
+\usepackage{svg}            % \includesvg — requires Inkscape on Overleaf
+
 %% ── Custom operators ─────────────────────────────────────────
 \DeclareMathOperator{\Entropy}{H}
 
@@ -422,6 +431,35 @@ The labelled subset comprises 46,564 nodes (4,545 illicit
 and 42,019 licit); the remaining 157,205 are unlabelled.
 The learning objective is binary node classification
 evaluated on nodes with $\tau(v) \in \{42,\ldots,49\}$.
+
+Figure~\ref{fig:architecture} provides an overview of the
+complete MixTrace framework, illustrating how each of the
+three research gaps is addressed by a dedicated module and
+how the modules are evaluated independently against their
+respective datasets.
+
+\begin{figure}[htbp]
+  \centering
+  \includesvg[width=\linewidth]{fig00_architecture}
+  \caption{MixTrace multi-modal forensic framework
+    architecture. The framework addresses three independent
+    research gaps through parallel evaluation tracks.
+    \textbf{Gap~1} (top, green): structural DBSCAN
+    clustering on a six-dimensional feature vector reduces
+    the false-positive rate from 3.72\,\% to 0.75\,\% across
+    200,000 multi-input P2WPKH transactions.
+    \textbf{Gap~2} (middle, amber): Multi-Dimensional Chamfer
+    Distance linking on four-dimensional temporal window
+    features yields a null result (MD-CD F1 = 0.245 vs.\
+    1-D F1 = 0.251), identifying a boundary condition.
+    \textbf{Gap~3} (bottom, blue): a two-phase DGI
+    pre-training and GAT fine-tuning pipeline on the Elliptic
+    benchmark achieves illicit-class F1 = 0.7337 and
+    ROC-AUC = 0.9868; the dashed arrow denotes the frozen
+    skip-connection $[\mathbf{H}_2 \,\|\, \mathbf{Z}^*]$
+    from DGI embeddings into the GAT fine-tuning phase.}
+  \label{fig:architecture}
+\end{figure}
 
 \subsection{Novel Feature Engineering}
 \label{sec:features}
@@ -804,6 +842,98 @@ validation improvement. ADASYN oversampling of the
 labelled training feature matrix is applied as a
 supplementary diagnostic, following the density-sensitive
 synthesis protocol documented by~\citet{tekkali2024}.
+
+Algorithm~\ref{alg:mixtrace} summarises the complete
+MixTrace training and inference procedure, consolidating
+the DGI pre-training phase, GAT fine-tuning phase, and
+threshold-calibrated inference into a single unified
+specification.
+
+\begin{algorithm}[htbp]
+\caption{MixTrace Training and Inference}
+\label{alg:mixtrace}
+\begin{algorithmic}[1]
+\Require Transaction graph
+  $\mathcal{G}=(\mathcal{V},\mathcal{E},\mathbf{X})$,
+  $\mathbf{X}\in\mathbb{R}^{N\times169}$,
+  partial labels $\mathbf{Y}_L$, chronological split
+  $\tau_\text{train}\!\in\!\{1,\ldots,34\}$,
+  $\tau_\text{val}\!\in\!\{35,\ldots,41\}$,
+  $\tau_\text{test}\!\in\!\{42,\ldots,49\}$
+\Ensure Predicted labels $\hat{\mathbf{y}}$ for test nodes
+
+\vspace{2pt}
+\Statex \textit{--- Phase 1: DGI Unsupervised Pre-Training ---}
+\For{$\text{epoch} \leftarrow 1$ \textbf{to} $300$}
+  \State $\mathbf{H}^{(1)} \leftarrow
+    \text{ELU}\!\bigl(\hat{\mathbf{A}}\mathbf{X}\mathbf{W}_1\bigr)
+    \in \mathbb{R}^{N\times256}$
+    \Comment{GCN layer 1}
+  \State $\mathbf{Z} \leftarrow
+    \text{ELU}\!\bigl(\hat{\mathbf{A}}\mathbf{H}^{(1)}\mathbf{W}_2\bigr)
+    \in \mathbb{R}^{N\times128}$
+    \Comment{GCN layer 2}
+  \State $\mathbf{s} \leftarrow
+    \sigma\!\bigl(\tfrac{1}{N}\textstyle\sum_v\mathbf{z}_v\bigr)$
+    \Comment{global graph summary}
+  \State $\tilde{\mathbf{X}} \leftarrow \text{shuffle\_rows}(\mathbf{X})$
+    \Comment{row-shuffle corruption}
+  \State $\tilde{\mathbf{Z}} \leftarrow
+    \text{GCN\_encoder}(\tilde{\mathbf{X}})$
+  \State Minimise $\mathcal{L}_\text{DGI}$ via Adam
+    ($\text{lr}=10^{-3}$,\ $\lambda=5\times10^{-4}$)
+\EndFor
+\State $\mathbf{Z}^* \leftarrow \mathbf{Z}$
+  \Comment{freeze DGI embeddings}
+
+\vspace{2pt}
+\Statex \textit{--- Phase 2: GAT Supervised Fine-Tuning ---}
+\State best\_val\_F1 $\leftarrow 0$;\ no\_improve $\leftarrow 0$
+\For{$\text{epoch} \leftarrow 1$ \textbf{to} $500$}
+  \State $\mathbf{H}_1 \leftarrow
+    \text{GAT}_1(\mathbf{X},\mathbf{A};\;\text{heads}=8)
+    \in \mathbb{R}^{N\times128}$
+  \State $\mathbf{H}_2 \leftarrow
+    \text{GAT}_2(\mathbf{H}_1,\mathbf{A};\;\text{heads}=1)
+    \in \mathbb{R}^{N\times128}$
+  \State $\mathbf{H}_\text{fused} \leftarrow
+    [\mathbf{H}_2 \;\|\; \mathbf{Z}^*]
+    \in \mathbb{R}^{N\times256}$
+    \Comment{skip connection}
+  \State $\hat{\mathbf{y}} \leftarrow
+    \text{MLP}(\mathbf{H}_\text{fused})$
+  \State Minimise $\mathcal{L}_\text{GAT}$ with
+    $w_0\!=\!0.565$, $w_1\!=\!4.317$
+    \Comment{class-weighted CE}
+  \If{val\_F1 improves}
+    \State Save checkpoint;\ best\_val\_F1 $\leftarrow$ val\_F1;\ no\_improve $\leftarrow 0$
+  \Else
+    \State no\_improve $\leftarrow$ no\_improve $+1$
+    \If{no\_improve $\bmod 10 = 0$}
+      \State $\text{lr} \leftarrow \text{lr} \times 0.5$
+        \Comment{ReduceLROnPlateau, factor 0.5}
+    \EndIf
+    \If{no\_improve $\geq 20$}
+      \textbf{ break}
+    \EndIf
+  \EndIf
+\EndFor
+\State Load best checkpoint $\boldsymbol{\theta}^*$
+
+\vspace{2pt}
+\Statex \textit{--- Inference ---}
+\State $\hat{p} \leftarrow
+  \sigma\!\bigl(\text{MLP}_{\boldsymbol{\theta}^*}(
+    [\text{GAT}(\mathbf{X}_\text{test})\,\|\,
+     \mathbf{Z}^*_\text{test}])\bigr)$
+\State $\theta^* \leftarrow \arg\max_\theta
+  F_1(\hat{p} \geq \theta,\;\mathbf{Y}_\text{val})$
+  \Comment{$\theta^*\!=\!0.9397$}
+\State $\hat{\mathbf{y}} \leftarrow
+  \mathbf{1}[\hat{p} \geq \theta^*]$
+\State \Return $\hat{\mathbf{y}}$
+\end{algorithmic}
+\end{algorithm}
 
 % ─────────────────────────────────────────────────────────────
 \section{Experiments}

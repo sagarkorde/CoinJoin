@@ -1,0 +1,230 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 790 460" width="790" height="460"
+     font-family="'Times New Roman', Georgia, serif">
+  <defs>
+    <!-- Standard arrowhead -->
+    <marker id="arr" markerWidth="9" markerHeight="7"
+            refX="7" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#333"/>
+    </marker>
+    <!-- Blue arrowhead (Gap 3) -->
+    <marker id="arr-b" markerWidth="9" markerHeight="7"
+            refX="7" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#1a4f8a"/>
+    </marker>
+    <!-- Dashed blue arrowhead -->
+    <marker id="arr-d" markerWidth="9" markerHeight="7"
+            refX="7" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#1a4f8a"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════════════════════════════════
+       Background + outer border
+  ═══════════════════════════════════════ -->
+  <rect x="0" y="0" width="790" height="460"
+        fill="white" stroke="#ccc" stroke-width="1"/>
+
+  <!-- Title bar -->
+  <rect x="0" y="0" width="790" height="36" fill="#f5f5f5"
+        stroke="#bbb" stroke-width="1"/>
+  <text x="395" y="23" text-anchor="middle"
+        font-size="14" font-weight="bold" fill="#111">
+    MixTrace: Multi-Modal Forensic Framework Architecture
+  </text>
+
+  <!-- Column header labels -->
+  <text x="78"  y="52" text-anchor="middle" font-size="9" fill="#666" font-style="italic">Input</text>
+  <text x="203" y="52" text-anchor="middle" font-size="9" fill="#666" font-style="italic">Feature Encoding</text>
+  <text x="355" y="52" text-anchor="middle" font-size="9" fill="#666" font-style="italic">Core Method</text>
+  <text x="568" y="52" text-anchor="middle" font-size="9" fill="#666" font-style="italic">Output / Result</text>
+
+  <!-- Vertical divider lines (light) -->
+  <line x1="138" y1="58" x2="138" y2="400" stroke="#e5e5e5" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="270" y1="58" x2="270" y2="400" stroke="#e5e5e5" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="480" y1="58" x2="480" y2="400" stroke="#e5e5e5" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- ═══════════════════════════════════════
+       GAP 1  —  Structural DBSCAN Clustering
+  ═══════════════════════════════════════ -->
+  <!-- Side label pill -->
+  <rect x="5" y="62" width="18" height="92" rx="4"
+        fill="#e8f5e8" stroke="#3a8a3a" stroke-width="1.2"/>
+  <text x="14" y="108" text-anchor="middle" font-size="10"
+        fill="#2a6a2a" font-weight="bold"
+        transform="rotate(-90,14,108)">Gap 1</text>
+
+  <!-- Box G1-A: Input -->
+  <rect x="28" y="67" width="105" height="62" rx="5"
+        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
+  <text x="80" y="87"  text-anchor="middle" font-size="10" font-weight="bold">Bitcoin</text>
+  <text x="80" y="100" text-anchor="middle" font-size="10" font-weight="bold">Corpus</text>
+  <text x="80" y="113" text-anchor="middle" font-size="9" fill="#444">200 K P2WPKH tx</text>
+  <text x="80" y="124" text-anchor="middle" font-size="9" fill="#444">(pre-Taproot)</text>
+
+  <line x1="133" y1="98" x2="148" y2="98" stroke="#3a8a3a"
+        stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Box G1-B: Features -->
+  <rect x="148" y="67" width="118" height="62" rx="5"
+        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
+  <text x="207" y="85"  text-anchor="middle" font-size="10" font-weight="bold">Structural</text>
+  <text x="207" y="98"  text-anchor="middle" font-size="10" font-weight="bold">Feature Vector</text>
+  <text x="207" y="111" text-anchor="middle" font-size="9" fill="#444">ψ(t) ∈ ℝ⁶</text>
+  <text x="207" y="123" text-anchor="middle" font-size="9" fill="#444">std-normalised</text>
+
+  <line x1="266" y1="98" x2="281" y2="98" stroke="#3a8a3a"
+        stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Box G1-C: DBSCAN -->
+  <rect x="281" y="67" width="192" height="62" rx="5"
+        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
+  <text x="377" y="85"  text-anchor="middle" font-size="10" font-weight="bold">Structural DBSCAN</text>
+  <text x="377" y="98"  text-anchor="middle" font-size="9" fill="#444">ε = 0.6,  min_samples = 5</text>
+  <text x="377" y="111" text-anchor="middle" font-size="9" fill="#444">k-d tree index</text>
+  <text x="377" y="123" text-anchor="middle" font-size="9" fill="#444">30 K subsample + centroid prop.</text>
+
+  <line x1="473" y1="98" x2="488" y2="98" stroke="#3a8a3a"
+        stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Box G1-D: Result -->
+  <rect x="488" y="67" width="188" height="62" rx="5"
+        fill="#c8eec8" stroke="#2a6a2a" stroke-width="2"/>
+  <text x="582" y="85"  text-anchor="middle" font-size="10" font-weight="bold">CoinJoin Clusters</text>
+  <text x="582" y="98"  text-anchor="middle" font-size="9" fill="#1a4a1a">FPR: 3.72 % → 0.75 % (−79.8 %)</text>
+  <text x="582" y="111" text-anchor="middle" font-size="9" fill="#1a4a1a">Precision = 0.833</text>
+  <text x="582" y="123" text-anchor="middle" font-size="9" fill="#1a4a1a">Silhouette score = 0.973</text>
+
+  <!-- ═══════════════════════════════════════
+       GAP 2  —  Multi-Dimensional Chamfer Distance
+  ═══════════════════════════════════════ -->
+  <rect x="5" y="172" width="18" height="92" rx="4"
+        fill="#fff3e0" stroke="#c07000" stroke-width="1.2"/>
+  <text x="14" y="218" text-anchor="middle" font-size="10"
+        fill="#804800" font-weight="bold"
+        transform="rotate(-90,14,218)">Gap 2</text>
+
+  <!-- Box G2-A: Input -->
+  <rect x="28" y="177" width="105" height="62" rx="5"
+        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
+  <text x="80" y="197"  text-anchor="middle" font-size="10" font-weight="bold">Bitcoin</text>
+  <text x="80" y="210"  text-anchor="middle" font-size="10" font-weight="bold">Corpus</text>
+  <text x="80" y="223"  text-anchor="middle" font-size="9" fill="#444">5 000 candidate</text>
+  <text x="80" y="234"  text-anchor="middle" font-size="9" fill="#444">window pairs</text>
+
+  <line x1="133" y1="208" x2="148" y2="208" stroke="#c07000"
+        stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Box G2-B: Features -->
+  <rect x="148" y="177" width="118" height="62" rx="5"
+        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
+  <text x="207" y="195"  text-anchor="middle" font-size="10" font-weight="bold">4-D Encoding</text>
+  <text x="207" y="208"  text-anchor="middle" font-size="9" fill="#444">φ(t) = [timestamp,</text>
+  <text x="207" y="220"  text-anchor="middle" font-size="9" fill="#444"> fee_rate,</text>
+  <text x="207" y="232"  text-anchor="middle" font-size="9" fill="#444"> in_cnt,  out_cnt]</text>
+
+  <line x1="266" y1="208" x2="281" y2="208" stroke="#c07000"
+        stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Box G2-C: Chamfer -->
+  <rect x="281" y="177" width="192" height="62" rx="5"
+        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
+  <text x="377" y="195"  text-anchor="middle" font-size="10" font-weight="bold">Chamfer Distance Linking</text>
+  <text x="377" y="208"  text-anchor="middle" font-size="9" fill="#444">1-D baseline (timestamp only)</text>
+  <text x="377" y="220"  text-anchor="middle" font-size="9" fill="#444">vs. MD-CD (d = 4 features)</text>
+  <text x="377" y="232"  text-anchor="middle" font-size="9" fill="#444">threshold θ* = val-F1 optimal</text>
+
+  <line x1="473" y1="208" x2="488" y2="208" stroke="#c07000"
+        stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Box G2-D: Result -->
+  <rect x="488" y="177" width="188" height="62" rx="5"
+        fill="#ffe8b0" stroke="#804800" stroke-width="2"/>
+  <text x="582" y="195"  text-anchor="middle" font-size="10" font-weight="bold">CST Window Pairs</text>
+  <text x="582" y="208"  text-anchor="middle" font-size="9" fill="#5a3000">1-D F1 = 0.251  |  MD F1 = 0.245</text>
+  <text x="582" y="220"  text-anchor="middle" font-size="9" fill="#5a3000">Null result: temporal</text>
+  <text x="582" y="232"  text-anchor="middle" font-size="9" fill="#5a3000">dominates over MD-CD</text>
+
+  <!-- ═══════════════════════════════════════
+       GAP 3  —  DGI + GAT Pipeline  (main)
+  ═══════════════════════════════════════ -->
+  <rect x="5" y="282" width="18" height="118" rx="4"
+        fill="#e8eeff" stroke="#1a4f8a" stroke-width="1.2"/>
+  <text x="14" y="341" text-anchor="middle" font-size="10"
+        fill="#1a4f8a" font-weight="bold"
+        transform="rotate(-90,14,341)">Gap 3</text>
+
+  <!-- Box G3-A: Elliptic Dataset -->
+  <rect x="28" y="287" width="105" height="78" rx="5"
+        fill="#eff3ff" stroke="#1a4f8a" stroke-width="1.5"/>
+  <text x="80" y="307"  text-anchor="middle" font-size="10" font-weight="bold">Elliptic</text>
+  <text x="80" y="320"  text-anchor="middle" font-size="10" font-weight="bold">Dataset</text>
+  <text x="80" y="334"  text-anchor="middle" font-size="9" fill="#333">X ∈ ℝᴺˣ¹⁶⁹</text>
+  <text x="80" y="347"  text-anchor="middle" font-size="9" fill="#333">203,769 nodes</text>
+  <text x="80" y="360"  text-anchor="middle" font-size="9" fill="#333">9.2 : 1 imbalance</text>
+
+  <line x1="133" y1="326" x2="148" y2="326" stroke="#1a4f8a"
+        stroke-width="1.5" marker-end="url(#arr-b)"/>
+
+  <!-- Box G3-B: DGI Pre-Training -->
+  <rect x="148" y="287" width="118" height="78" rx="5"
+        fill="#eff3ff" stroke="#1a4f8a" stroke-width="1.5"/>
+  <text x="207" y="305"  text-anchor="middle" font-size="10" font-weight="bold">DGI Pre-Training</text>
+  <text x="207" y="318"  text-anchor="middle" font-size="9" fill="#333">2-layer GCN encoder</text>
+  <text x="207" y="330"  text-anchor="middle" font-size="9" fill="#333">bilinear discriminator</text>
+  <text x="207" y="343"  text-anchor="middle" font-size="9" fill="#333">row-shuffle corrupt.</text>
+  <text x="207" y="356"  text-anchor="middle" font-size="9" fill="#333">Z ∈ ℝᴺˣ¹²⁸  (300 ep.)</text>
+
+  <!-- Solid arrow G3-B → G3-C (main data flow) -->
+  <line x1="266" y1="326" x2="281" y2="326" stroke="#1a4f8a"
+        stroke-width="1.5" marker-end="url(#arr-b)"/>
+
+  <!-- Box G3-C: GAT Fine-Tuning -->
+  <rect x="281" y="287" width="192" height="78" rx="5"
+        fill="#eff3ff" stroke="#1a4f8a" stroke-width="2"/>
+  <text x="377" y="305"  text-anchor="middle" font-size="10" font-weight="bold">GAT Fine-Tuning</text>
+  <text x="377" y="318"  text-anchor="middle" font-size="9" fill="#333">8-head + 1-head attention</text>
+  <text x="377" y="331"  text-anchor="middle" font-size="9" fill="#333">skip-connect: [H₂ ‖ Z*]</text>
+  <text x="377" y="344"  text-anchor="middle" font-size="9" fill="#333">H_fused ∈ ℝᴺˣ²⁵⁶</text>
+  <text x="377" y="357"  text-anchor="middle" font-size="9" fill="#333">MLP → weighted CE loss</text>
+
+  <!-- Dashed "frozen Z" skip-connection arc -->
+  <!-- Arc from bottom of DGI box → bottom of GAT box -->
+  <path d="M 207 365  Q 207 395  280 395  Q 377 395  377 365"
+        fill="none" stroke="#1a4f8a" stroke-width="1.3"
+        stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+  <text x="290" y="407" text-anchor="middle" font-size="8.5"
+        fill="#1a4f8a" font-style="italic">frozen Z (skip connection)</text>
+
+  <line x1="473" y1="326" x2="488" y2="326" stroke="#1a4f8a"
+        stroke-width="1.5" marker-end="url(#arr-b)"/>
+
+  <!-- Box G3-D: Result -->
+  <rect x="488" y="287" width="188" height="78" rx="5"
+        fill="#c8d8f8" stroke="#0a3a78" stroke-width="2"/>
+  <text x="582" y="305"  text-anchor="middle" font-size="10" font-weight="bold">Illicit Node Detection</text>
+  <text x="582" y="320"  text-anchor="middle" font-size="9" fill="#0a2858">F1 (illicit) = 0.7337</text>
+  <text x="582" y="333"  text-anchor="middle" font-size="9" fill="#0a2858">ROC-AUC = 0.9868</text>
+  <text x="582" y="346"  text-anchor="middle" font-size="9" fill="#0a2858">Precision = 0.7094</text>
+  <text x="582" y="359"  text-anchor="middle" font-size="9" fill="#0a2858">Recall = 0.7598</text>
+
+  <!-- ═══════════════════════════════════════
+       Bottom legend / note
+  ═══════════════════════════════════════ -->
+  <line x1="20" y1="430" x2="770" y2="430" stroke="#ccc" stroke-width="0.8"/>
+
+  <!-- Legend: Gap colours -->
+  <rect x="20"  y="438" width="12" height="12" fill="#edfaed" stroke="#3a8a3a" stroke-width="1"/>
+  <text x="36"  y="449" font-size="9" fill="#333">Gap 1 – Structural Clustering</text>
+
+  <rect x="215" y="438" width="12" height="12" fill="#fffaf0" stroke="#c07000" stroke-width="1"/>
+  <text x="231" y="449" font-size="9" fill="#333">Gap 2 – Chamfer Linking</text>
+
+  <rect x="390" y="438" width="12" height="12" fill="#eff3ff" stroke="#1a4f8a" stroke-width="1"/>
+  <text x="406" y="449" font-size="9" fill="#333">Gap 3 – DGI+GAT Pipeline (primary)</text>
+
+  <!-- Dashed line legend -->
+  <line x1="590" y1="444" x2="615" y2="444" stroke="#1a4f8a"
+        stroke-width="1.3" stroke-dasharray="4,2"/>
+  <text x="619" y="449" font-size="9" fill="#333">Frozen skip-connection</text>
+</svg>
