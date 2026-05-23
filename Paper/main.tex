@@ -441,23 +441,29 @@ respective datasets.
 \begin{figure}[htbp]
   \centering
   \includesvg[width=\linewidth]{fig00_architecture}
-  \caption{MixTrace multi-modal forensic framework
-    architecture. The framework addresses three independent
-    research gaps through parallel evaluation tracks.
-    \textbf{Gap~1} (top, green): structural DBSCAN
-    clustering on a six-dimensional feature vector reduces
-    the false-positive rate from 3.72\,\% to 0.75\,\% across
-    200,000 multi-input P2WPKH transactions.
-    \textbf{Gap~2} (middle, amber): Multi-Dimensional Chamfer
-    Distance linking on four-dimensional temporal window
-    features yields a null result (MD-CD F1 = 0.245 vs.\
-    1-D F1 = 0.251), identifying a boundary condition.
-    \textbf{Gap~3} (bottom, blue): a two-phase DGI
-    pre-training and GAT fine-tuning pipeline on the Elliptic
-    benchmark achieves illicit-class F1 = 0.7337 and
-    ROC-AUC = 0.9868; the dashed arrow denotes the frozen
-    skip-connection $[\mathbf{H}_2 \,\|\, \mathbf{Z}^*]$
-    from DGI embeddings into the GAT fine-tuning phase.}
+  \caption{MixTrace architecture addressing three independent
+    research gaps. \textit{Top row}: raw inputs flow from the
+    Elliptic Bitcoin Dataset (203,769 nodes) and the
+    Author-Curated Corpus (5.88\,M transactions) into a shared
+    Feature Engineering stage that produces a
+    169-dimensional feature matrix.
+    \textbf{Gap~1} (Structural DBSCAN, purple left lane):
+    a six-dimensional clustering vector $\psi(t)$
+    reduces the false-positive rate from 3.72\,\% to 0.75\,\%
+    ($-$79.8\,\% relative) across 200\,k P2WPKH transactions.
+    \textbf{Gap~2} (MD-CD, purple centre lane):
+    a four-dimensional Chamfer-distance linker yields a null
+    result ($\Delta$F1 $= -0.006$), identifying temporal
+    clustering as the dominant signal.
+    \textbf{Gap~3} (DGI\,+\,GAT, purple right lane):
+    unsupervised Deep Graph Infomax pre-training on all
+    203,769 nodes is followed by supervised Graph Attention
+    Network fine-tuning; the fused representation
+    $[\mathbf{H}_2 \,\|\, \mathbf{Z}^*] \in \mathbb{R}^{N\times256}$
+    achieves illicit-class F1\,=\,0.7337 and
+    ROC-AUC\,=\,0.9868 on the Elliptic test set.
+    \textit{Bottom row}: four quantitative output summaries
+    with bootstrap confidence intervals.}
   \label{fig:architecture}
 \end{figure}
 

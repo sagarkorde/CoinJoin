@@ -1,258 +1,286 @@
-<svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 820 500" width="820" height="500"
-     font-family="'Times New Roman', Georgia, serif">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 960"
+     font-family="Arial, Helvetica, sans-serif">
   <defs>
-    <marker id="arr" markerWidth="9" markerHeight="7"
-            refX="7" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#333"/>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="#444444"/>
     </marker>
-    <marker id="arr-b" markerWidth="9" markerHeight="7"
-            refX="7" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#1a4f8a"/>
+    <marker id="arr-purple" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="#9673a6"/>
     </marker>
-    <marker id="arr-d" markerWidth="9" markerHeight="7"
-            refX="7" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#1a4f8a"/>
+    <marker id="arr-dash" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="#555555"/>
     </marker>
   </defs>
 
-  <!-- Background -->
-  <rect x="0" y="0" width="820" height="500" fill="white" stroke="#ccc" stroke-width="1"/>
+  <!-- ======================================================
+       ROW 1 - DATA SOURCES + FEATURE ENGINEERING
+       ====================================================== -->
 
-  <!-- ── Title bar ── -->
-  <rect x="0" y="0" width="820" height="34" fill="#f0f0f0" stroke="#bbb" stroke-width="1"/>
-  <text x="410" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#111">
-    MixTrace: Multi-Modal Framework  —  Input → Processing → Output
-  </text>
+  <!-- Data Sources box -->
+  <rect x="10"  y="10" width="380" height="150" rx="5" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.8"/>
+  <rect x="10"  y="10" width="380" height="30"  rx="5" fill="#6c8ebf"/>
+  <rect x="10"  y="32" width="380" height="8"        fill="#6c8ebf"/>
+  <text x="200" y="31" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Data Sources</text>
 
-  <!-- ── Stage header row ── -->
-  <!-- Stage bands (light) -->
-  <rect x="24"  y="36" width="104" height="22" fill="#fafafa" stroke="#ddd" stroke-width="0.8" rx="2"/>
-  <rect x="140" y="36" width="120" height="22" fill="#fafafa" stroke="#ddd" stroke-width="0.8" rx="2"/>
-  <rect x="272" y="36" width="226" height="22" fill="#fafafa" stroke="#ddd" stroke-width="0.8" rx="2"/>
-  <rect x="510" y="36" width="110" height="22" fill="#fafafa" stroke="#ddd" stroke-width="0.8" rx="2"/>
-  <rect x="632" y="36" width="175" height="22" fill="#fafafa" stroke="#ddd" stroke-width="0.8" rx="2"/>
+  <text x="22"  y="57"  fill="#1a3a5c" font-size="10" font-weight="bold">Elliptic Bitcoin Dataset</text>
+  <text x="22"  y="70"  fill="#444"    font-size="9.5">203,769 nodes · 49 time steps · chronological split (train 1-34 / val 35-41 / test 42-49)</text>
+  <text x="22"  y="83"  fill="#444"    font-size="9.5">165 graph features + 4 novel features · 9.2:1 class imbalance</text>
 
-  <text x="76"  y="51" text-anchor="middle" font-size="9.5" fill="#555" font-weight="bold">① INPUT</text>
-  <text x="200" y="51" text-anchor="middle" font-size="9.5" fill="#555" font-weight="bold">② PRE-PROCESSING</text>
-  <text x="385" y="51" text-anchor="middle" font-size="9.5" fill="#555" font-weight="bold">③ LEARNING</text>
-  <text x="565" y="51" text-anchor="middle" font-size="9.5" fill="#555" font-weight="bold">④ INFERENCE</text>
-  <text x="719" y="51" text-anchor="middle" font-size="9.5" fill="#555" font-weight="bold">⑤ OUTPUT</text>
+  <line x1="10" y1="93" x2="390" y2="93" stroke="#6c8ebf" stroke-width="0.8" stroke-dasharray="4,3"/>
 
-  <!-- ── Task label strip (left) ── -->
-  <rect x="3" y="60" width="18" height="120" rx="3" fill="#eff3ff" stroke="#1a4f8a" stroke-width="1.2"/>
-  <text x="12" y="120" text-anchor="middle" font-size="9.5" fill="#1a4f8a" font-weight="bold"
-        transform="rotate(-90,12,120)">Node Classification</text>
+  <text x="22"  y="109" fill="#1a3a5c" font-size="10" font-weight="bold">Author-Curated Corpus</text>
+  <text x="22"  y="122" fill="#444"    font-size="9.5">5,884,387 Bitcoin transactions · 53 engineered features</text>
+  <text x="22"  y="135" fill="#444"    font-size="9.5">110,352 CoinJoin-like transactions identified for Gap 2 analysis</text>
 
-  <rect x="3" y="192" width="18" height="100" rx="3" fill="#edfaed" stroke="#3a8a3a" stroke-width="1.2"/>
-  <text x="12" y="242" text-anchor="middle" font-size="9.5" fill="#2a6a2a" font-weight="bold"
-        transform="rotate(-90,12,242)">Graph Clustering</text>
+  <!-- Arrow: Data Sources to Feature Engineering -->
+  <line x1="390" y1="85" x2="438" y2="85" stroke="#444" stroke-width="1.8" marker-end="url(#arr)"/>
 
-  <rect x="3" y="304" width="18" height="100" rx="3" fill="#fffaf0" stroke="#c07000" stroke-width="1.2"/>
-  <text x="12" y="354" text-anchor="middle" font-size="9.5" fill="#804800" font-weight="bold"
-        transform="rotate(-90,12,354)">Tx Linking</text>
+  <!-- Feature Engineering box -->
+  <rect x="440" y="10" width="390" height="150" rx="5" fill="#d5e8d4" stroke="#82b366" stroke-width="1.8"/>
+  <rect x="440" y="10" width="390" height="30"  rx="5" fill="#82b366"/>
+  <rect x="440" y="32" width="390" height="8"        fill="#82b366"/>
+  <text x="635" y="31" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Feature Engineering</text>
 
-  <!-- ══════════════════════════════════════════════════════
-       TRACK A  — Node Classification  (DGI + GAT)
-  ══════════════════════════════════════════════════════ -->
+  <text x="452" y="56"  fill="#1a4a1a" font-size="10" font-weight="bold">Novel graph-structural features (5 added to baseline 164):</text>
+  <text x="452" y="69"  fill="#444"    font-size="9.5">* Shortest path to nearest illicit node  (Spearman r = -0.9182)</text>
+  <text x="452" y="82"  fill="#444"    font-size="9.5">* Illicit neighbour ratio (INR)</text>
+  <text x="452" y="95"  fill="#444"    font-size="9.5">* Denomination entropy and Mixing index</text>
+  <text x="452" y="108" fill="#444"    font-size="9.5">* Temporal irregularity and Value concentration</text>
 
-  <!-- A1: Input -->
-  <rect x="24" y="64" width="104" height="108" rx="5"
-        fill="#eff3ff" stroke="#1a4f8a" stroke-width="1.5"/>
-  <text x="76" y="83"  text-anchor="middle" font-size="10" font-weight="bold">Elliptic</text>
-  <text x="76" y="96"  text-anchor="middle" font-size="10" font-weight="bold">Bitcoin Dataset</text>
-  <text x="76" y="112" text-anchor="middle" font-size="9" fill="#333">203,769 nodes</text>
-  <text x="76" y="125" text-anchor="middle" font-size="9" fill="#333">49 time steps</text>
-  <text x="76" y="138" text-anchor="middle" font-size="9" fill="#333">9.2 : 1 imbalance</text>
-  <text x="76" y="154" text-anchor="middle" font-size="9" fill="#333" font-style="italic">A ∈ ℝᴺˣᴺ, X ∈ ℝᴺˣ¹⁶⁵</text>
-  <line x1="128" y1="118" x2="140" y2="118" stroke="#1a4f8a" stroke-width="1.5" marker-end="url(#arr-b)"/>
+  <line x1="440" y1="119" x2="830" y2="119" stroke="#82b366" stroke-width="0.8" stroke-dasharray="4,3"/>
+  <text x="452" y="134" fill="#2d6a2d" font-size="10" font-style="italic" font-weight="bold">Output: 169-dim feature matrix  X in R^(N x 169)</text>
+  <text x="452" y="148" fill="#2d6a2d" font-size="9"  font-style="italic">(standardised; k-d tree spatial index for clustering)</text>
 
-  <!-- A2: Pre-processing -->
-  <rect x="140" y="64" width="120" height="108" rx="5"
-        fill="#eff3ff" stroke="#1a4f8a" stroke-width="1.5"/>
-  <text x="200" y="83"  text-anchor="middle" font-size="10" font-weight="bold">Feature</text>
-  <text x="200" y="96"  text-anchor="middle" font-size="10" font-weight="bold">Engineering</text>
-  <text x="200" y="112" text-anchor="middle" font-size="9" fill="#333">+4 graph features:</text>
-  <text x="200" y="124" text-anchor="middle" font-size="9" fill="#333">INR, shortest-path,</text>
-  <text x="200" y="136" text-anchor="middle" font-size="9" fill="#333">in-degree, out-degree</text>
-  <text x="200" y="150" text-anchor="middle" font-size="9" fill="#333" font-style="italic">X̂ ∈ ℝᴺˣ¹⁶⁹</text>
-  <line x1="260" y1="118" x2="272" y2="118" stroke="#1a4f8a" stroke-width="1.5" marker-end="url(#arr-b)"/>
+  <!-- ======================================================
+       DASHED ARROWS: Feature Engineering to Three Gaps
+       ====================================================== -->
 
-  <!-- A3: Learning — split into DGI (top) + GAT (bottom) -->
-  <rect x="272" y="64" width="226" height="108" rx="5"
-        fill="#eff3ff" stroke="#1a4f8a" stroke-width="2"/>
+  <!-- FE bottom-left to Gap 1 (center x=243) -->
+  <polyline points="510,160 510,183 243,183 243,218"
+            fill="none" stroke="#555" stroke-width="1.4"
+            stroke-dasharray="6,4" marker-end="url(#arr-dash)"/>
 
-  <!-- DGI sub-box -->
-  <rect x="278" y="69" width="105" height="48" rx="3"
-        fill="#dde8ff" stroke="#1a4f8a" stroke-width="1"/>
-  <text x="330" y="83"  text-anchor="middle" font-size="9.5" font-weight="bold">DGI Pre-Training</text>
-  <text x="330" y="95"  text-anchor="middle" font-size="8.5" fill="#333">2-layer GCN, 300 ep.</text>
-  <text x="330" y="107" text-anchor="middle" font-size="8.5" fill="#333">bilinear discriminator</text>
+  <!-- FE bottom-center to Gap 2 (center x=696) -->
+  <polyline points="635,160 635,183 696,183 696,218"
+            fill="none" stroke="#555" stroke-width="1.4"
+            stroke-dasharray="6,4" marker-end="url(#arr-dash)"/>
 
-  <!-- GAT sub-box -->
-  <rect x="389" y="69" width="105" height="48" rx="3"
-        fill="#dde8ff" stroke="#1a4f8a" stroke-width="1"/>
-  <text x="441" y="83"  text-anchor="middle" font-size="9.5" font-weight="bold">GAT Fine-Tuning</text>
-  <text x="441" y="95"  text-anchor="middle" font-size="8.5" fill="#333">8-head + 1-head attn</text>
-  <text x="441" y="107" text-anchor="middle" font-size="8.5" fill="#333">weighted CE loss</text>
+  <!-- FE right edge to Gap 3 (center x=1153) -->
+  <polyline points="830,85 1153,85 1153,218"
+            fill="none" stroke="#555" stroke-width="1.4"
+            stroke-dasharray="6,4" marker-end="url(#arr-dash)"/>
 
-  <!-- Frozen Z skip-connection arc (within box) -->
-  <path d="M 330 117  Q 330 148  385 148  Q 441 148  441 117"
-        fill="none" stroke="#1a4f8a" stroke-width="1.2" stroke-dasharray="4,2"
-        marker-end="url(#arr-d)"/>
-  <text x="385" y="162" text-anchor="middle" font-size="7.5" fill="#1a4f8a" font-style="italic">
-    frozen  Z* ∈ ℝᴺˣ¹²⁸  (skip connection)
-  </text>
+  <!-- ======================================================
+       MIXTRACE CORE COMPONENTS CONTAINER
+       ====================================================== -->
 
-  <!-- Normal arrow DGI → GAT within box -->
-  <line x1="383" y1="93" x2="389" y2="93" stroke="#1a4f8a" stroke-width="1.2" marker-end="url(#arr-b)"/>
+  <rect x="10" y="196" width="1380" height="530" rx="6" fill="#fff2cc" stroke="#d6b656" stroke-width="2.2"/>
+  <rect x="10" y="196" width="1380" height="34"  rx="6" fill="#d6b656"/>
+  <rect x="10" y="220" width="1380" height="10"       fill="#d6b656"/>
+  <text x="700" y="218" text-anchor="middle" fill="white" font-size="13" font-weight="bold">MixTrace Core Components - Addressing Three Research Gaps</text>
 
-  <line x1="498" y1="118" x2="510" y2="118" stroke="#1a4f8a" stroke-width="1.5" marker-end="url(#arr-b)"/>
+  <!-- ======================================================
+       GAP 1: STRUCTURAL DBSCAN
+       ====================================================== -->
 
-  <!-- A4: Inference -->
-  <rect x="510" y="64" width="110" height="108" rx="5"
-        fill="#eff3ff" stroke="#1a4f8a" stroke-width="1.5"/>
-  <text x="565" y="83"  text-anchor="middle" font-size="10" font-weight="bold">MLP Classifier</text>
-  <text x="565" y="100" text-anchor="middle" font-size="9" fill="#333">[H₂ ‖ Z*] ∈ ℝᴺˣ²⁵⁶</text>
-  <text x="565" y="113" text-anchor="middle" font-size="9" fill="#333">2-layer MLP</text>
-  <text x="565" y="126" text-anchor="middle" font-size="9" fill="#333">threshold θ*=0.9397</text>
-  <text x="565" y="139" text-anchor="middle" font-size="9" fill="#333">chronological split</text>
-  <text x="565" y="153" text-anchor="middle" font-size="9" fill="#333">τ ∈ {42,…,49}</text>
-  <line x1="620" y1="118" x2="632" y2="118" stroke="#1a4f8a" stroke-width="1.5" marker-end="url(#arr-b)"/>
+  <rect x="22"  y="218" width="443" height="500" rx="5" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.6"/>
+  <rect x="22"  y="218" width="443" height="28"  rx="5" fill="#9673a6"/>
+  <rect x="22"  y="238" width="443" height="8"        fill="#9673a6"/>
+  <text x="243" y="236" text-anchor="middle" fill="white" font-size="10.5" font-weight="bold">Gap 1: Multi-Input Clustering Under Script Indistinguishability</text>
 
-  <!-- A5: Output -->
-  <rect x="632" y="64" width="175" height="108" rx="5"
-        fill="#c8d8f8" stroke="#0a3a78" stroke-width="2"/>
-  <text x="719" y="83"  text-anchor="middle" font-size="10" font-weight="bold">Illicit Node Detection</text>
-  <text x="719" y="98"  text-anchor="middle" font-size="9" fill="#0a2858">F1 (illicit) = 0.7337</text>
-  <text x="719" y="111" text-anchor="middle" font-size="9" fill="#0a2858">ROC-AUC = 0.9868</text>
-  <text x="719" y="124" text-anchor="middle" font-size="9" fill="#0a2858">Precision = 0.7094</text>
-  <text x="719" y="137" text-anchor="middle" font-size="9" fill="#0a2858">Recall = 0.7598</text>
-  <text x="719" y="153" text-anchor="middle" font-size="8.5" fill="#0a2858" font-style="italic">↑36 pp F1 over GAT alone</text>
+  <rect x="92"  y="256" width="303" height="28" rx="4" fill="#f8cecc" stroke="#b85450" stroke-width="1.2"/>
+  <text x="243" y="274" text-anchor="middle" fill="#7d1f1f" font-size="10.5" font-weight="bold">Structural DBSCAN Clustering</text>
 
-  <!-- ══════════════════════════════════════════════════════
-       TRACK B  — Graph Clustering  (Structural DBSCAN)
-  ══════════════════════════════════════════════════════ -->
+  <text x="34"  y="302" fill="#333" font-size="9.5" font-weight="bold">6-dim feature vector psi(t) in R^6:</text>
+  <text x="34"  y="315" fill="#555" font-size="9">[input_count, output_count, fee_rate,</text>
+  <text x="34"  y="328" fill="#555" font-size="9"> value_concentration, address_reuse, mixing_index]</text>
+  <text x="34"  y="343" fill="#555" font-size="9">Z-score standardisation  DBSCAN  (epsilon = 0.6, minPts = 5)</text>
+  <text x="34"  y="357" fill="#555" font-size="9">k-d tree spatial index; 30k-node subsample  centroid propagation</text>
 
-  <!-- B1: Input -->
-  <rect x="24" y="196" width="104" height="90" rx="5"
-        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
-  <text x="76" y="216" text-anchor="middle" font-size="10" font-weight="bold">Bitcoin Corpus</text>
-  <text x="76" y="230" text-anchor="middle" font-size="9" fill="#333">200 K P2WPKH tx</text>
-  <text x="76" y="243" text-anchor="middle" font-size="9" fill="#333">(pre-Taproot proxy)</text>
-  <text x="76" y="260" text-anchor="middle" font-size="9" fill="#333">22,169 CoinJoin-like</text>
-  <text x="76" y="273" text-anchor="middle" font-size="9" fill="#333">177,831 non-CJ</text>
-  <line x1="128" y1="241" x2="140" y2="241" stroke="#3a8a3a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="34" y1="370" x2="453" y2="370" stroke="#9673a6" stroke-width="0.8" stroke-dasharray="4,3"/>
 
-  <!-- B2: Pre-processing -->
-  <rect x="140" y="196" width="120" height="90" rx="5"
-        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
-  <text x="200" y="216" text-anchor="middle" font-size="10" font-weight="bold">Structural</text>
-  <text x="200" y="229" text-anchor="middle" font-size="10" font-weight="bold">Feature Vector</text>
-  <text x="200" y="244" text-anchor="middle" font-size="9" fill="#333">ψ(t) ∈ ℝ⁶</text>
-  <text x="200" y="256" text-anchor="middle" font-size="9" fill="#333">input/output counts,</text>
-  <text x="200" y="268" text-anchor="middle" font-size="9" fill="#333">fee-rate, value conc.,</text>
-  <text x="200" y="280" text-anchor="middle" font-size="9" fill="#333">addr-reuse, mix-idx</text>
-  <line x1="260" y1="241" x2="272" y2="241" stroke="#3a8a3a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="34"  y="386" fill="#333" font-size="9.5" font-weight="bold" font-style="italic">Results (pre-Taproot proxy evaluation):</text>
+  <text x="34"  y="400" fill="#444" font-size="9">* FPR:  3.72%  0.75%  (-79.8% relative reduction)</text>
+  <text x="34"  y="413" fill="#444" font-size="9">* Precision:  0.770  0.833</text>
+  <text x="34"  y="426" fill="#444" font-size="9">* FNR: 70.0%  (conservative; Taproot indistinguishability)</text>
+  <text x="34"  y="441" fill="#444" font-size="9">* Greater than 5,200 false positives eliminated per 200k transactions</text>
 
-  <!-- B3: Learning -->
-  <rect x="272" y="196" width="226" height="90" rx="5"
-        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
-  <text x="385" y="216" text-anchor="middle" font-size="10" font-weight="bold">Structural DBSCAN Fitting</text>
-  <text x="385" y="229" text-anchor="middle" font-size="9" fill="#333">ε = 0.6,  min_samples = 5</text>
-  <text x="385" y="242" text-anchor="middle" font-size="9" fill="#333">k-d tree index (O(n log n))</text>
-  <text x="385" y="255" text-anchor="middle" font-size="9" fill="#333">30 K stratified subsample</text>
-  <text x="385" y="268" text-anchor="middle" font-size="9" fill="#333">centroid propagation to 200 K</text>
-  <text x="385" y="279" text-anchor="middle" font-size="9" fill="#333">majority-vote label assignment</text>
-  <line x1="498" y1="241" x2="510" y2="241" stroke="#3a8a3a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="34" y1="453" x2="453" y2="453" stroke="#9673a6" stroke-width="0.8" stroke-dasharray="4,3"/>
 
-  <!-- B4: Inference -->
-  <rect x="510" y="196" width="110" height="90" rx="5"
-        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
-  <text x="565" y="215" text-anchor="middle" font-size="10" font-weight="bold">Cluster</text>
-  <text x="565" y="228" text-anchor="middle" font-size="10" font-weight="bold">Assignment</text>
-  <text x="565" y="244" text-anchor="middle" font-size="9" fill="#333">nearest-centroid</text>
-  <text x="565" y="257" text-anchor="middle" font-size="9" fill="#333">within ε radius</text>
-  <text x="565" y="270" text-anchor="middle" font-size="9" fill="#333">CIOH fallback</text>
-  <text x="565" y="283" text-anchor="middle" font-size="9" fill="#333">outside clusters</text>
-  <line x1="620" y1="241" x2="632" y2="241" stroke="#3a8a3a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="34"  y="468" fill="#555" font-size="9" font-style="italic">Implementation note:</text>
+  <text x="34"  y="481" fill="#555" font-size="9">k-d tree built on 30k subsample; cluster labels propagated to</text>
+  <text x="34"  y="494" fill="#555" font-size="9">remaining 5.85M nodes via nearest-centroid assignment</text>
 
-  <!-- B5: Output -->
-  <rect x="632" y="196" width="175" height="90" rx="5"
-        fill="#c8eec8" stroke="#2a6a2a" stroke-width="2"/>
-  <text x="719" y="216" text-anchor="middle" font-size="10" font-weight="bold">CoinJoin Clusters</text>
-  <text x="719" y="230" text-anchor="middle" font-size="9" fill="#1a4a1a">FPR: 3.72 % → 0.75 %</text>
-  <text x="719" y="243" text-anchor="middle" font-size="9" fill="#1a4a1a">↓ 79.8 % relative reduction</text>
-  <text x="719" y="256" text-anchor="middle" font-size="9" fill="#1a4a1a">Precision = 0.833</text>
-  <text x="719" y="269" text-anchor="middle" font-size="9" fill="#1a4a1a">Silhouette = 0.973</text>
-  <text x="719" y="282" text-anchor="middle" font-size="8.5" fill="#1a4a1a" font-style="italic">FNR = 70.0 % (high-precision point)</text>
+  <rect x="44"  y="506" width="359" height="26" rx="4" fill="#d5e8d4" stroke="#82b366" stroke-width="1.1"/>
+  <text x="223" y="523" text-anchor="middle" fill="#2d5a2d" font-size="9.5" font-weight="bold">Gap 1 addressed: FPR reduced by 79.8%; precision raised to 0.833</text>
 
-  <!-- ══════════════════════════════════════════════════════
-       TRACK C  — Transaction Linking  (MD-Chamfer Distance)
-  ══════════════════════════════════════════════════════ -->
+  <!-- ======================================================
+       GAP 2: MD-CD
+       ====================================================== -->
 
-  <!-- C1: Input -->
-  <rect x="24" y="308" width="104" height="90" rx="5"
-        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
-  <text x="76" y="328" text-anchor="middle" font-size="10" font-weight="bold">Bitcoin Corpus</text>
-  <text x="76" y="342" text-anchor="middle" font-size="9" fill="#333">5,000 candidate</text>
-  <text x="76" y="355" text-anchor="middle" font-size="9" fill="#333">window pairs</text>
-  <text x="76" y="368" text-anchor="middle" font-size="9" fill="#333">2,247 time windows</text>
-  <text x="76" y="381" text-anchor="middle" font-size="9" fill="#333">(1-hour blocks)</text>
-  <line x1="128" y1="353" x2="140" y2="353" stroke="#c07000" stroke-width="1.5" marker-end="url(#arr)"/>
+  <rect x="475" y="218" width="443" height="500" rx="5" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.6"/>
+  <rect x="475" y="218" width="443" height="28"  rx="5" fill="#9673a6"/>
+  <rect x="475" y="238" width="443" height="8"        fill="#9673a6"/>
+  <text x="696" y="236" text-anchor="middle" fill="white" font-size="10.5" font-weight="bold">Gap 2: CoinJoin Spending Transaction (CST) Linking</text>
 
-  <!-- C2: Pre-processing -->
-  <rect x="140" y="308" width="120" height="90" rx="5"
-        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
-  <text x="200" y="327" text-anchor="middle" font-size="10" font-weight="bold">Temporal Encoding</text>
-  <text x="200" y="342" text-anchor="middle" font-size="9" fill="#333">φ(t) = [timestamp,</text>
-  <text x="200" y="354" text-anchor="middle" font-size="9" fill="#333"> fee_rate,</text>
-  <text x="200" y="366" text-anchor="middle" font-size="9" fill="#333"> in_count, out_count]</text>
-  <text x="200" y="380" text-anchor="middle" font-size="9" fill="#333">zero-mean unit-var norm.</text>
-  <line x1="260" y1="353" x2="272" y2="353" stroke="#c07000" stroke-width="1.5" marker-end="url(#arr)"/>
+  <rect x="535" y="256" width="323" height="28" rx="4" fill="#f8cecc" stroke="#b85450" stroke-width="1.2"/>
+  <text x="696" y="274" text-anchor="middle" fill="#7d1f1f" font-size="10.5" font-weight="bold">Multi-Dimensional Chamfer Distance (MD-CD)</text>
 
-  <!-- C3: Learning -->
-  <rect x="272" y="308" width="226" height="90" rx="5"
-        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
-  <text x="385" y="327" text-anchor="middle" font-size="10" font-weight="bold">Chamfer Distance Threshold Fitting</text>
-  <text x="385" y="341" text-anchor="middle" font-size="9" fill="#333">1-D baseline: d = 1 (timestamp only)</text>
-  <text x="385" y="353" text-anchor="middle" font-size="9" fill="#333">MD-CD: d = 4 (full φ(t))</text>
-  <text x="385" y="366" text-anchor="middle" font-size="9" fill="#333">θ* = arg max F1 on validation set</text>
-  <text x="385" y="378" text-anchor="middle" font-size="9" fill="#333">θ*₁D = 0.452,  θ*₄D = 3.384</text>
-  <line x1="498" y1="353" x2="510" y2="353" stroke="#c07000" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="487" y="302" fill="#333" font-size="9.5" font-weight="bold">4-dim feature vector phi(t) in R^4:</text>
+  <text x="487" y="315" fill="#555" font-size="9">[timestamp, fee_rate, input_count, output_count]</text>
+  <text x="487" y="330" fill="#555" font-size="9">Min-max normalisation  one-sided Chamfer distance:</text>
+  <text x="487" y="345" fill="#555" font-size="9">  d_C(U,V) = (1/|U|) SUM min ||u_i - v_j||_2</text>
+  <text x="487" y="360" fill="#555" font-size="9">Optimal threshold theta* determined by F1 maximisation on validation set</text>
 
-  <!-- C4: Inference -->
-  <rect x="510" y="308" width="110" height="90" rx="5"
-        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
-  <text x="565" y="328" text-anchor="middle" font-size="10" font-weight="bold">Window Pair</text>
-  <text x="565" y="341" text-anchor="middle" font-size="10" font-weight="bold">Prediction</text>
-  <text x="565" y="357" text-anchor="middle" font-size="9" fill="#333">d_C(Wᵢ, Wⱼ) &lt; θ*</text>
-  <text x="565" y="370" text-anchor="middle" font-size="9" fill="#333">→ linked CST pair</text>
-  <text x="565" y="385" text-anchor="middle" font-size="9" fill="#333">else: unlinked</text>
-  <line x1="620" y1="353" x2="632" y2="353" stroke="#c07000" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="487" y1="373" x2="906" y2="373" stroke="#9673a6" stroke-width="0.8" stroke-dasharray="4,3"/>
 
-  <!-- C5: Output -->
-  <rect x="632" y="308" width="175" height="90" rx="5"
-        fill="#ffe8b0" stroke="#804800" stroke-width="2"/>
-  <text x="719" y="327" text-anchor="middle" font-size="10" font-weight="bold">Spend-Transaction Links</text>
-  <text x="719" y="342" text-anchor="middle" font-size="9" fill="#5a3000">1-D  F1 = 0.251</text>
-  <text x="719" y="355" text-anchor="middle" font-size="9" fill="#5a3000">MD-CD  F1 = 0.245</text>
-  <text x="719" y="368" text-anchor="middle" font-size="9" fill="#5a3000">Null result: temporal</text>
-  <text x="719" y="381" text-anchor="middle" font-size="9" fill="#5a3000">feature dominates</text>
-  <text x="719" y="394" text-anchor="middle" font-size="8.5" fill="#5a3000" font-style="italic">→ boundary condition</text>
+  <text x="487" y="389" fill="#333" font-size="9.5" font-weight="bold" font-style="italic">Results (author-curated corpus, 5.88M transactions):</text>
+  <text x="487" y="403" fill="#444" font-size="9">* Recall greater than 0.954  (identical for 1-D and 4-D MD variants)</text>
+  <text x="487" y="416" fill="#444" font-size="9">* F1 difference = -0.006  (no measurable gain from extra dimensions)</text>
+  <text x="487" y="429" fill="#444" font-size="9">* Temporal clustering dominates; MD extension adds no signal</text>
+  <text x="487" y="444" fill="#444" font-size="9">* Boundary condition: 1-D timestamp sufficient for this corpus</text>
 
-  <!-- ── Footer legend ── -->
-  <line x1="20" y1="420" x2="800" y2="420" stroke="#ccc" stroke-width="0.8"/>
-  <rect x="20"  y="430" width="11" height="11" fill="#eff3ff" stroke="#1a4f8a" stroke-width="1"/>
-  <text x="35"  y="440" font-size="8.5" fill="#333">Node Classification (DGI+GAT)</text>
-  <rect x="220" y="430" width="11" height="11" fill="#edfaed" stroke="#3a8a3a" stroke-width="1"/>
-  <text x="235" y="440" font-size="8.5" fill="#333">Graph Clustering (DBSCAN)</text>
-  <rect x="420" y="430" width="11" height="11" fill="#fffaf0" stroke="#c07000" stroke-width="1"/>
-  <text x="435" y="440" font-size="8.5" fill="#333">Transaction Linking (MD-CD)</text>
-  <line x1="610" y1="435" x2="636" y2="435" stroke="#1a4f8a" stroke-width="1.2" stroke-dasharray="4,2"/>
-  <text x="640" y="440" font-size="8.5" fill="#333">Frozen skip-connection (Z*)</text>
+  <line x1="487" y1="456" x2="906" y2="456" stroke="#9673a6" stroke-width="0.8" stroke-dasharray="4,3"/>
 
-  <!-- ── Track separator lines ── -->
-  <line x1="22" y1="188" x2="808" y2="188" stroke="#ddd" stroke-width="0.8" stroke-dasharray="2,4"/>
-  <line x1="22" y1="300" x2="808" y2="300" stroke="#ddd" stroke-width="0.8" stroke-dasharray="2,4"/>
+  <text x="487" y="471" fill="#555" font-size="9" font-style="italic">Interpretation:</text>
+  <text x="487" y="484" fill="#555" font-size="9">Null result is informative - multi-dimensional geometry of</text>
+  <text x="487" y="497" fill="#555" font-size="9">Chamfer distance adds value only in temporally dispersed datasets</text>
+
+  <rect x="497" y="509" width="359" height="26" rx="4" fill="#d5e8d4" stroke="#82b366" stroke-width="1.1"/>
+  <text x="676" y="526" text-anchor="middle" fill="#2d5a2d" font-size="9.5" font-weight="bold">Gap 2 informed: null result guides temporally-dispersed future datasets</text>
+
+  <!-- ======================================================
+       GAP 3: DGI + GAT
+       ====================================================== -->
+
+  <rect x="928" y="218" width="450" height="500" rx="5" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.6"/>
+  <rect x="928" y="218" width="450" height="28"  rx="5" fill="#9673a6"/>
+  <rect x="928" y="238" width="450" height="8"        fill="#9673a6"/>
+  <text x="1153" y="236" text-anchor="middle" fill="white" font-size="10.5" font-weight="bold">Gap 3: Class Imbalance in Graph-Based Detection</text>
+
+  <!-- Phase 1: DGI -->
+  <rect x="940" y="256" width="425" height="28" rx="4" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.2"/>
+  <text x="1153" y="274" text-anchor="middle" fill="#7a4800" font-size="10.5" font-weight="bold">Phase 1: Deep Graph Infomax Pre-training  (unsupervised)</text>
+
+  <text x="940" y="300" fill="#555" font-size="9">2-layer GCN encoder:  H(1) = ELU(A_hat X W1),  Z = ELU(A_hat H(1) W2) in R^(N x 128)</text>
+  <text x="940" y="313" fill="#555" font-size="9">Global summary: s = sigma(mean_v z_v)  *  Bilinear discriminator: D(z_i, s) = z_i^T W s</text>
+  <text x="940" y="326" fill="#555" font-size="9">Binary cross-entropy loss: real pairs vs. row-shuffled corrupted pairs</text>
+  <text x="940" y="339" fill="#555" font-size="9">Uses all 203,769 nodes (incl. 157,205 unlabelled) - fully transductive</text>
+
+  <!-- Phase 2: GAT -->
+  <rect x="940" y="353" width="425" height="28" rx="4" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.2"/>
+  <text x="1153" y="371" text-anchor="middle" fill="#7a4800" font-size="10.5" font-weight="bold">Phase 2: GAT Fine-tuning  (supervised, 46,564 labelled nodes)</text>
+
+  <text x="940" y="397" fill="#555" font-size="9">Layer 1: 8-head concat attention  H1 in R^(N x 128)  (ELU, dropout 0.6)</text>
+  <text x="940" y="410" fill="#555" font-size="9">Layer 2: 1-head mean attention  H2 in R^(N x 128)</text>
+  <text x="940" y="423" fill="#555" font-size="9">Fused representation: H_fused = [H2 || Z*] in R^(N x 256)</text>
+  <text x="940" y="436" fill="#555" font-size="9">MLP classifier  *  class-weighted CE: w1 = 4.317, w0 = 0.565</text>
+  <text x="940" y="449" fill="#555" font-size="9">ADASYN oversampling (diagnostic only)  *  threshold theta* = 0.9397</text>
+
+  <line x1="940" y1="461" x2="1366" y2="461" stroke="#9673a6" stroke-width="0.8" stroke-dasharray="4,3"/>
+
+  <text x="940" y="477" fill="#333" font-size="9.5" font-weight="bold" font-style="italic">Results (Elliptic test set, time steps 42-49):</text>
+  <text x="940" y="491" fill="#444" font-size="9">* Illicit F1 = 0.7337   (RF 0.628, GAT-only 0.204, KNN 0.483)</text>
+  <text x="940" y="504" fill="#444" font-size="9">* ROC-AUC = 0.9868  *  Bootstrap 95% CI: (0.674, 0.793)</text>
+  <text x="940" y="517" fill="#444" font-size="9">* DGI pre-training contributes +36 pp to F1  (ablation confirmed)</text>
+
+  <rect x="950" y="531" width="416" height="26" rx="4" fill="#d5e8d4" stroke="#82b366" stroke-width="1.1"/>
+  <text x="1158" y="548" text-anchor="middle" fill="#2d5a2d" font-size="9" font-weight="bold">Gap 3 addressed: self-supervised pre-training on unlabelled nodes enables high-F1 detection</text>
+
+  <!-- ======================================================
+       ARROWS: Gaps to Evaluation
+       ====================================================== -->
+
+  <line x1="243"  y1="718" x2="243"  y2="750" stroke="#9673a6" stroke-width="1.8" marker-end="url(#arr-purple)"/>
+  <line x1="696"  y1="718" x2="696"  y2="750" stroke="#9673a6" stroke-width="1.8" marker-end="url(#arr-purple)"/>
+  <line x1="1153" y1="718" x2="1153" y2="750" stroke="#9673a6" stroke-width="1.8" marker-end="url(#arr-purple)"/>
+
+  <!-- ======================================================
+       ROW 3 - LEGEND + EVALUATION AND OUTPUTS
+       ====================================================== -->
+
+  <!-- Legend -->
+  <rect x="10" y="752" width="235" height="195" rx="5" fill="white" stroke="#444" stroke-width="1.6"/>
+  <rect x="10" y="752" width="235" height="28"  rx="5" fill="#555"/>
+  <rect x="10" y="772" width="235" height="8"        fill="#555"/>
+  <text x="127" y="770" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Legend</text>
+
+  <rect x="22" y="792" width="18" height="14" rx="2" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1"/>
+  <text x="46"  y="804" fill="#333" font-size="9.5">Data sources / feature engineering</text>
+
+  <rect x="22" y="813" width="18" height="14" rx="2" fill="#fff2cc" stroke="#d6b656" stroke-width="1"/>
+  <text x="46"  y="825" fill="#333" font-size="9.5">MixTrace core components</text>
+
+  <rect x="22" y="834" width="18" height="14" rx="2" fill="#e1d5e7" stroke="#9673a6" stroke-width="1"/>
+  <text x="46"  y="846" fill="#333" font-size="9.5">Gap-addressing sub-module</text>
+
+  <rect x="22" y="855" width="18" height="14" rx="2" fill="#f8cecc" stroke="#b85450" stroke-width="1"/>
+  <text x="46"  y="867" fill="#333" font-size="9.5">Processing component</text>
+
+  <rect x="22" y="876" width="18" height="14" rx="2" fill="#d5e8d4" stroke="#82b366" stroke-width="1"/>
+  <text x="46"  y="888" fill="#333" font-size="9.5">Gap addressed (result badge)</text>
+
+  <line x1="22" y1="903" x2="38" y2="903" stroke="#555" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <polygon points="38,900 46,903 38,906" fill="#555"/>
+  <text x="52"  y="907" fill="#333" font-size="9.5">Feature feeds into component</text>
+
+  <line x1="22" y1="924" x2="38" y2="924" stroke="#9673a6" stroke-width="1.6"/>
+  <polygon points="38,921 46,924 38,927" fill="#9673a6"/>
+  <text x="52"  y="928" fill="#333" font-size="9.5">Component feeds into evaluation</text>
+
+  <!-- Evaluation and Outputs -->
+  <rect x="255" y="752" width="1135" height="195" rx="5" fill="#f5f5f5" stroke="#666" stroke-width="1.6"/>
+  <rect x="255" y="752" width="1135" height="28"  rx="5" fill="#666"/>
+  <rect x="255" y="772" width="1135" height="8"        fill="#666"/>
+  <text x="822" y="770" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Evaluation and Outputs</text>
+
+  <!-- Result box 1: Illicit detection -->
+  <rect x="268" y="790" width="258" height="143" rx="4" fill="white" stroke="#aaa" stroke-width="1"/>
+  <rect x="268" y="790" width="258" height="22"  rx="4" fill="#e8e8e8"/>
+  <rect x="268" y="804" width="258" height="8"        fill="#e8e8e8"/>
+  <text x="397" y="805" text-anchor="middle" fill="#333" font-size="10" font-weight="bold">Illicit Detection (Elliptic)</text>
+  <text x="397" y="825" text-anchor="middle" fill="#444" font-size="9">F1 = 0.734  |  ROC-AUC = 0.987</text>
+  <text x="397" y="838" text-anchor="middle" fill="#444" font-size="9">+10.5 pp over Random Forest (0.628)</text>
+  <text x="397" y="851" text-anchor="middle" fill="#444" font-size="9">Bootstrap 95% CI:  (0.674, 0.793)</text>
+  <text x="397" y="864" text-anchor="middle" fill="#444" font-size="9">Cohen kappa = 0.720  (RF: 0.615)</text>
+  <text x="397" y="877" text-anchor="middle" fill="#2d6a2d" font-size="9" font-weight="bold">McNemar chi-sq = 6.1,  p = 0.013</text>
+  <text x="397" y="924" text-anchor="middle" fill="#555" font-size="8.5" font-style="italic">310 TP | 127 FP | 98 FN | 8,306 TN</text>
+
+  <!-- Result box 2: Structural clustering -->
+  <rect x="542" y="790" width="258" height="143" rx="4" fill="white" stroke="#aaa" stroke-width="1"/>
+  <rect x="542" y="790" width="258" height="22"  rx="4" fill="#e8e8e8"/>
+  <rect x="542" y="804" width="258" height="8"        fill="#e8e8e8"/>
+  <text x="671" y="805" text-anchor="middle" fill="#333" font-size="10" font-weight="bold">Structural Clustering (Gap 1)</text>
+  <text x="671" y="825" text-anchor="middle" fill="#444" font-size="9">FPR:  3.72%  to  0.75%  (-79.8%)</text>
+  <text x="671" y="838" text-anchor="middle" fill="#444" font-size="9">Precision:  0.770  to  0.833</text>
+  <text x="671" y="851" text-anchor="middle" fill="#444" font-size="9">FNR: 70.0%  (conservative)</text>
+  <text x="671" y="864" text-anchor="middle" fill="#444" font-size="9">Greater than 5,200 FP eliminated / 200k txns</text>
+  <text x="671" y="877" text-anchor="middle" fill="#2d6a2d" font-size="9" font-weight="bold">DBSCAN (epsilon=0.6, minPts=5)</text>
+  <text x="671" y="924" text-anchor="middle" fill="#555" font-size="8.5" font-style="italic">Pre-Taproot proxy; P2TR limits FNR improvement</text>
+
+  <!-- Result box 3: CST Linking -->
+  <rect x="816" y="790" width="258" height="143" rx="4" fill="white" stroke="#aaa" stroke-width="1"/>
+  <rect x="816" y="790" width="258" height="22"  rx="4" fill="#e8e8e8"/>
+  <rect x="816" y="804" width="258" height="8"        fill="#e8e8e8"/>
+  <text x="945" y="805" text-anchor="middle" fill="#333" font-size="10" font-weight="bold">CST Linking - MD-CD (Gap 2)</text>
+  <text x="945" y="825" text-anchor="middle" fill="#444" font-size="9">Recall greater than 0.954  (1-D and 4-D MD)</text>
+  <text x="945" y="838" text-anchor="middle" fill="#444" font-size="9">F1 difference = -0.006  (null result)</text>
+  <text x="945" y="851" text-anchor="middle" fill="#444" font-size="9">Temporal clustering dominates</text>
+  <text x="945" y="864" text-anchor="middle" fill="#444" font-size="9">Boundary condition identified</text>
+  <text x="945" y="877" text-anchor="middle" fill="#2d6a2d" font-size="9" font-weight="bold">Guides future temporally-dispersed work</text>
+  <text x="945" y="924" text-anchor="middle" fill="#555" font-size="8.5" font-style="italic">Evaluated on author corpus (5.88M txns)</text>
+
+  <!-- Result box 4: DGI ablation -->
+  <rect x="1090" y="790" width="287" height="143" rx="4" fill="white" stroke="#aaa" stroke-width="1"/>
+  <rect x="1090" y="790" width="287" height="22"  rx="4" fill="#e8e8e8"/>
+  <rect x="1090" y="804" width="287" height="8"        fill="#e8e8e8"/>
+  <text x="1233" y="805" text-anchor="middle" fill="#333" font-size="10" font-weight="bold">DGI Ablation Study (Gap 3)</text>
+  <text x="1233" y="825" text-anchor="middle" fill="#444" font-size="9">+36 pp F1 gain:  0.204  to  0.734</text>
+  <text x="1233" y="838" text-anchor="middle" fill="#444" font-size="9">Self-supervised pre-training validated</text>
+  <text x="1233" y="851" text-anchor="middle" fill="#444" font-size="9">157,205 unlabelled nodes leveraged</text>
+  <text x="1233" y="864" text-anchor="middle" fill="#444" font-size="9">Class weights + threshold calibration</text>
+  <text x="1233" y="877" text-anchor="middle" fill="#2d6a2d" font-size="9" font-weight="bold">Best-in-class vs. Weber, Alarab, Xiao and Yin</text>
+  <text x="1233" y="924" text-anchor="middle" fill="#555" font-size="8.5" font-style="italic">Chronological split prevents look-ahead bias</text>
+
 </svg>
