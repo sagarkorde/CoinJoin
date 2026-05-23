@@ -1,230 +1,258 @@
 <svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 790 460" width="790" height="460"
+     viewBox="0 0 820 500" width="820" height="500"
      font-family="'Times New Roman', Georgia, serif">
   <defs>
-    <!-- Standard arrowhead -->
     <marker id="arr" markerWidth="9" markerHeight="7"
             refX="7" refY="3.5" orient="auto">
-      <polygon points="0 0, 9 3.5, 0 7" fill="#333"/>
+      <polygon points="0 0,9 3.5,0 7" fill="#333"/>
     </marker>
-    <!-- Blue arrowhead (Gap 3) -->
     <marker id="arr-b" markerWidth="9" markerHeight="7"
             refX="7" refY="3.5" orient="auto">
-      <polygon points="0 0, 9 3.5, 0 7" fill="#1a4f8a"/>
+      <polygon points="0 0,9 3.5,0 7" fill="#1a4f8a"/>
     </marker>
-    <!-- Dashed blue arrowhead -->
     <marker id="arr-d" markerWidth="9" markerHeight="7"
             refX="7" refY="3.5" orient="auto">
-      <polygon points="0 0, 9 3.5, 0 7" fill="#1a4f8a"/>
+      <polygon points="0 0,9 3.5,0 7" fill="#1a4f8a"/>
     </marker>
   </defs>
 
-  <!-- ═══════════════════════════════════════
-       Background + outer border
-  ═══════════════════════════════════════ -->
-  <rect x="0" y="0" width="790" height="460"
-        fill="white" stroke="#ccc" stroke-width="1"/>
+  <!-- Background -->
+  <rect x="0" y="0" width="820" height="500" fill="white" stroke="#ccc" stroke-width="1"/>
 
-  <!-- Title bar -->
-  <rect x="0" y="0" width="790" height="36" fill="#f5f5f5"
-        stroke="#bbb" stroke-width="1"/>
-  <text x="395" y="23" text-anchor="middle"
-        font-size="14" font-weight="bold" fill="#111">
-    MixTrace: Multi-Modal Forensic Framework Architecture
+  <!-- ── Title bar ── -->
+  <rect x="0" y="0" width="820" height="34" fill="#f0f0f0" stroke="#bbb" stroke-width="1"/>
+  <text x="410" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#111">
+    MixTrace: Multi-Modal Framework  —  Input → Processing → Output
   </text>
 
-  <!-- Column header labels -->
-  <text x="78"  y="52" text-anchor="middle" font-size="9" fill="#666" font-style="italic">Input</text>
-  <text x="203" y="52" text-anchor="middle" font-size="9" fill="#666" font-style="italic">Feature Encoding</text>
-  <text x="355" y="52" text-anchor="middle" font-size="9" fill="#666" font-style="italic">Core Method</text>
-  <text x="568" y="52" text-anchor="middle" font-size="9" fill="#666" font-style="italic">Output / Result</text>
+  <!-- ── Stage header row ── -->
+  <!-- Stage bands (light) -->
+  <rect x="24"  y="36" width="104" height="22" fill="#fafafa" stroke="#ddd" stroke-width="0.8" rx="2"/>
+  <rect x="140" y="36" width="120" height="22" fill="#fafafa" stroke="#ddd" stroke-width="0.8" rx="2"/>
+  <rect x="272" y="36" width="226" height="22" fill="#fafafa" stroke="#ddd" stroke-width="0.8" rx="2"/>
+  <rect x="510" y="36" width="110" height="22" fill="#fafafa" stroke="#ddd" stroke-width="0.8" rx="2"/>
+  <rect x="632" y="36" width="175" height="22" fill="#fafafa" stroke="#ddd" stroke-width="0.8" rx="2"/>
 
-  <!-- Vertical divider lines (light) -->
-  <line x1="138" y1="58" x2="138" y2="400" stroke="#e5e5e5" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="270" y1="58" x2="270" y2="400" stroke="#e5e5e5" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="480" y1="58" x2="480" y2="400" stroke="#e5e5e5" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="76"  y="51" text-anchor="middle" font-size="9.5" fill="#555" font-weight="bold">① INPUT</text>
+  <text x="200" y="51" text-anchor="middle" font-size="9.5" fill="#555" font-weight="bold">② PRE-PROCESSING</text>
+  <text x="385" y="51" text-anchor="middle" font-size="9.5" fill="#555" font-weight="bold">③ LEARNING</text>
+  <text x="565" y="51" text-anchor="middle" font-size="9.5" fill="#555" font-weight="bold">④ INFERENCE</text>
+  <text x="719" y="51" text-anchor="middle" font-size="9.5" fill="#555" font-weight="bold">⑤ OUTPUT</text>
 
-  <!-- ═══════════════════════════════════════
-       GAP 1  —  Structural DBSCAN Clustering
-  ═══════════════════════════════════════ -->
-  <!-- Side label pill -->
-  <rect x="5" y="62" width="18" height="92" rx="4"
-        fill="#e8f5e8" stroke="#3a8a3a" stroke-width="1.2"/>
-  <text x="14" y="108" text-anchor="middle" font-size="10"
-        fill="#2a6a2a" font-weight="bold"
-        transform="rotate(-90,14,108)">Gap 1</text>
+  <!-- ── Task label strip (left) ── -->
+  <rect x="3" y="60" width="18" height="120" rx="3" fill="#eff3ff" stroke="#1a4f8a" stroke-width="1.2"/>
+  <text x="12" y="120" text-anchor="middle" font-size="9.5" fill="#1a4f8a" font-weight="bold"
+        transform="rotate(-90,12,120)">Node Classification</text>
 
-  <!-- Box G1-A: Input -->
-  <rect x="28" y="67" width="105" height="62" rx="5"
-        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
-  <text x="80" y="87"  text-anchor="middle" font-size="10" font-weight="bold">Bitcoin</text>
-  <text x="80" y="100" text-anchor="middle" font-size="10" font-weight="bold">Corpus</text>
-  <text x="80" y="113" text-anchor="middle" font-size="9" fill="#444">200 K P2WPKH tx</text>
-  <text x="80" y="124" text-anchor="middle" font-size="9" fill="#444">(pre-Taproot)</text>
+  <rect x="3" y="192" width="18" height="100" rx="3" fill="#edfaed" stroke="#3a8a3a" stroke-width="1.2"/>
+  <text x="12" y="242" text-anchor="middle" font-size="9.5" fill="#2a6a2a" font-weight="bold"
+        transform="rotate(-90,12,242)">Graph Clustering</text>
 
-  <line x1="133" y1="98" x2="148" y2="98" stroke="#3a8a3a"
-        stroke-width="1.5" marker-end="url(#arr)"/>
+  <rect x="3" y="304" width="18" height="100" rx="3" fill="#fffaf0" stroke="#c07000" stroke-width="1.2"/>
+  <text x="12" y="354" text-anchor="middle" font-size="9.5" fill="#804800" font-weight="bold"
+        transform="rotate(-90,12,354)">Tx Linking</text>
 
-  <!-- Box G1-B: Features -->
-  <rect x="148" y="67" width="118" height="62" rx="5"
-        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
-  <text x="207" y="85"  text-anchor="middle" font-size="10" font-weight="bold">Structural</text>
-  <text x="207" y="98"  text-anchor="middle" font-size="10" font-weight="bold">Feature Vector</text>
-  <text x="207" y="111" text-anchor="middle" font-size="9" fill="#444">ψ(t) ∈ ℝ⁶</text>
-  <text x="207" y="123" text-anchor="middle" font-size="9" fill="#444">std-normalised</text>
+  <!-- ══════════════════════════════════════════════════════
+       TRACK A  — Node Classification  (DGI + GAT)
+  ══════════════════════════════════════════════════════ -->
 
-  <line x1="266" y1="98" x2="281" y2="98" stroke="#3a8a3a"
-        stroke-width="1.5" marker-end="url(#arr)"/>
-
-  <!-- Box G1-C: DBSCAN -->
-  <rect x="281" y="67" width="192" height="62" rx="5"
-        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
-  <text x="377" y="85"  text-anchor="middle" font-size="10" font-weight="bold">Structural DBSCAN</text>
-  <text x="377" y="98"  text-anchor="middle" font-size="9" fill="#444">ε = 0.6,  min_samples = 5</text>
-  <text x="377" y="111" text-anchor="middle" font-size="9" fill="#444">k-d tree index</text>
-  <text x="377" y="123" text-anchor="middle" font-size="9" fill="#444">30 K subsample + centroid prop.</text>
-
-  <line x1="473" y1="98" x2="488" y2="98" stroke="#3a8a3a"
-        stroke-width="1.5" marker-end="url(#arr)"/>
-
-  <!-- Box G1-D: Result -->
-  <rect x="488" y="67" width="188" height="62" rx="5"
-        fill="#c8eec8" stroke="#2a6a2a" stroke-width="2"/>
-  <text x="582" y="85"  text-anchor="middle" font-size="10" font-weight="bold">CoinJoin Clusters</text>
-  <text x="582" y="98"  text-anchor="middle" font-size="9" fill="#1a4a1a">FPR: 3.72 % → 0.75 % (−79.8 %)</text>
-  <text x="582" y="111" text-anchor="middle" font-size="9" fill="#1a4a1a">Precision = 0.833</text>
-  <text x="582" y="123" text-anchor="middle" font-size="9" fill="#1a4a1a">Silhouette score = 0.973</text>
-
-  <!-- ═══════════════════════════════════════
-       GAP 2  —  Multi-Dimensional Chamfer Distance
-  ═══════════════════════════════════════ -->
-  <rect x="5" y="172" width="18" height="92" rx="4"
-        fill="#fff3e0" stroke="#c07000" stroke-width="1.2"/>
-  <text x="14" y="218" text-anchor="middle" font-size="10"
-        fill="#804800" font-weight="bold"
-        transform="rotate(-90,14,218)">Gap 2</text>
-
-  <!-- Box G2-A: Input -->
-  <rect x="28" y="177" width="105" height="62" rx="5"
-        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
-  <text x="80" y="197"  text-anchor="middle" font-size="10" font-weight="bold">Bitcoin</text>
-  <text x="80" y="210"  text-anchor="middle" font-size="10" font-weight="bold">Corpus</text>
-  <text x="80" y="223"  text-anchor="middle" font-size="9" fill="#444">5 000 candidate</text>
-  <text x="80" y="234"  text-anchor="middle" font-size="9" fill="#444">window pairs</text>
-
-  <line x1="133" y1="208" x2="148" y2="208" stroke="#c07000"
-        stroke-width="1.5" marker-end="url(#arr)"/>
-
-  <!-- Box G2-B: Features -->
-  <rect x="148" y="177" width="118" height="62" rx="5"
-        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
-  <text x="207" y="195"  text-anchor="middle" font-size="10" font-weight="bold">4-D Encoding</text>
-  <text x="207" y="208"  text-anchor="middle" font-size="9" fill="#444">φ(t) = [timestamp,</text>
-  <text x="207" y="220"  text-anchor="middle" font-size="9" fill="#444"> fee_rate,</text>
-  <text x="207" y="232"  text-anchor="middle" font-size="9" fill="#444"> in_cnt,  out_cnt]</text>
-
-  <line x1="266" y1="208" x2="281" y2="208" stroke="#c07000"
-        stroke-width="1.5" marker-end="url(#arr)"/>
-
-  <!-- Box G2-C: Chamfer -->
-  <rect x="281" y="177" width="192" height="62" rx="5"
-        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
-  <text x="377" y="195"  text-anchor="middle" font-size="10" font-weight="bold">Chamfer Distance Linking</text>
-  <text x="377" y="208"  text-anchor="middle" font-size="9" fill="#444">1-D baseline (timestamp only)</text>
-  <text x="377" y="220"  text-anchor="middle" font-size="9" fill="#444">vs. MD-CD (d = 4 features)</text>
-  <text x="377" y="232"  text-anchor="middle" font-size="9" fill="#444">threshold θ* = val-F1 optimal</text>
-
-  <line x1="473" y1="208" x2="488" y2="208" stroke="#c07000"
-        stroke-width="1.5" marker-end="url(#arr)"/>
-
-  <!-- Box G2-D: Result -->
-  <rect x="488" y="177" width="188" height="62" rx="5"
-        fill="#ffe8b0" stroke="#804800" stroke-width="2"/>
-  <text x="582" y="195"  text-anchor="middle" font-size="10" font-weight="bold">CST Window Pairs</text>
-  <text x="582" y="208"  text-anchor="middle" font-size="9" fill="#5a3000">1-D F1 = 0.251  |  MD F1 = 0.245</text>
-  <text x="582" y="220"  text-anchor="middle" font-size="9" fill="#5a3000">Null result: temporal</text>
-  <text x="582" y="232"  text-anchor="middle" font-size="9" fill="#5a3000">dominates over MD-CD</text>
-
-  <!-- ═══════════════════════════════════════
-       GAP 3  —  DGI + GAT Pipeline  (main)
-  ═══════════════════════════════════════ -->
-  <rect x="5" y="282" width="18" height="118" rx="4"
-        fill="#e8eeff" stroke="#1a4f8a" stroke-width="1.2"/>
-  <text x="14" y="341" text-anchor="middle" font-size="10"
-        fill="#1a4f8a" font-weight="bold"
-        transform="rotate(-90,14,341)">Gap 3</text>
-
-  <!-- Box G3-A: Elliptic Dataset -->
-  <rect x="28" y="287" width="105" height="78" rx="5"
+  <!-- A1: Input -->
+  <rect x="24" y="64" width="104" height="108" rx="5"
         fill="#eff3ff" stroke="#1a4f8a" stroke-width="1.5"/>
-  <text x="80" y="307"  text-anchor="middle" font-size="10" font-weight="bold">Elliptic</text>
-  <text x="80" y="320"  text-anchor="middle" font-size="10" font-weight="bold">Dataset</text>
-  <text x="80" y="334"  text-anchor="middle" font-size="9" fill="#333">X ∈ ℝᴺˣ¹⁶⁹</text>
-  <text x="80" y="347"  text-anchor="middle" font-size="9" fill="#333">203,769 nodes</text>
-  <text x="80" y="360"  text-anchor="middle" font-size="9" fill="#333">9.2 : 1 imbalance</text>
+  <text x="76" y="83"  text-anchor="middle" font-size="10" font-weight="bold">Elliptic</text>
+  <text x="76" y="96"  text-anchor="middle" font-size="10" font-weight="bold">Bitcoin Dataset</text>
+  <text x="76" y="112" text-anchor="middle" font-size="9" fill="#333">203,769 nodes</text>
+  <text x="76" y="125" text-anchor="middle" font-size="9" fill="#333">49 time steps</text>
+  <text x="76" y="138" text-anchor="middle" font-size="9" fill="#333">9.2 : 1 imbalance</text>
+  <text x="76" y="154" text-anchor="middle" font-size="9" fill="#333" font-style="italic">A ∈ ℝᴺˣᴺ, X ∈ ℝᴺˣ¹⁶⁵</text>
+  <line x1="128" y1="118" x2="140" y2="118" stroke="#1a4f8a" stroke-width="1.5" marker-end="url(#arr-b)"/>
 
-  <line x1="133" y1="326" x2="148" y2="326" stroke="#1a4f8a"
-        stroke-width="1.5" marker-end="url(#arr-b)"/>
-
-  <!-- Box G3-B: DGI Pre-Training -->
-  <rect x="148" y="287" width="118" height="78" rx="5"
+  <!-- A2: Pre-processing -->
+  <rect x="140" y="64" width="120" height="108" rx="5"
         fill="#eff3ff" stroke="#1a4f8a" stroke-width="1.5"/>
-  <text x="207" y="305"  text-anchor="middle" font-size="10" font-weight="bold">DGI Pre-Training</text>
-  <text x="207" y="318"  text-anchor="middle" font-size="9" fill="#333">2-layer GCN encoder</text>
-  <text x="207" y="330"  text-anchor="middle" font-size="9" fill="#333">bilinear discriminator</text>
-  <text x="207" y="343"  text-anchor="middle" font-size="9" fill="#333">row-shuffle corrupt.</text>
-  <text x="207" y="356"  text-anchor="middle" font-size="9" fill="#333">Z ∈ ℝᴺˣ¹²⁸  (300 ep.)</text>
+  <text x="200" y="83"  text-anchor="middle" font-size="10" font-weight="bold">Feature</text>
+  <text x="200" y="96"  text-anchor="middle" font-size="10" font-weight="bold">Engineering</text>
+  <text x="200" y="112" text-anchor="middle" font-size="9" fill="#333">+4 graph features:</text>
+  <text x="200" y="124" text-anchor="middle" font-size="9" fill="#333">INR, shortest-path,</text>
+  <text x="200" y="136" text-anchor="middle" font-size="9" fill="#333">in-degree, out-degree</text>
+  <text x="200" y="150" text-anchor="middle" font-size="9" fill="#333" font-style="italic">X̂ ∈ ℝᴺˣ¹⁶⁹</text>
+  <line x1="260" y1="118" x2="272" y2="118" stroke="#1a4f8a" stroke-width="1.5" marker-end="url(#arr-b)"/>
 
-  <!-- Solid arrow G3-B → G3-C (main data flow) -->
-  <line x1="266" y1="326" x2="281" y2="326" stroke="#1a4f8a"
-        stroke-width="1.5" marker-end="url(#arr-b)"/>
-
-  <!-- Box G3-C: GAT Fine-Tuning -->
-  <rect x="281" y="287" width="192" height="78" rx="5"
+  <!-- A3: Learning — split into DGI (top) + GAT (bottom) -->
+  <rect x="272" y="64" width="226" height="108" rx="5"
         fill="#eff3ff" stroke="#1a4f8a" stroke-width="2"/>
-  <text x="377" y="305"  text-anchor="middle" font-size="10" font-weight="bold">GAT Fine-Tuning</text>
-  <text x="377" y="318"  text-anchor="middle" font-size="9" fill="#333">8-head + 1-head attention</text>
-  <text x="377" y="331"  text-anchor="middle" font-size="9" fill="#333">skip-connect: [H₂ ‖ Z*]</text>
-  <text x="377" y="344"  text-anchor="middle" font-size="9" fill="#333">H_fused ∈ ℝᴺˣ²⁵⁶</text>
-  <text x="377" y="357"  text-anchor="middle" font-size="9" fill="#333">MLP → weighted CE loss</text>
 
-  <!-- Dashed "frozen Z" skip-connection arc -->
-  <!-- Arc from bottom of DGI box → bottom of GAT box -->
-  <path d="M 207 365  Q 207 395  280 395  Q 377 395  377 365"
-        fill="none" stroke="#1a4f8a" stroke-width="1.3"
-        stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
-  <text x="290" y="407" text-anchor="middle" font-size="8.5"
-        fill="#1a4f8a" font-style="italic">frozen Z (skip connection)</text>
+  <!-- DGI sub-box -->
+  <rect x="278" y="69" width="105" height="48" rx="3"
+        fill="#dde8ff" stroke="#1a4f8a" stroke-width="1"/>
+  <text x="330" y="83"  text-anchor="middle" font-size="9.5" font-weight="bold">DGI Pre-Training</text>
+  <text x="330" y="95"  text-anchor="middle" font-size="8.5" fill="#333">2-layer GCN, 300 ep.</text>
+  <text x="330" y="107" text-anchor="middle" font-size="8.5" fill="#333">bilinear discriminator</text>
 
-  <line x1="473" y1="326" x2="488" y2="326" stroke="#1a4f8a"
-        stroke-width="1.5" marker-end="url(#arr-b)"/>
+  <!-- GAT sub-box -->
+  <rect x="389" y="69" width="105" height="48" rx="3"
+        fill="#dde8ff" stroke="#1a4f8a" stroke-width="1"/>
+  <text x="441" y="83"  text-anchor="middle" font-size="9.5" font-weight="bold">GAT Fine-Tuning</text>
+  <text x="441" y="95"  text-anchor="middle" font-size="8.5" fill="#333">8-head + 1-head attn</text>
+  <text x="441" y="107" text-anchor="middle" font-size="8.5" fill="#333">weighted CE loss</text>
 
-  <!-- Box G3-D: Result -->
-  <rect x="488" y="287" width="188" height="78" rx="5"
+  <!-- Frozen Z skip-connection arc (within box) -->
+  <path d="M 330 117  Q 330 148  385 148  Q 441 148  441 117"
+        fill="none" stroke="#1a4f8a" stroke-width="1.2" stroke-dasharray="4,2"
+        marker-end="url(#arr-d)"/>
+  <text x="385" y="162" text-anchor="middle" font-size="7.5" fill="#1a4f8a" font-style="italic">
+    frozen  Z* ∈ ℝᴺˣ¹²⁸  (skip connection)
+  </text>
+
+  <!-- Normal arrow DGI → GAT within box -->
+  <line x1="383" y1="93" x2="389" y2="93" stroke="#1a4f8a" stroke-width="1.2" marker-end="url(#arr-b)"/>
+
+  <line x1="498" y1="118" x2="510" y2="118" stroke="#1a4f8a" stroke-width="1.5" marker-end="url(#arr-b)"/>
+
+  <!-- A4: Inference -->
+  <rect x="510" y="64" width="110" height="108" rx="5"
+        fill="#eff3ff" stroke="#1a4f8a" stroke-width="1.5"/>
+  <text x="565" y="83"  text-anchor="middle" font-size="10" font-weight="bold">MLP Classifier</text>
+  <text x="565" y="100" text-anchor="middle" font-size="9" fill="#333">[H₂ ‖ Z*] ∈ ℝᴺˣ²⁵⁶</text>
+  <text x="565" y="113" text-anchor="middle" font-size="9" fill="#333">2-layer MLP</text>
+  <text x="565" y="126" text-anchor="middle" font-size="9" fill="#333">threshold θ*=0.9397</text>
+  <text x="565" y="139" text-anchor="middle" font-size="9" fill="#333">chronological split</text>
+  <text x="565" y="153" text-anchor="middle" font-size="9" fill="#333">τ ∈ {42,…,49}</text>
+  <line x1="620" y1="118" x2="632" y2="118" stroke="#1a4f8a" stroke-width="1.5" marker-end="url(#arr-b)"/>
+
+  <!-- A5: Output -->
+  <rect x="632" y="64" width="175" height="108" rx="5"
         fill="#c8d8f8" stroke="#0a3a78" stroke-width="2"/>
-  <text x="582" y="305"  text-anchor="middle" font-size="10" font-weight="bold">Illicit Node Detection</text>
-  <text x="582" y="320"  text-anchor="middle" font-size="9" fill="#0a2858">F1 (illicit) = 0.7337</text>
-  <text x="582" y="333"  text-anchor="middle" font-size="9" fill="#0a2858">ROC-AUC = 0.9868</text>
-  <text x="582" y="346"  text-anchor="middle" font-size="9" fill="#0a2858">Precision = 0.7094</text>
-  <text x="582" y="359"  text-anchor="middle" font-size="9" fill="#0a2858">Recall = 0.7598</text>
+  <text x="719" y="83"  text-anchor="middle" font-size="10" font-weight="bold">Illicit Node Detection</text>
+  <text x="719" y="98"  text-anchor="middle" font-size="9" fill="#0a2858">F1 (illicit) = 0.7337</text>
+  <text x="719" y="111" text-anchor="middle" font-size="9" fill="#0a2858">ROC-AUC = 0.9868</text>
+  <text x="719" y="124" text-anchor="middle" font-size="9" fill="#0a2858">Precision = 0.7094</text>
+  <text x="719" y="137" text-anchor="middle" font-size="9" fill="#0a2858">Recall = 0.7598</text>
+  <text x="719" y="153" text-anchor="middle" font-size="8.5" fill="#0a2858" font-style="italic">↑36 pp F1 over GAT alone</text>
 
-  <!-- ═══════════════════════════════════════
-       Bottom legend / note
-  ═══════════════════════════════════════ -->
-  <line x1="20" y1="430" x2="770" y2="430" stroke="#ccc" stroke-width="0.8"/>
+  <!-- ══════════════════════════════════════════════════════
+       TRACK B  — Graph Clustering  (Structural DBSCAN)
+  ══════════════════════════════════════════════════════ -->
 
-  <!-- Legend: Gap colours -->
-  <rect x="20"  y="438" width="12" height="12" fill="#edfaed" stroke="#3a8a3a" stroke-width="1"/>
-  <text x="36"  y="449" font-size="9" fill="#333">Gap 1 – Structural Clustering</text>
+  <!-- B1: Input -->
+  <rect x="24" y="196" width="104" height="90" rx="5"
+        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
+  <text x="76" y="216" text-anchor="middle" font-size="10" font-weight="bold">Bitcoin Corpus</text>
+  <text x="76" y="230" text-anchor="middle" font-size="9" fill="#333">200 K P2WPKH tx</text>
+  <text x="76" y="243" text-anchor="middle" font-size="9" fill="#333">(pre-Taproot proxy)</text>
+  <text x="76" y="260" text-anchor="middle" font-size="9" fill="#333">22,169 CoinJoin-like</text>
+  <text x="76" y="273" text-anchor="middle" font-size="9" fill="#333">177,831 non-CJ</text>
+  <line x1="128" y1="241" x2="140" y2="241" stroke="#3a8a3a" stroke-width="1.5" marker-end="url(#arr)"/>
 
-  <rect x="215" y="438" width="12" height="12" fill="#fffaf0" stroke="#c07000" stroke-width="1"/>
-  <text x="231" y="449" font-size="9" fill="#333">Gap 2 – Chamfer Linking</text>
+  <!-- B2: Pre-processing -->
+  <rect x="140" y="196" width="120" height="90" rx="5"
+        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
+  <text x="200" y="216" text-anchor="middle" font-size="10" font-weight="bold">Structural</text>
+  <text x="200" y="229" text-anchor="middle" font-size="10" font-weight="bold">Feature Vector</text>
+  <text x="200" y="244" text-anchor="middle" font-size="9" fill="#333">ψ(t) ∈ ℝ⁶</text>
+  <text x="200" y="256" text-anchor="middle" font-size="9" fill="#333">input/output counts,</text>
+  <text x="200" y="268" text-anchor="middle" font-size="9" fill="#333">fee-rate, value conc.,</text>
+  <text x="200" y="280" text-anchor="middle" font-size="9" fill="#333">addr-reuse, mix-idx</text>
+  <line x1="260" y1="241" x2="272" y2="241" stroke="#3a8a3a" stroke-width="1.5" marker-end="url(#arr)"/>
 
-  <rect x="390" y="438" width="12" height="12" fill="#eff3ff" stroke="#1a4f8a" stroke-width="1"/>
-  <text x="406" y="449" font-size="9" fill="#333">Gap 3 – DGI+GAT Pipeline (primary)</text>
+  <!-- B3: Learning -->
+  <rect x="272" y="196" width="226" height="90" rx="5"
+        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
+  <text x="385" y="216" text-anchor="middle" font-size="10" font-weight="bold">Structural DBSCAN Fitting</text>
+  <text x="385" y="229" text-anchor="middle" font-size="9" fill="#333">ε = 0.6,  min_samples = 5</text>
+  <text x="385" y="242" text-anchor="middle" font-size="9" fill="#333">k-d tree index (O(n log n))</text>
+  <text x="385" y="255" text-anchor="middle" font-size="9" fill="#333">30 K stratified subsample</text>
+  <text x="385" y="268" text-anchor="middle" font-size="9" fill="#333">centroid propagation to 200 K</text>
+  <text x="385" y="279" text-anchor="middle" font-size="9" fill="#333">majority-vote label assignment</text>
+  <line x1="498" y1="241" x2="510" y2="241" stroke="#3a8a3a" stroke-width="1.5" marker-end="url(#arr)"/>
 
-  <!-- Dashed line legend -->
-  <line x1="590" y1="444" x2="615" y2="444" stroke="#1a4f8a"
-        stroke-width="1.3" stroke-dasharray="4,2"/>
-  <text x="619" y="449" font-size="9" fill="#333">Frozen skip-connection</text>
+  <!-- B4: Inference -->
+  <rect x="510" y="196" width="110" height="90" rx="5"
+        fill="#edfaed" stroke="#3a8a3a" stroke-width="1.5"/>
+  <text x="565" y="215" text-anchor="middle" font-size="10" font-weight="bold">Cluster</text>
+  <text x="565" y="228" text-anchor="middle" font-size="10" font-weight="bold">Assignment</text>
+  <text x="565" y="244" text-anchor="middle" font-size="9" fill="#333">nearest-centroid</text>
+  <text x="565" y="257" text-anchor="middle" font-size="9" fill="#333">within ε radius</text>
+  <text x="565" y="270" text-anchor="middle" font-size="9" fill="#333">CIOH fallback</text>
+  <text x="565" y="283" text-anchor="middle" font-size="9" fill="#333">outside clusters</text>
+  <line x1="620" y1="241" x2="632" y2="241" stroke="#3a8a3a" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- B5: Output -->
+  <rect x="632" y="196" width="175" height="90" rx="5"
+        fill="#c8eec8" stroke="#2a6a2a" stroke-width="2"/>
+  <text x="719" y="216" text-anchor="middle" font-size="10" font-weight="bold">CoinJoin Clusters</text>
+  <text x="719" y="230" text-anchor="middle" font-size="9" fill="#1a4a1a">FPR: 3.72 % → 0.75 %</text>
+  <text x="719" y="243" text-anchor="middle" font-size="9" fill="#1a4a1a">↓ 79.8 % relative reduction</text>
+  <text x="719" y="256" text-anchor="middle" font-size="9" fill="#1a4a1a">Precision = 0.833</text>
+  <text x="719" y="269" text-anchor="middle" font-size="9" fill="#1a4a1a">Silhouette = 0.973</text>
+  <text x="719" y="282" text-anchor="middle" font-size="8.5" fill="#1a4a1a" font-style="italic">FNR = 70.0 % (high-precision point)</text>
+
+  <!-- ══════════════════════════════════════════════════════
+       TRACK C  — Transaction Linking  (MD-Chamfer Distance)
+  ══════════════════════════════════════════════════════ -->
+
+  <!-- C1: Input -->
+  <rect x="24" y="308" width="104" height="90" rx="5"
+        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
+  <text x="76" y="328" text-anchor="middle" font-size="10" font-weight="bold">Bitcoin Corpus</text>
+  <text x="76" y="342" text-anchor="middle" font-size="9" fill="#333">5,000 candidate</text>
+  <text x="76" y="355" text-anchor="middle" font-size="9" fill="#333">window pairs</text>
+  <text x="76" y="368" text-anchor="middle" font-size="9" fill="#333">2,247 time windows</text>
+  <text x="76" y="381" text-anchor="middle" font-size="9" fill="#333">(1-hour blocks)</text>
+  <line x1="128" y1="353" x2="140" y2="353" stroke="#c07000" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- C2: Pre-processing -->
+  <rect x="140" y="308" width="120" height="90" rx="5"
+        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
+  <text x="200" y="327" text-anchor="middle" font-size="10" font-weight="bold">Temporal Encoding</text>
+  <text x="200" y="342" text-anchor="middle" font-size="9" fill="#333">φ(t) = [timestamp,</text>
+  <text x="200" y="354" text-anchor="middle" font-size="9" fill="#333"> fee_rate,</text>
+  <text x="200" y="366" text-anchor="middle" font-size="9" fill="#333"> in_count, out_count]</text>
+  <text x="200" y="380" text-anchor="middle" font-size="9" fill="#333">zero-mean unit-var norm.</text>
+  <line x1="260" y1="353" x2="272" y2="353" stroke="#c07000" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- C3: Learning -->
+  <rect x="272" y="308" width="226" height="90" rx="5"
+        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
+  <text x="385" y="327" text-anchor="middle" font-size="10" font-weight="bold">Chamfer Distance Threshold Fitting</text>
+  <text x="385" y="341" text-anchor="middle" font-size="9" fill="#333">1-D baseline: d = 1 (timestamp only)</text>
+  <text x="385" y="353" text-anchor="middle" font-size="9" fill="#333">MD-CD: d = 4 (full φ(t))</text>
+  <text x="385" y="366" text-anchor="middle" font-size="9" fill="#333">θ* = arg max F1 on validation set</text>
+  <text x="385" y="378" text-anchor="middle" font-size="9" fill="#333">θ*₁D = 0.452,  θ*₄D = 3.384</text>
+  <line x1="498" y1="353" x2="510" y2="353" stroke="#c07000" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- C4: Inference -->
+  <rect x="510" y="308" width="110" height="90" rx="5"
+        fill="#fffaf0" stroke="#c07000" stroke-width="1.5"/>
+  <text x="565" y="328" text-anchor="middle" font-size="10" font-weight="bold">Window Pair</text>
+  <text x="565" y="341" text-anchor="middle" font-size="10" font-weight="bold">Prediction</text>
+  <text x="565" y="357" text-anchor="middle" font-size="9" fill="#333">d_C(Wᵢ, Wⱼ) &lt; θ*</text>
+  <text x="565" y="370" text-anchor="middle" font-size="9" fill="#333">→ linked CST pair</text>
+  <text x="565" y="385" text-anchor="middle" font-size="9" fill="#333">else: unlinked</text>
+  <line x1="620" y1="353" x2="632" y2="353" stroke="#c07000" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- C5: Output -->
+  <rect x="632" y="308" width="175" height="90" rx="5"
+        fill="#ffe8b0" stroke="#804800" stroke-width="2"/>
+  <text x="719" y="327" text-anchor="middle" font-size="10" font-weight="bold">Spend-Transaction Links</text>
+  <text x="719" y="342" text-anchor="middle" font-size="9" fill="#5a3000">1-D  F1 = 0.251</text>
+  <text x="719" y="355" text-anchor="middle" font-size="9" fill="#5a3000">MD-CD  F1 = 0.245</text>
+  <text x="719" y="368" text-anchor="middle" font-size="9" fill="#5a3000">Null result: temporal</text>
+  <text x="719" y="381" text-anchor="middle" font-size="9" fill="#5a3000">feature dominates</text>
+  <text x="719" y="394" text-anchor="middle" font-size="8.5" fill="#5a3000" font-style="italic">→ boundary condition</text>
+
+  <!-- ── Footer legend ── -->
+  <line x1="20" y1="420" x2="800" y2="420" stroke="#ccc" stroke-width="0.8"/>
+  <rect x="20"  y="430" width="11" height="11" fill="#eff3ff" stroke="#1a4f8a" stroke-width="1"/>
+  <text x="35"  y="440" font-size="8.5" fill="#333">Node Classification (DGI+GAT)</text>
+  <rect x="220" y="430" width="11" height="11" fill="#edfaed" stroke="#3a8a3a" stroke-width="1"/>
+  <text x="235" y="440" font-size="8.5" fill="#333">Graph Clustering (DBSCAN)</text>
+  <rect x="420" y="430" width="11" height="11" fill="#fffaf0" stroke="#c07000" stroke-width="1"/>
+  <text x="435" y="440" font-size="8.5" fill="#333">Transaction Linking (MD-CD)</text>
+  <line x1="610" y1="435" x2="636" y2="435" stroke="#1a4f8a" stroke-width="1.2" stroke-dasharray="4,2"/>
+  <text x="640" y="440" font-size="8.5" fill="#333">Frozen skip-connection (Z*)</text>
+
+  <!-- ── Track separator lines ── -->
+  <line x1="22" y1="188" x2="808" y2="188" stroke="#ddd" stroke-width="0.8" stroke-dasharray="2,4"/>
+  <line x1="22" y1="300" x2="808" y2="300" stroke="#ddd" stroke-width="0.8" stroke-dasharray="2,4"/>
 </svg>
