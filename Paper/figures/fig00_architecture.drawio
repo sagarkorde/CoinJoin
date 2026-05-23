@@ -1,567 +1,139 @@
-<mxfile host="Electron" agent="draw.io" version="28.0.6">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.0.6 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36" version="28.0.6">
   <diagram name="MixTrace Architecture" id="mixtrace-arch-v2">
-    <mxGraphModel dx="1600" dy="1200" grid="1" gridSize="10" guides="1"
-                  tooltips="1" connect="1" arrows="1" fold="1" page="1"
-                  pageScale="1" pageWidth="1600" pageHeight="1200"
-                  math="0" shadow="0">
+    <mxGraphModel dx="1737" dy="1043" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
       <root>
-        <mxCell id="0"/>
-        <mxCell id="1" parent="0"/>
-
-        <!-- ============================================================
-             ROW 1 — DATA SOURCES
-             ============================================================ -->
-        <mxCell id="dataGroup" value="Data Sources"
-                style="swimlane;fontStyle=1;align=center;verticalAlign=top;
-                       startSize=28;fillColor=#dae8fc;strokeColor=#6c8ebf;
-                       fontColor=#ffffff;fontSize=12;swimlaneLine=1;"
-                parent="1" vertex="1">
-          <mxGeometry x="10" y="10" width="380" height="150" as="geometry"/>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="dataGroup" value="Data Sources" style="swimlane;fontStyle=1;align=center;verticalAlign=top;                        startSize=28;fillColor=#dae8fc;strokeColor=#6c8ebf;                        fontColor=#ffffff;fontSize=28;swimlaneLine=1;fontFamily=Times New Roman;whiteSpace=wrap;convertToSvg=0;startSize=40;" parent="1" vertex="1">
+          <mxGeometry y="10" width="390" height="150" as="geometry" />
         </mxCell>
-
-        <mxCell id="ellipticCell"
-                value="&lt;b&gt;Elliptic Bitcoin Dataset&lt;/b&gt;&lt;br&gt;
-203,769 nodes · 49 time steps · chronological split&lt;br&gt;
-Train 1–34 / Val 35–41 / Test 42–49&lt;br&gt;
-165 graph features + 4 novel features · 9.2:1 class imbalance"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;"
-                parent="dataGroup" vertex="1">
-          <mxGeometry x="0" y="0" width="380" height="58" as="geometry"/>
+        <mxCell id="dataDivider" value="" style="line;strokeColor=#6c8ebf;fillColor=none;                        strokeWidth=0.8;dashed=1;dashPattern=4 3;fontFamily=Times New Roman;fontSize=28;whiteSpace=wrap;convertToSvg=0;" parent="dataGroup" vertex="1">
+          <mxGeometry x="5" y="86" width="380" height="4" as="geometry" />
         </mxCell>
-
-        <mxCell id="dataDivider" value=""
-                style="line;strokeColor=#6c8ebf;fillColor=none;
-                       strokeWidth=0.8;dashed=1;dashPattern=4 3;"
-                parent="dataGroup" vertex="1">
-          <mxGeometry x="0" y="60" width="380" height="4" as="geometry"/>
+        <mxCell id="authorCell" value="&lt;b&gt;Author-Curated Corpus&lt;/b&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;                        align=left;verticalAlign=top;spacingLeft=6;                        whiteSpace=wrap;fontSize=28;fontFamily=Times New Roman;whiteSpace=wrap;convertToSvg=0;" parent="dataGroup" vertex="1">
+          <mxGeometry x="20" y="100" width="380" height="60" as="geometry" />
         </mxCell>
-
-        <mxCell id="authorCell"
-                value="&lt;b&gt;Author-Curated Corpus&lt;/b&gt;&lt;br&gt;
-5,884,387 Bitcoin transactions · 53 engineered features&lt;br&gt;
-110,352 CoinJoin-like transactions identified for Gap 2 analysis"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;"
-                parent="dataGroup" vertex="1">
-          <mxGeometry x="0" y="64" width="380" height="58" as="geometry"/>
+        <mxCell id="ellipticCell" value="&lt;b&gt;Elliptic Bitcoin Dataset&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;                        align=left;verticalAlign=top;spacingLeft=6;                        whiteSpace=wrap;fontSize=28;fontFamily=Times New Roman;whiteSpace=wrap;convertToSvg=0;" parent="dataGroup" vertex="1">
+          <mxGeometry x="20" y="40" width="380" height="30" as="geometry" />
         </mxCell>
-
-        <!-- ============================================================
-             ROW 1 — FEATURE ENGINEERING
-             ============================================================ -->
-        <mxCell id="featGroup" value="Feature Engineering"
-                style="swimlane;fontStyle=1;align=center;verticalAlign=top;
-                       startSize=28;fillColor=#d5e8d4;strokeColor=#82b366;
-                       fontColor=#ffffff;fontSize=12;swimlaneLine=1;"
-                parent="1" vertex="1">
-          <mxGeometry x="440" y="10" width="390" height="150" as="geometry"/>
+        <mxCell id="A4f_GA7WDMnYTBNGX4ib-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="dataGroup" source="ellipticCell" target="ellipticCell">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="featContent"
-                value="&lt;b&gt;Novel graph-structural features (5 added to baseline 164):&lt;/b&gt;&lt;br&gt;
-• Shortest path to nearest illicit node  (Spearman r = −0.9182)&lt;br&gt;
-• Illicit neighbour ratio (INR)&lt;br&gt;
-• Denomination entropy &amp; Mixing index&lt;br&gt;
-• Temporal irregularity &amp; Value concentration"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;"
-                parent="featGroup" vertex="1">
-          <mxGeometry x="0" y="0" width="390" height="80" as="geometry"/>
+        <mxCell id="featGroup" value="Feature Engineering" style="swimlane;fontStyle=1;align=center;verticalAlign=top;                        startSize=28;fillColor=#d5e8d4;strokeColor=#82b366;                        fontColor=#ffffff;fontSize=28;swimlaneLine=1;fontFamily=Times New Roman;whiteSpace=wrap;convertToSvg=0;startSize=40;" parent="1" vertex="1">
+          <mxGeometry x="440" y="10" width="400" height="150" as="geometry" />
         </mxCell>
-
-        <mxCell id="featDivider" value=""
-                style="line;strokeColor=#82b366;fillColor=none;
-                       strokeWidth=0.8;dashed=1;dashPattern=4 3;"
-                parent="featGroup" vertex="1">
-          <mxGeometry x="0" y="82" width="390" height="4" as="geometry"/>
+        <mxCell id="featContent" value="&lt;b&gt;Novel graph-structural features&lt;/b&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;                        align=left;verticalAlign=top;spacingLeft=6;                        whiteSpace=wrap;fontSize=28;fontFamily=Times New Roman;whiteSpace=wrap;convertToSvg=0;" parent="featGroup" vertex="1">
+          <mxGeometry y="60" width="390" height="80" as="geometry" />
         </mxCell>
-
-        <mxCell id="featOutput"
-                value="&lt;i&gt;&lt;b&gt;Output: 169-dim feature matrix  X ∈ ℝᴺˣ¹⁶⁹&lt;/b&gt;&lt;/i&gt;&lt;br&gt;
-&lt;i&gt;(standardised; k-d tree spatial index for clustering)&lt;/i&gt;"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;fontColor=#2d6a2d;"
-                parent="featGroup" vertex="1">
-          <mxGeometry x="0" y="86" width="390" height="36" as="geometry"/>
+        <mxCell id="arrowDSFE" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;                        orthogonalLoop=1;jettySize=auto;html=1;                        endArrow=block;endFill=1;                        strokeColor=#444444;strokeWidth=1.8;fontFamily=Times New Roman;fontSize=28;convertToSvg=0;" parent="1" source="dataGroup" target="featGroup" edge="1">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <!-- Arrow: Data Sources → Feature Engineering -->
-        <mxCell id="arrowDSFE" value=""
-                style="edgeStyle=orthogonalEdgeStyle;rounded=0;
-                       orthogonalLoop=1;jettySize=auto;html=1;
-                       endArrow=block;endFill=1;
-                       strokeColor=#444444;strokeWidth=1.8;"
-                parent="1" source="dataGroup" target="featGroup" edge="1">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="parallelGroup" value="MixTrace Core Components - Addressing Three Research Gaps" style="swimlane;fontStyle=1;align=center;verticalAlign=top;                        startSize=34;fillColor=#fff2cc;strokeColor=#d6b656;                        fontColor=#ffffff;fontSize=28;swimlaneLine=1;fontFamily=Times New Roman;whiteSpace=wrap;convertToSvg=0;startSize=40;" parent="1" vertex="1">
+          <mxGeometry x="10" y="200" width="1480" height="500" as="geometry" />
         </mxCell>
-
-        <!-- ============================================================
-             ROW 2 — MIXTRACE CORE COMPONENTS CONTAINER
-             ============================================================ -->
-        <mxCell id="parallelGroup"
-                value="MixTrace Core Components — Addressing Three Research Gaps"
-                style="swimlane;fontStyle=1;align=center;verticalAlign=top;
-                       startSize=34;fillColor=#fff2cc;strokeColor=#d6b656;
-                       fontColor=#ffffff;fontSize=13;swimlaneLine=1;"
-                parent="1" vertex="1">
-          <mxGeometry x="10" y="196" width="1380" height="530" as="geometry"/>
+        <mxCell id="gap1" value="Gap 1: Multi-Input Clustering Under Script Indistinguishability" style="swimlane;fontStyle=1;align=center;verticalAlign=top;                        startSize=28;fillColor=#e1d5e7;strokeColor=#9673a6;                        fontColor=#ffffff;fontSize=28;fontFamily=Times New Roman;whiteSpace=wrap;convertToSvg=0;startSize=80;" parent="parallelGroup" vertex="1">
+          <mxGeometry y="50" width="440" height="150" as="geometry" />
         </mxCell>
-
-        <!-- ============================================================
-             GAP 1: STRUCTURAL DBSCAN
-             ============================================================ -->
-        <mxCell id="gap1"
-                value="Gap 1: Multi-Input Clustering Under Script Indistinguishability"
-                style="swimlane;fontStyle=1;align=center;verticalAlign=top;
-                       startSize=28;fillColor=#e1d5e7;strokeColor=#9673a6;
-                       fontColor=#ffffff;fontSize=10.5;"
-                parent="parallelGroup" vertex="1">
-          <mxGeometry x="12" y="22" width="443" height="500" as="geometry"/>
+        <mxCell id="gap1Pill" value="Structural DBSCAN Clustering" style="rounded=1;whiteSpace=wrap;html=1;                        fillColor=#f8cecc;strokeColor=#b85450;                        fontStyle=1;fontSize=23;fontColor=#7d1f1f;align=center;fontFamily=Times New Roman;convertToSvg=0;" parent="gap1" vertex="1">
+          <mxGeometry x="70" y="100" width="300" height="30" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap1Pill" value="Structural DBSCAN Clustering"
-                style="rounded=1;whiteSpace=wrap;html=1;
-                       fillColor=#f8cecc;strokeColor=#b85450;
-                       fontStyle=1;fontSize=10.5;fontColor=#7d1f1f;align=center;"
-                parent="gap1" vertex="1">
-          <mxGeometry x="70" y="38" width="303" height="28" as="geometry"/>
+        <mxCell id="A4f_GA7WDMnYTBNGX4ib-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="gap1" source="gap1Pill" target="gap1Pill">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap1Content"
-                value="&lt;b&gt;6-dim feature vector ψ(t) ∈ ℝ⁶:&lt;/b&gt;&lt;br&gt;
-[input_count, output_count, fee_rate,&lt;br&gt;
- value_concentration, address_reuse, mixing_index]&lt;br&gt;
-Z-score standardisation → DBSCAN  (ε = 0.6, minPts = 5)&lt;br&gt;
-k-d tree spatial index; 30k-node subsample → centroid propagation"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;"
-                parent="gap1" vertex="1">
-          <mxGeometry x="12" y="82" width="419" height="78" as="geometry"/>
+        <mxCell id="A4f_GA7WDMnYTBNGX4ib-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;strokeWidth=2;" edge="1" parent="parallelGroup" source="gap2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="689.666666666667" y="300" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
-
-        <mxCell id="gap1Div1" value=""
-                style="line;strokeColor=#9673a6;fillColor=none;
-                       strokeWidth=0.8;dashed=1;dashPattern=4 3;"
-                parent="gap1" vertex="1">
-          <mxGeometry x="12" y="164" width="419" height="4" as="geometry"/>
+        <mxCell id="gap2" value="Gap 2: CoinJoin Spending Transaction (CST) Linking" style="swimlane;fontStyle=1;align=center;verticalAlign=top;                        startSize=28;fillColor=#e1d5e7;strokeColor=#9673a6;                        fontColor=#ffffff;fontSize=24;fontFamily=Times New Roman;whiteSpace=wrap;convertToSvg=0;startSize=80;" parent="parallelGroup" vertex="1">
+          <mxGeometry x="470" y="50" width="440" height="150" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap1Results"
-                value="&lt;i&gt;&lt;b&gt;Results (pre-Taproot proxy evaluation):&lt;/b&gt;&lt;/i&gt;&lt;br&gt;
-• FPR: 3.72% → 0.75%  (−79.8% relative reduction)&lt;br&gt;
-• Precision: 0.770 → 0.833&lt;br&gt;
-• FNR: 70.0%  (conservative; Taproot indistinguishability)&lt;br&gt;
-• &gt;5,200 false positives eliminated per 200k transactions"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;fontStyle=2;"
-                parent="gap1" vertex="1">
-          <mxGeometry x="12" y="170" width="419" height="76" as="geometry"/>
+        <mxCell id="gap2Pill" value="Multi-Dimensional Chamfer Distance" style="rounded=1;whiteSpace=wrap;html=1;                        fillColor=#f8cecc;strokeColor=#b85450;                        fontStyle=1;fontSize=23;fontColor=#7d1f1f;align=center;fontFamily=Times New Roman;convertToSvg=0;" parent="gap2" vertex="1">
+          <mxGeometry x="20" y="100" width="390" height="30" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap1Div2" value=""
-                style="line;strokeColor=#9673a6;fillColor=none;
-                       strokeWidth=0.8;dashed=1;dashPattern=4 3;"
-                parent="gap1" vertex="1">
-          <mxGeometry x="12" y="250" width="419" height="4" as="geometry"/>
+        <mxCell id="gap3" value="Gap 3: Class Imbalance in Graph-Based Detection" style="swimlane;fontStyle=1;align=center;verticalAlign=top;                        startSize=28;fillColor=#e1d5e7;strokeColor=#9673a6;                        fontColor=#ffffff;fontSize=28;fontFamily=Times New Roman;whiteSpace=wrap;convertToSvg=0;startSize=80;" parent="parallelGroup" vertex="1">
+          <mxGeometry x="930" y="50" width="450" height="170" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap1ImplNote"
-                value="&lt;i&gt;Implementation note:&lt;/i&gt;&lt;br&gt;
-k-d tree built on 30k subsample; cluster labels propagated&lt;br&gt;
-to remaining 5.85M nodes via nearest-centroid assignment"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;"
-                parent="gap1" vertex="1">
-          <mxGeometry x="12" y="256" width="419" height="50" as="geometry"/>
+        <mxCell id="gap3DGIPill" value="&lt;font style=&quot;font-size: 23px;&quot;&gt;Phase 1: Deep Graph Infomax (unsupervised)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;                        fillColor=#ffe6cc;strokeColor=#d79b00;                        fontStyle=1;fontSize=28;fontColor=#7a4800;align=center;fontFamily=Times New Roman;convertToSvg=0;" parent="gap3" vertex="1">
+          <mxGeometry x="10" y="90" width="430" height="30" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap1Badge"
-                value="✓ Gap 1 addressed: FPR reduced by 79.8%;  precision raised to 0.833"
-                style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;
-                       align=center;verticalAlign=middle;whiteSpace=wrap;
-                       rounded=1;fontSize=9.5;fontStyle=1;fontColor=#2d5a2d;"
-                parent="gap1" vertex="1">
-          <mxGeometry x="22" y="316" width="399" height="26" as="geometry"/>
+        <mxCell id="gap3GATPill" value="&lt;font style=&quot;font-size: 23px;&quot;&gt;Phase 2: GAT Fine-tuning  (supervised)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;                        fillColor=#ffe6cc;strokeColor=#d79b00;                        fontStyle=1;fontSize=28;fontColor=#7a4800;align=center;fontFamily=Times New Roman;convertToSvg=0;" parent="gap3" vertex="1">
+          <mxGeometry x="10" y="130" width="430" height="30" as="geometry" />
         </mxCell>
-
-        <!-- ============================================================
-             GAP 2: MD-CD
-             ============================================================ -->
-        <mxCell id="gap2"
-                value="Gap 2: CoinJoin Spending Transaction (CST) Linking"
-                style="swimlane;fontStyle=1;align=center;verticalAlign=top;
-                       startSize=28;fillColor=#e1d5e7;strokeColor=#9673a6;
-                       fontColor=#ffffff;fontSize=10.5;"
-                parent="parallelGroup" vertex="1">
-          <mxGeometry x="465" y="22" width="443" height="500" as="geometry"/>
+        <mxCell id="evalGroup" value="Evaluation and Outputs" style="swimlane;fontStyle=1;align=center;verticalAlign=top;                        startSize=28;fillColor=#f5f5f5;strokeColor=#666666;                        fontColor=#ffffff;fontSize=28;fontFamily=Times New Roman;whiteSpace=wrap;convertToSvg=0;startSize=40;" parent="parallelGroup" vertex="1">
+          <mxGeometry x="340" y="300" width="1140" height="200" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap2Pill"
-                value="Multi-Dimensional Chamfer Distance (MD-CD)"
-                style="rounded=1;whiteSpace=wrap;html=1;
-                       fillColor=#f8cecc;strokeColor=#b85450;
-                       fontStyle=1;fontSize=10.5;fontColor=#7d1f1f;align=center;"
-                parent="gap2" vertex="1">
-          <mxGeometry x="60" y="38" width="323" height="28" as="geometry"/>
+        <mxCell id="evalBox1" value="&lt;b&gt;Illicit Detection (Elliptic)&lt;/b&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;                        fillColor=#ffffff;strokeColor=#aaaaaa;                        fontSize=9;align=center;verticalAlign=top;spacingTop=4;fontFamily=Times New Roman;fontSize=28;convertToSvg=0;" parent="evalGroup" vertex="1">
+          <mxGeometry x="10" y="70" width="260" height="110" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap2Content"
-                value="&lt;b&gt;4-dim feature vector φ(t) ∈ ℝ⁴:&lt;/b&gt;&lt;br&gt;
-[timestamp, fee_rate, input_count, output_count]&lt;br&gt;
-Min-max normalisation → one-sided Chamfer distance:&lt;br&gt;
-  d_C(U,V) = (1/|U|) Σ min ‖u_i − v_j‖₂&lt;br&gt;
-Optimal threshold θ* determined by F1 maximisation"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;"
-                parent="gap2" vertex="1">
-          <mxGeometry x="12" y="82" width="419" height="82" as="geometry"/>
+        <mxCell id="evalBox2" value="&lt;b&gt;Structural Clustering&amp;nbsp;&lt;/b&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;                        fillColor=#ffffff;strokeColor=#aaaaaa;                        fontSize=9;align=center;verticalAlign=top;spacingTop=4;fontFamily=Times New Roman;fontSize=28;convertToSvg=0;" parent="evalGroup" vertex="1">
+          <mxGeometry x="290" y="70" width="260" height="110" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap2Div1" value=""
-                style="line;strokeColor=#9673a6;fillColor=none;
-                       strokeWidth=0.8;dashed=1;dashPattern=4 3;"
-                parent="gap2" vertex="1">
-          <mxGeometry x="12" y="168" width="419" height="4" as="geometry"/>
+        <mxCell id="evalBox3" value="&lt;b&gt;CST Linking -&amp;nbsp;&lt;/b&gt;&lt;div&gt;&lt;b&gt;MD-CD&lt;/b&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;                        fillColor=#ffffff;strokeColor=#aaaaaa;                        fontSize=9;align=center;verticalAlign=top;spacingTop=4;fontFamily=Times New Roman;fontSize=28;convertToSvg=0;" parent="evalGroup" vertex="1">
+          <mxGeometry x="560" y="70" width="260" height="110" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap2Results"
-                value="&lt;i&gt;&lt;b&gt;Results (author-curated corpus, 5.88M transactions):&lt;/b&gt;&lt;/i&gt;&lt;br&gt;
-• Recall &gt; 0.954  (identical for 1-D and 4-D MD variants)&lt;br&gt;
-• F1 difference = −0.006  (no measurable gain from extra dims)&lt;br&gt;
-• Temporal clustering dominates; MD extension adds no signal&lt;br&gt;
-• Boundary condition: 1-D timestamp sufficient for this corpus"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;fontStyle=2;"
-                parent="gap2" vertex="1">
-          <mxGeometry x="12" y="174" width="419" height="76" as="geometry"/>
+        <mxCell id="evalBox4" value="&lt;b&gt;DGI Ablation Study&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;                        fillColor=#ffffff;strokeColor=#aaaaaa;                        fontSize=9;align=center;verticalAlign=top;spacingTop=4;fontFamily=Times New Roman;fontSize=28;convertToSvg=0;" parent="evalGroup" vertex="1">
+          <mxGeometry x="835" y="70" width="287" height="111" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap2Div2" value=""
-                style="line;strokeColor=#9673a6;fillColor=none;
-                       strokeWidth=0.8;dashed=1;dashPattern=4 3;"
-                parent="gap2" vertex="1">
-          <mxGeometry x="12" y="254" width="419" height="4" as="geometry"/>
+        <mxCell id="legend" value="Legend" style="swimlane;fontStyle=1;align=center;verticalAlign=top;                        startSize=28;fillColor=#ffffff;strokeColor=#444444;                        fontColor=#333333;fontSize=28;fontFamily=Times New Roman;whiteSpace=wrap;convertToSvg=0;startSize=40;" parent="parallelGroup" vertex="1">
+          <mxGeometry y="300" width="330" height="200" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap2Interp"
-                value="&lt;i&gt;Interpretation:&lt;/i&gt;&lt;br&gt;
-Null result is informative — multi-dimensional Chamfer geometry&lt;br&gt;
-adds value only in temporally dispersed datasets"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;"
-                parent="gap2" vertex="1">
-          <mxGeometry x="12" y="260" width="419" height="50" as="geometry"/>
+        <mxCell id="leg1" value="Data sources / feature engg" style="text;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;                        align=center;verticalAlign=middle;whiteSpace=wrap;                        rounded=1;fontSize=23;fontFamily=Times New Roman;convertToSvg=0;" parent="legend" vertex="1">
+          <mxGeometry x="10" y="50" width="310" height="20" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap2Badge"
-                value="✓ Gap 2 informed: null result guides temporally-dispersed future datasets"
-                style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;
-                       align=center;verticalAlign=middle;whiteSpace=wrap;
-                       rounded=1;fontSize=9.5;fontStyle=1;fontColor=#2d5a2d;"
-                parent="gap2" vertex="1">
-          <mxGeometry x="22" y="320" width="399" height="26" as="geometry"/>
+        <mxCell id="leg2" value="MixTrace core components" style="text;html=1;strokeColor=#d6b656;fillColor=#fff2cc;                        align=center;verticalAlign=middle;whiteSpace=wrap;                        rounded=1;fontSize=23;fontFamily=Times New Roman;convertToSvg=0;" parent="legend" vertex="1">
+          <mxGeometry x="10" y="80" width="310" height="20" as="geometry" />
         </mxCell>
-
-        <!-- ============================================================
-             GAP 3: DGI + GAT
-             ============================================================ -->
-        <mxCell id="gap3"
-                value="Gap 3: Class Imbalance in Graph-Based Detection"
-                style="swimlane;fontStyle=1;align=center;verticalAlign=top;
-                       startSize=28;fillColor=#e1d5e7;strokeColor=#9673a6;
-                       fontColor=#ffffff;fontSize=10.5;"
-                parent="parallelGroup" vertex="1">
-          <mxGeometry x="918" y="22" width="450" height="500" as="geometry"/>
+        <mxCell id="leg3" value="Gap-addressing sub-module" style="text;html=1;strokeColor=#9673a6;fillColor=#e1d5e7;                        align=center;verticalAlign=middle;whiteSpace=wrap;                        rounded=1;fontSize=23;fontFamily=Times New Roman;convertToSvg=0;" parent="legend" vertex="1">
+          <mxGeometry x="10" y="110" width="310" height="20" as="geometry" />
         </mxCell>
-
-        <!-- Phase 1: DGI pill -->
-        <mxCell id="gap3DGIPill"
-                value="Phase 1: Deep Graph Infomax Pre-training  (unsupervised)"
-                style="rounded=1;whiteSpace=wrap;html=1;
-                       fillColor=#ffe6cc;strokeColor=#d79b00;
-                       fontStyle=1;fontSize=10.5;fontColor=#7a4800;align=center;"
-                parent="gap3" vertex="1">
-          <mxGeometry x="12" y="38" width="425" height="28" as="geometry"/>
+        <mxCell id="leg4" value="Processing component" style="text;html=1;strokeColor=#b85450;fillColor=#f8cecc;                        align=center;verticalAlign=middle;whiteSpace=wrap;                        rounded=1;fontSize=23;fontFamily=Times New Roman;convertToSvg=0;" parent="legend" vertex="1">
+          <mxGeometry x="10" y="140" width="310" height="20" as="geometry" />
         </mxCell>
-
-        <mxCell id="gap3DGIContent"
-                value="2-layer GCN encoder:  H⁽¹⁾ = ELU(Â X W₁),  Z = ELU(Â H⁽¹⁾ W₂) ∈ ℝᴺˣ¹²⁸&lt;br&gt;
-Global summary: s = σ(mean z_v)  •  Bilinear discriminator: D(z_i, s) = z_iᵀ W s&lt;br&gt;
-Binary cross-entropy: real pairs vs. row-shuffled corrupted pairs&lt;br&gt;
-Uses all 203,769 nodes (incl. 157,205 unlabelled) — fully transductive"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;"
-                parent="gap3" vertex="1">
-          <mxGeometry x="12" y="74" width="426" height="66" as="geometry"/>
+        <mxCell id="leg5" value="Gap addressed (result badge)" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;                        align=center;verticalAlign=middle;whiteSpace=wrap;                        rounded=1;fontSize=23;fontFamily=Times New Roman;convertToSvg=0;" parent="legend" vertex="1">
+          <mxGeometry x="10" y="170" width="310" height="20" as="geometry" />
         </mxCell>
-
-        <!-- Phase 2: GAT pill -->
-        <mxCell id="gap3GATPill"
-                value="Phase 2: GAT Fine-tuning  (supervised, 46,564 labelled nodes)"
-                style="rounded=1;whiteSpace=wrap;html=1;
-                       fillColor=#ffe6cc;strokeColor=#d79b00;
-                       fontStyle=1;fontSize=10.5;fontColor=#7a4800;align=center;"
-                parent="gap3" vertex="1">
-          <mxGeometry x="12" y="148" width="425" height="28" as="geometry"/>
-        </mxCell>
-
-        <mxCell id="gap3GATContent"
-                value="Layer 1: 8-head concat attention → H₁ ∈ ℝᴺˣ¹²⁸  (ELU, dropout 0.6)&lt;br&gt;
-Layer 2: 1-head mean attention → H₂ ∈ ℝᴺˣ¹²⁸&lt;br&gt;
-Fused representation: H_fused = [H₂ ‖ Z*] ∈ ℝᴺˣ²⁵⁶&lt;br&gt;
-MLP classifier  •  class-weighted CE:  w₁ = 4.317,  w₀ = 0.565&lt;br&gt;
-ADASYN oversampling (diagnostic only)  •  threshold θ* = 0.9397"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;"
-                parent="gap3" vertex="1">
-          <mxGeometry x="12" y="184" width="426" height="78" as="geometry"/>
-        </mxCell>
-
-        <mxCell id="gap3Div" value=""
-                style="line;strokeColor=#9673a6;fillColor=none;
-                       strokeWidth=0.8;dashed=1;dashPattern=4 3;"
-                parent="gap3" vertex="1">
-          <mxGeometry x="12" y="266" width="426" height="4" as="geometry"/>
-        </mxCell>
-
-        <mxCell id="gap3Results"
-                value="&lt;i&gt;&lt;b&gt;Results (Elliptic test set, time steps 42–49):&lt;/b&gt;&lt;/i&gt;&lt;br&gt;
-• Illicit F1 = 0.7337   (RF 0.628, GAT-only 0.204, KNN 0.483)&lt;br&gt;
-• ROC-AUC = 0.9868  •  Bootstrap 95% CI: (0.674, 0.793)&lt;br&gt;
-• DGI pre-training contributes +36 pp to F1  (ablation confirmed)"
-                style="text;html=1;strokeColor=none;fillColor=none;
-                       align=left;verticalAlign=top;spacingLeft=6;
-                       whiteSpace=wrap;fontSize=9;fontStyle=2;"
-                parent="gap3" vertex="1">
-          <mxGeometry x="12" y="272" width="426" height="64" as="geometry"/>
-        </mxCell>
-
-        <mxCell id="gap3Badge"
-                value="✓ Gap 3 addressed: self-supervised pre-training on unlabelled nodes enables high-F1 detection"
-                style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;
-                       align=center;verticalAlign=middle;whiteSpace=wrap;
-                       rounded=1;fontSize=9;fontStyle=1;fontColor=#2d5a2d;"
-                parent="gap3" vertex="1">
-          <mxGeometry x="22" y="346" width="406" height="26" as="geometry"/>
-        </mxCell>
-
-        <!-- ============================================================
-             DASHED ARROWS: Feature Engineering → Three Gap swimlanes
-             ============================================================ -->
-
-        <!-- FE → Gap 1  (go down-left) -->
-        <mxCell id="arrowFEGap1" value=""
-                style="edgeStyle=orthogonalEdgeStyle;rounded=0;
-                       orthogonalLoop=1;jettySize=auto;html=1;
-                       endArrow=block;endFill=1;dashed=1;
-                       strokeColor=#555555;strokeWidth=1.4;"
-                parent="1" source="featGroup" target="gap1" edge="1">
+        <mxCell id="arrowFEGap1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;                        orthogonalLoop=1;jettySize=auto;html=1;                        endArrow=block;endFill=1;dashed=1;                        strokeColor=#555555;strokeWidth=1.4;fontFamily=Times New Roman;fontSize=28;convertToSvg=0;" parent="1" source="featGroup" target="gap1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="510" y="175"/>
-              <mxPoint x="243" y="175"/>
+              <mxPoint x="510" y="175" />
+              <mxPoint x="243" y="175" />
             </Array>
           </mxGeometry>
         </mxCell>
-
-        <!-- FE → Gap 2  (go straight down then slight right) -->
-        <mxCell id="arrowFEGap2" value=""
-                style="edgeStyle=orthogonalEdgeStyle;rounded=0;
-                       orthogonalLoop=1;jettySize=auto;html=1;
-                       endArrow=block;endFill=1;dashed=1;
-                       strokeColor=#555555;strokeWidth=1.4;"
-                parent="1" source="featGroup" target="gap2" edge="1">
+        <mxCell id="arrowFEGap2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;                        orthogonalLoop=1;jettySize=auto;html=1;                        endArrow=block;endFill=1;dashed=1;                        strokeColor=#555555;strokeWidth=1.4;fontFamily=Times New Roman;fontSize=28;convertToSvg=0;" parent="1" source="featGroup" target="gap2" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="635" y="175"/>
-              <mxPoint x="696" y="175"/>
+              <mxPoint x="635" y="175" />
+              <mxPoint x="696" y="175" />
             </Array>
           </mxGeometry>
         </mxCell>
-
-        <!-- FE → Gap 3  (go right then down) -->
-        <mxCell id="arrowFEGap3" value=""
-                style="edgeStyle=orthogonalEdgeStyle;rounded=0;
-                       orthogonalLoop=1;jettySize=auto;html=1;
-                       endArrow=block;endFill=1;dashed=1;
-                       strokeColor=#555555;strokeWidth=1.4;"
-                parent="1" source="featGroup" target="gap3" edge="1">
+        <mxCell id="arrowFEGap3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;                        orthogonalLoop=1;jettySize=auto;html=1;                        endArrow=block;endFill=1;dashed=1;                        strokeColor=#555555;strokeWidth=1.4;fontFamily=Times New Roman;fontSize=28;convertToSvg=0;" parent="1" source="featGroup" target="gap3" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1153" y="85"/>
+              <mxPoint x="1153" y="85" />
             </Array>
           </mxGeometry>
         </mxCell>
-
-        <!-- ============================================================
-             ROW 3 — LEGEND
-             ============================================================ -->
-        <mxCell id="legend" value="Legend"
-                style="swimlane;fontStyle=1;align=center;verticalAlign=top;
-                       startSize=28;fillColor=#ffffff;strokeColor=#444444;
-                       fontColor=#333333;fontSize=11;"
-                parent="1" vertex="1">
-          <mxGeometry x="10" y="752" width="235" height="195" as="geometry"/>
+        <mxCell id="arrowGap1Eval" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;                        orthogonalLoop=1;jettySize=auto;html=1;                        endArrow=block;endFill=1;                        strokeColor=#9673a6;strokeWidth=1.8;fontFamily=Times New Roman;fontSize=28;convertToSvg=0;" parent="1" source="gap1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="480" y="500" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="244" y="440" />
+              <mxPoint x="480" y="440" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-
-        <mxCell id="leg1" value="Data sources / feature engineering"
-                style="text;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;
-                       align=center;verticalAlign=middle;whiteSpace=wrap;
-                       rounded=1;fontSize=9.5;"
-                parent="legend" vertex="1">
-          <mxGeometry x="12" y="34" width="211" height="22" as="geometry"/>
+        <mxCell id="arrowGap3Eval" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;                        orthogonalLoop=1;jettySize=auto;html=1;                        endArrow=block;endFill=1;                        strokeColor=#9673a6;strokeWidth=1.8;fontFamily=Times New Roman;fontSize=28;convertToSvg=0;" parent="1" source="gap3" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1040" y="500" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1153" y="440" />
+              <mxPoint x="1040" y="440" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-
-        <mxCell id="leg2" value="MixTrace core components"
-                style="text;html=1;strokeColor=#d6b656;fillColor=#fff2cc;
-                       align=center;verticalAlign=middle;whiteSpace=wrap;
-                       rounded=1;fontSize=9.5;"
-                parent="legend" vertex="1">
-          <mxGeometry x="12" y="62" width="211" height="22" as="geometry"/>
-        </mxCell>
-
-        <mxCell id="leg3" value="Gap-addressing sub-module"
-                style="text;html=1;strokeColor=#9673a6;fillColor=#e1d5e7;
-                       align=center;verticalAlign=middle;whiteSpace=wrap;
-                       rounded=1;fontSize=9.5;"
-                parent="legend" vertex="1">
-          <mxGeometry x="12" y="90" width="211" height="22" as="geometry"/>
-        </mxCell>
-
-        <mxCell id="leg4" value="Processing component"
-                style="text;html=1;strokeColor=#b85450;fillColor=#f8cecc;
-                       align=center;verticalAlign=middle;whiteSpace=wrap;
-                       rounded=1;fontSize=9.5;"
-                parent="legend" vertex="1">
-          <mxGeometry x="12" y="118" width="211" height="22" as="geometry"/>
-        </mxCell>
-
-        <mxCell id="leg5" value="Gap addressed (result badge)"
-                style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;
-                       align=center;verticalAlign=middle;whiteSpace=wrap;
-                       rounded=1;fontSize=9.5;"
-                parent="legend" vertex="1">
-          <mxGeometry x="12" y="146" width="211" height="22" as="geometry"/>
-        </mxCell>
-
-        <!-- ============================================================
-             ROW 3 — EVALUATION AND OUTPUTS
-             ============================================================ -->
-        <mxCell id="evalGroup" value="Evaluation and Outputs"
-                style="swimlane;fontStyle=1;align=center;verticalAlign=top;
-                       startSize=28;fillColor=#f5f5f5;strokeColor=#666666;
-                       fontColor=#ffffff;fontSize=12;"
-                parent="1" vertex="1">
-          <mxGeometry x="255" y="752" width="1135" height="195" as="geometry"/>
-        </mxCell>
-
-        <!-- Eval box 1: Illicit Detection -->
-        <mxCell id="evalBox1"
-                value="&lt;b&gt;Illicit Detection (Elliptic)&lt;/b&gt;&lt;br&gt;
-F1 = 0.734  |  ROC-AUC = 0.987&lt;br&gt;
-+10.5 pp over Random Forest (0.628)&lt;br&gt;
-Bootstrap 95% CI:  (0.674, 0.793)&lt;br&gt;
-Cohen κ = 0.720  (RF: 0.615)&lt;br&gt;
-&lt;font color=&quot;#2d6a2d&quot;&gt;&lt;b&gt;McNemar χ² = 6.1,  p = 0.013&lt;/b&gt;&lt;/font&gt;&lt;br&gt;
-&lt;i&gt;310 TP | 127 FP | 98 FN | 8,306 TN&lt;/i&gt;"
-                style="rounded=1;whiteSpace=wrap;html=1;
-                       fillColor=#ffffff;strokeColor=#aaaaaa;
-                       fontSize=9;align=center;verticalAlign=top;spacingTop=4;"
-                parent="evalGroup" vertex="1">
-          <mxGeometry x="13" y="38" width="258" height="143" as="geometry"/>
-        </mxCell>
-
-        <!-- Eval box 2: Structural Clustering -->
-        <mxCell id="evalBox2"
-                value="&lt;b&gt;Structural Clustering (Gap 1)&lt;/b&gt;&lt;br&gt;
-FPR: 3.72% → 0.75%  (−79.8%)&lt;br&gt;
-Precision: 0.770 → 0.833&lt;br&gt;
-FNR: 70.0%  (conservative)&lt;br&gt;
-&gt;5,200 FP eliminated / 200k txns&lt;br&gt;
-&lt;font color=&quot;#2d6a2d&quot;&gt;&lt;b&gt;DBSCAN (ε=0.6, minPts=5)&lt;/b&gt;&lt;/font&gt;&lt;br&gt;
-&lt;i&gt;Pre-Taproot proxy; P2TR limits FNR improvement&lt;/i&gt;"
-                style="rounded=1;whiteSpace=wrap;html=1;
-                       fillColor=#ffffff;strokeColor=#aaaaaa;
-                       fontSize=9;align=center;verticalAlign=top;spacingTop=4;"
-                parent="evalGroup" vertex="1">
-          <mxGeometry x="287" y="38" width="258" height="143" as="geometry"/>
-        </mxCell>
-
-        <!-- Eval box 3: CST Linking -->
-        <mxCell id="evalBox3"
-                value="&lt;b&gt;CST Linking — MD-CD (Gap 2)&lt;/b&gt;&lt;br&gt;
-Recall &gt; 0.954  (1-D and 4-D MD)&lt;br&gt;
-F1 difference = −0.006  (null result)&lt;br&gt;
-Temporal clustering dominates&lt;br&gt;
-Boundary condition identified&lt;br&gt;
-&lt;font color=&quot;#2d6a2d&quot;&gt;&lt;b&gt;Guides future temporally-dispersed work&lt;/b&gt;&lt;/font&gt;&lt;br&gt;
-&lt;i&gt;Evaluated on author corpus (5.88M txns)&lt;/i&gt;"
-                style="rounded=1;whiteSpace=wrap;html=1;
-                       fillColor=#ffffff;strokeColor=#aaaaaa;
-                       fontSize=9;align=center;verticalAlign=top;spacingTop=4;"
-                parent="evalGroup" vertex="1">
-          <mxGeometry x="561" y="38" width="258" height="143" as="geometry"/>
-        </mxCell>
-
-        <!-- Eval box 4: DGI Ablation -->
-        <mxCell id="evalBox4"
-                value="&lt;b&gt;DGI Ablation Study (Gap 3)&lt;/b&gt;&lt;br&gt;
-+36 pp F1 gain:  0.204 → 0.734&lt;br&gt;
-Self-supervised pre-training validated&lt;br&gt;
-157,205 unlabelled nodes leveraged&lt;br&gt;
-Class weights + threshold calibration&lt;br&gt;
-&lt;font color=&quot;#2d6a2d&quot;&gt;&lt;b&gt;Best-in-class vs. Weber, Alarab, Xiao &amp; Yin&lt;/b&gt;&lt;/font&gt;&lt;br&gt;
-&lt;i&gt;Chronological split prevents look-ahead bias&lt;/i&gt;"
-                style="rounded=1;whiteSpace=wrap;html=1;
-                       fillColor=#ffffff;strokeColor=#aaaaaa;
-                       fontSize=9;align=center;verticalAlign=top;spacingTop=4;"
-                parent="evalGroup" vertex="1">
-          <mxGeometry x="835" y="38" width="287" height="143" as="geometry"/>
-        </mxCell>
-
-        <!-- ============================================================
-             PURPLE ARROWS: Gap swimlanes → Evaluation
-             ============================================================ -->
-        <mxCell id="arrowGap1Eval" value=""
-                style="edgeStyle=orthogonalEdgeStyle;rounded=0;
-                       orthogonalLoop=1;jettySize=auto;html=1;
-                       endArrow=block;endFill=1;
-                       strokeColor=#9673a6;strokeWidth=1.8;"
-                parent="1" source="gap1" target="evalGroup" edge="1">
-          <mxGeometry relative="1" as="geometry"/>
-        </mxCell>
-
-        <mxCell id="arrowGap2Eval" value=""
-                style="edgeStyle=orthogonalEdgeStyle;rounded=0;
-                       orthogonalLoop=1;jettySize=auto;html=1;
-                       endArrow=block;endFill=1;
-                       strokeColor=#9673a6;strokeWidth=1.8;"
-                parent="1" source="gap2" target="evalGroup" edge="1">
-          <mxGeometry relative="1" as="geometry"/>
-        </mxCell>
-
-        <mxCell id="arrowGap3Eval" value=""
-                style="edgeStyle=orthogonalEdgeStyle;rounded=0;
-                       orthogonalLoop=1;jettySize=auto;html=1;
-                       endArrow=block;endFill=1;
-                       strokeColor=#9673a6;strokeWidth=1.8;"
-                parent="1" source="gap3" target="evalGroup" edge="1">
-          <mxGeometry relative="1" as="geometry"/>
-        </mxCell>
-
       </root>
     </mxGraphModel>
   </diagram>

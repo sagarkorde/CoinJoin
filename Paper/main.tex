@@ -75,8 +75,7 @@
 \algrenewcommand\algorithmicrequire{\textbf{Input:}}
 \algrenewcommand\algorithmicensure{\textbf{Output:}}
 
-%% ── SVG figures ──────────────────────────────────────────────
-\usepackage{svg}            % \includesvg — requires Inkscape on Overleaf
+%% ── (svg package removed; architecture figure now supplied as PNG) ──
 
 %% ── Custom operators ─────────────────────────────────────────
 \DeclareMathOperator{\Entropy}{H}
@@ -440,7 +439,7 @@ respective datasets.
 
 \begin{figure}[htbp]
   \centering
-  \includesvg[width=\linewidth]{fig00_architecture}
+  \includegraphics[width=\linewidth]{fig00_architecture}
   \caption{MixTrace architecture addressing three independent
     research gaps. \textit{Top row}: raw inputs flow from the
     Elliptic Bitcoin Dataset (203,769 nodes) and the
