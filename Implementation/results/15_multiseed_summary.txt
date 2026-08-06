@@ -1,0 +1,58 @@
+======================================================================
+MixTrace -- Multi-Seed Validation Summary (Step 15)
+Seeds: [1, 123, 2, 3, 42]  (n=5)
+======================================================================
+
+  MixTrace (DGI+GAT)
+    Precision (mean+/-std) : 0.7129 +/- 0.1150
+    Recall    (mean+/-std) : 0.9338 +/- 0.0469
+    F1 illicit(mean+/-std) : 0.8062 +/- 0.0896
+    F1 macro  (mean+/-std) : 0.8974 +/- 0.0477
+    PR-AUC    (mean+/-std) : 0.8624 +/- 0.1241
+    ROC-AUC   (mean+/-std) : 0.9924 +/- 0.0054
+    Paired t vs MixTrace   : (reference)   p=(reference)
+
+  GAT (no DGI, retrained end-to-end)
+    Precision (mean+/-std) : 0.3769 +/- 0.2341
+    Recall    (mean+/-std) : 0.8784 +/- 0.1013
+    F1 illicit(mean+/-std) : 0.4823 +/- 0.2053
+    F1 macro  (mean+/-std) : 0.7049 +/- 0.1343
+    PR-AUC    (mean+/-std) : 0.8134 +/- 0.0371
+    ROC-AUC   (mean+/-std) : 0.9611 +/- 0.0211
+    Paired t vs MixTrace   : 3.144   p=0.0347
+
+  Random Forest
+    Precision (mean+/-std) : 0.9543 +/- 0.0052
+    Recall    (mean+/-std) : 0.4701 +/- 0.0011
+    F1 illicit(mean+/-std) : 0.6299 +/- 0.0014
+    F1 macro  (mean+/-std) : 0.8083 +/- 0.0007
+    PR-AUC    (mean+/-std) : 0.6396 +/- 0.0041
+    ROC-AUC   (mean+/-std) : 0.9370 +/- 0.0018
+    Paired t vs MixTrace   : 4.473   p=0.0110
+
+  KNN
+    Precision (mean+/-std) : 0.5096 +/- 0.0000
+    Recall    (mean+/-std) : 0.4559 +/- 0.0000
+    F1 illicit(mean+/-std) : 0.4812 +/- 0.0000
+    F1 macro  (mean+/-std) : 0.7288 +/- 0.0000
+    PR-AUC    (mean+/-std) : 0.4470 +/- 0.0000
+    ROC-AUC   (mean+/-std) : 0.7939 +/- 0.0000
+    Paired t vs MixTrace   : 8.113   p=0.0013
+
+  K-Means
+    Precision (mean+/-std) : 0.0474 +/- 0.0016
+    Recall    (mean+/-std) : 1.0000 +/- 0.0000
+    F1 illicit(mean+/-std) : 0.0904 +/- 0.0029
+    F1 macro  (mean+/-std) : 0.0696 +/- 0.0337
+    PR-AUC    (mean+/-std) : 0.0000 +/- 0.0000
+    ROC-AUC   (mean+/-std) : 0.0000 +/- 0.0000
+    Paired t vs MixTrace   : 18.345   p=0.0001
+
+  Random Forest + ADASYN
+    Precision (mean+/-std) : 0.9567 +/- 0.0043
+    Recall    (mean+/-std) : 0.4657 +/- 0.0000
+    F1 illicit(mean+/-std) : 0.6264 +/- 0.0009
+    F1 macro  (mean+/-std) : 0.8066 +/- 0.0005
+    PR-AUC    (mean+/-std) : 0.6071 +/- 0.0102
+    ROC-AUC   (mean+/-std) : 0.9207 +/- 0.0078
+    Paired t vs MixTrace   : 4.504   p=0.0108

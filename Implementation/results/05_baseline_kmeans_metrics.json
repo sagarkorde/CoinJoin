@@ -5,6 +5,7 @@
   "f1_illicit": 0.08829257736420688,
   "f1_macro": 0.04497567256835937,
   "pr_auc": 0.0,
+  "roc_auc": 0.0,
   "support_illicit": 408,
   "support_licit": 8433
 }
