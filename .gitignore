@@ -57,3 +57,38 @@ Thumbs.db
 # Claude Code internal
 .claude/
 Reference_Papers/
+
+# ── Manuscript drafts and submission material (never publish pre-print text) ──
+*.docx
+*.doc
+Paper/main.tex
+Paper/references.bib
+Paper/README_PAPER.md
+Paper/compile.bat
+Paper/jcp-template.dot
+Paper/*.pdf
+Paper/Structure of the paper.jpeg
+CoinJoin_Litreture_Survey.pdf
+Paper/AI Report_*.pdf
+MDPI Submission/
+Ref Papers Doc/
+
+# ── Non-canonical / backup figure variants ─────────────────────────────────────
+Paper/figures/*.drawio
+Paper/figures/*.drawio.bkp
+Paper/figures/*V1_original*
+Paper/figures/*V2*
+Paper/figures/* - Copy*
+Paper/figures/Arch.drawio.png
+Paper/figures/fig00_architecture.svg
+Paper/figures/MixTrace Multi-Modal Forensic Framework Architecture.svg
+Paper/figures/Figure_01_MixTrace_Architecture.png
+
+# ── Graphical abstract (MDPI submission artifact, not an article figure) ──────
+Paper/figures/Graphical Abstract.png
+Paper/figures/MixTrace_Graphical_Abstract_MDPI.png
+
+# ── Large local datasets / reorganized implementation copy (canonical copy is
+#    the root-level Implementation/ that's already published) ────────────────
+Paper/Datasets/
+Paper/Implementation/
