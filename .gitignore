@@ -5,14 +5,15 @@ Datasets/Elliptic_Dataset/elliptic_txs_classes.csv
 Datasets/Elliptic_Dataset/elliptic_txs_edgelist.csv
 Datasets/Blockchai_Dataset/
 
-# ── Pipeline Intermediate Files ───────────────────────────────────────────────
-Implementation/data/
-Implementation/models/
-Implementation/figures/
-Implementation/logs/
-
-# ── Keep results directory structure but ignore large outputs ─────────────────
-!Implementation/results/.gitkeep
+# ── Pipeline Intermediate Files (canonical code now lives at Paper/Implementation/) ──
+Paper/Implementation/data/
+Paper/Implementation/models/
+Paper/Implementation/figures/
+Paper/Implementation/logs/
+# Old root-level path, retired in favour of Paper/Implementation/ — kept in
+# case any local intermediate files reappear here. Anchored to root only
+# (no leading slash would also match Paper/Implementation/).
+/Implementation/
 
 # ── Python ────────────────────────────────────────────────────────────────────
 __pycache__/
@@ -89,7 +90,8 @@ Paper/figures/Figure_01_MixTrace_Architecture.png
 Paper/figures/Graphical Abstract.png
 Paper/figures/MixTrace_Graphical_Abstract_MDPI.png
 
-# ── Large local datasets / reorganized implementation copy (canonical copy is
-#    the root-level Implementation/ that's already published) ────────────────
+# ── Large local datasets ───────────────────────────────────────────────────────
 Paper/Datasets/
-Paper/Implementation/
+
+# ── Keep results directory structure but ignore large outputs ─────────────────
+!Paper/Implementation/results/.gitkeep
