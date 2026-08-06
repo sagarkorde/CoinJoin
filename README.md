@@ -47,24 +47,28 @@ CoinJoin/
 │
 ├── Reference_Papers/            # 8 reference PDFs (literature)
 │
-├── Implementation/              # ← All source code
-│   ├── requirements.txt
-│   ├── 01_data_loader.py        # Step 1 : Load & validate datasets
-│   ├── 02_preprocessor.py       # Step 2 : Clean, normalize, split
-│   ├── 03_feature_engineer.py   # Step 3 : Novel feature computation
-│   ├── 04_baseline_chamfer.py   # Step 4 : 1-D Chamfer Distance baseline
-│   ├── 05_baseline_classifiers.py  # Step 5 : RF, KNN, K-Means
-│   ├── 06_graph_builder.py      # Step 6 : PyTorch Geometric graph
-│   ├── 07_dgi_pretrainer.py     # Step 7 : Deep Graph Infomax pre-training
-│   ├── 08_gat_model.py          # Step 8 : GAT model architecture
-│   ├── 09_training_pipeline.py  # Step 9 : Fine-tuning with ADASYN
-│   ├── 10_taproot_analyzer.py   # Step 10: Gap 1 — Taproot analysis
-│   ├── 11_multidim_chamfer.py   # Step 11: Gap 2 — MD-Chamfer Distance
-│   ├── 12_coinjoin_detector.py  # Step 12: End-to-end inference
-│   ├── 13_evaluator.py          # Step 13: Metrics & comparison tables
-│   └── 14_visualizer.py         # Step 14: Publication figures
+├── Paper/
+│   └── Implementation/          # ← All source code
+│       ├── requirements.txt
+│       ├── 01_data_loader.py        # Step 1 : Load & validate datasets
+│       ├── 02_preprocessor.py       # Step 2 : Clean, normalize, split
+│       ├── 03_feature_engineer.py   # Step 3 : Novel feature computation
+│       ├── 04_baseline_chamfer.py   # Step 4 : 1-D Chamfer Distance baseline
+│       ├── 05_baseline_classifiers.py  # Step 5 : RF, KNN, K-Means
+│       ├── 06_graph_builder.py      # Step 6 : PyTorch Geometric graph
+│       ├── 07_dgi_pretrainer.py     # Step 7 : Deep Graph Infomax pre-training
+│       ├── 08_gat_model.py          # Step 8 : GAT model architecture
+│       ├── 09_training_pipeline.py  # Step 9 : Fine-tuning with ADASYN
+│       ├── 10_taproot_analyzer.py   # Step 10: Gap 1 — Taproot analysis
+│       ├── 11_multidim_chamfer.py   # Step 11: Gap 2 — MD-Chamfer Distance
+│       ├── 12_coinjoin_detector.py  # Step 12: End-to-end inference
+│       ├── 13_evaluator.py          # Step 13: Metrics & comparison tables
+│       ├── 14_visualizer.py         # Step 14: Publication figures
+│       ├── run_seed_experiment.py       # Five-seed validation harness
+│       ├── aggregate_multiseed.py       # Aggregate per-seed results
+│       ├── generate_multiseed_report.py # Cross-seed summary report
+│       └── results/, results_multiseed/ # Metrics, JSON/CSV outputs
 │
-├── CoinJoin_Litreture_Survey.pdf
 └── README.md
 ```
 
@@ -104,7 +108,7 @@ A curated dataset of 5.88M Bitcoin transactions with 53 engineered features incl
 ```bash
 # Clone the repository
 git clone https://github.com/sagarkorde/CoinJoin.git
-cd CoinJoin/Implementation
+cd CoinJoin/Paper/Implementation
 
 # Install dependencies
 pip install -r requirements.txt
@@ -125,7 +129,7 @@ pip install torch-geometric torch-scatter torch-sparse \
 
 ## Execution Pipeline
 
-Run each step in order from the `Implementation/` directory:
+Run each step in order from the `Paper/Implementation/` directory:
 
 ```bash
 # Phase 1 — Data Preparation
