@@ -8,6 +8,7 @@ MixTrace — Evaluation Summary  (Step 13)
     F1 (illicit)        : 0.6285
     F1 (macro)          : 0.8076
     PR-AUC              : 0.6316
+    ROC-AUC             : 0.9365
 
   KNN
     Precision           : 0.4987
@@ -15,6 +16,7 @@ MixTrace — Evaluation Summary  (Step 13)
     F1 (illicit)        : 0.4829
     F1 (macro)          : 0.7294
     PR-AUC              : 0.4157
+    ROC-AUC             : 0.7720
 
   K-Means
     Precision           : 0.0462

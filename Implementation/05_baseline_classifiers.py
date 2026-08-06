@@ -41,6 +41,7 @@ from sklearn.metrics import (
     f1_score,
     precision_score,
     recall_score,
+    roc_auc_score,
 )
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.neighbors import KNeighborsClassifier
@@ -101,9 +102,11 @@ def compute_metrics(
     f1_ill = f1_score(       y_true, y_pred, pos_label=1, zero_division=0)
     f1_mac = f1_score(       y_true, y_pred, average="macro", zero_division=0)
 
-    pr_auc = 0.0
+    pr_auc  = 0.0
+    roc_auc = 0.0
     if y_proba is not None:
-        pr_auc = average_precision_score(y_true, y_proba)
+        pr_auc  = average_precision_score(y_true, y_proba)
+        roc_auc = roc_auc_score(y_true, y_proba)
 
     metrics = {
         "method":            name,
@@ -112,6 +115,7 @@ def compute_metrics(
         "f1_illicit":        float(f1_ill),
         "f1_macro":          float(f1_mac),
         "pr_auc":            float(pr_auc),
+        "roc_auc":           float(roc_auc),
         "support_illicit":   int((y_true == 1).sum()),
         "support_licit":     int((y_true == 0).sum()),
     }
@@ -124,6 +128,8 @@ def print_metrics(m: dict) -> None:
     print(f"  F1        (illicit) : {m['f1_illicit']:.4f}")
     print(f"  F1 (macro)          : {m['f1_macro']:.4f}")
     print(f"  PR-AUC              : {m['pr_auc']:.4f}")
+    if m.get("roc_auc", 0) > 0:
+        print(f"  ROC-AUC             : {m['roc_auc']:.4f}")
 
 
 # ── Random Forest ─────────────────────────────────────────────────────────────

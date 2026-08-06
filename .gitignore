@@ -9,6 +9,7 @@ Datasets/Blockchai_Dataset/
 Implementation/data/
 Implementation/models/
 Implementation/figures/
+Implementation/logs/
 
 # ── Keep results directory structure but ignore large outputs ─────────────────
 !Implementation/results/.gitkeep
