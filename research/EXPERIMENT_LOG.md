@@ -29,6 +29,8 @@ train = steps 1–34, validation = 35–41, test = 42–49.
 | E02 | Four-way feature ablation requested by Reviewer 1 | Elliptic raw CSVs | RandomForest + HistGradientBoosting, 5 seeds, val-selected frozen threshold | **Leak quantified.** Base 165 features: F1 0.621 (RF) / 0.613 (HGB). Adding SPTI drives F1, PR-AUC and MCC to **1.0000** under both model families. INR adds +0.012 (RF) / +0.069 (HGB). Leakage-free tabular ceiling is F1 ~ 0.62. | `60dca79` |
 | E03 | Label-free topological features as a replacement for the withdrawn ones | Elliptic raw CSVs | 15 descriptors computed inside each node's own time-step subgraph; permutation verification; 5 seeds x 2 models | **Clean but uninformative (negative result).** All 15 features bit-identical under full label permutation; max \|r\| with label 0.1223 (vs 0.9182 for SPTI). Adding them to the 165 base features changes F1 by -0.004 (RF) / +0.001 (HGB). Topology alone: F1 0.03, ROC-AUC 0.38 - *below chance*, indicating the topology-label relation inverts between train and test periods. | `65b137a` |
 | E04 | Per-time-step evaluation and protocol comparison | Elliptic raw CSVs | RandomForest, 165 base features, 5 seeds, frozen threshold | **Baseline validated; collapse localised.** Literature protocol (train 1-25, test 35-49) gives F1 0.7634, consistent with published Elliptic RF results, so the leakage-free baseline is sound. Per step: mean F1 0.8582 on steps 35-42 vs 0.0283 on steps 43-49; recall falls 0.789 to 0.000 at step 43 (dark-market shutdown). The round-1 test window 42-49 lies almost entirely inside the collapsed regime. | `88365ed` |
+| E06 | Recover the undocumented `is_coinjoin_like` rule | Author corpus, 5,884,387 tx | Decision tree fitted to structural columns | **Rule recovered exactly.** Depth-3 tree reproduces the label with accuracy 1.00000000: `is_coinjoin_like == (input_count >= 4) AND (output_count >= 4)`. The label is a deterministic function of two columns that the round-1 DBSCAN detector also clusters on, confirming the circularity all three reviewers raised. | `TBD6` |
+| E07 | Reconstruct script types; test the Taproot premise | Author corpus, 5,884,387 tx | Parse `input/output_script_types` node descriptors | **Taproot premise overturned.** All six declared script flags are identically False for every row, so nothing could be confirmed through them. Parsing the descriptor columns shows P2TR is 24.10% of outputs; 2,494,168 tx (42.39%) touch Taproot, and 79,386 / 110,352 (71.94%) of label-positive CoinJoin-like candidates do. The corpus spans 2022-07 to 2025-07 and is post-Taproot throughout. | `TBD7` |
 
 ---
 
@@ -214,3 +216,88 @@ point transfers not at all.
    are the same story told twice.
 3. Threshold transfer, not ranking, is the dominant failure mode. A forensic
    deployment would need recalibration rather than retraining alone.
+
+---
+
+## E06 — The CoinJoin label rule
+
+**Question.** What rule produced `is_coinjoin_like`, and does it share
+variables with the detector evaluated against it?
+
+**Method.** The rule was never documented, so it was recovered empirically:
+decision trees of increasing depth were fitted to predict the label from 34
+structural and behavioural columns over all 5,884,387 transactions.
+
+**Result.** A depth-3 tree reproduces the label with training accuracy
+`1.00000000`. Read off the tree, and verified directly against the column:
+
+```
+is_coinjoin_like  ==  (input_count >= 4) AND (output_count >= 4)
+```
+
+The equality holds for every one of the 5,884,387 rows. Positive rate 1.88 %
+(110,352 transactions).
+
+**Interpretation.** The label is a deterministic threshold on two count
+variables, and those same two variables are among the structural features the
+round-1 DBSCAN detector clusters on. The round-1 experiment therefore measured
+how well clustering recovers a two-variable threshold rule, not how well it
+detects CoinJoin transactions. This confirms mechanically the circularity
+raised by R1 (comment 3), R2 and R3 (comment 2).
+
+A further defect: `value_concentration_ratio`, one of the clustering features,
+is degenerate. Its median, 25th and 75th percentiles are all exactly 1.0
+(mean 0.99984, sd 0.0126), so it carries almost no information.
+
+**Decision.** The label cannot be called ground truth. The manuscript must
+state the rule explicitly, and the clustering experiment must be rebuilt
+against a target that does not share its inputs.
+
+---
+
+## E07 — Script types and the Taproot claim
+
+**Question.** Does the corpus really contain no confirmed P2TR transactions?
+
+**Why it matters.** Round-1 stated that it does not, and used multi-input
+P2WPKH as a Taproot proxy. R1 (comment 5), R2 and R3 (comment 3) all asked for
+the Taproot claims to be moderated on that basis, R3 calling a pre-Taproot
+validation "a substantial limitation for a paper centered on modern CoinJoin
+detection".
+
+**Finding.** The premise is an artefact of broken columns. All six declared
+script-type booleans (`has_p2pk`, `has_p2pkh`, `has_p2sh`, `has_p2wpkh`,
+`has_p2wsh`, `has_taproot`) are identically `False` for all 5,884,387 rows, so
+no script type could ever be confirmed through them. The node-reported
+descriptors in `input_script_types` / `output_script_types` carry the real
+information.
+
+**Reconstructed composition (output side).**
+
+| Script type | Share of outputs |
+|---|---|
+| P2WPKH | 38.66 % |
+| **P2TR (Taproot)** | **24.10 %** |
+| P2SH | 15.61 % |
+| P2PKH | 12.39 % |
+| OP_RETURN | 6.84 % |
+| P2WSH | 2.25 % |
+| bare multisig | 0.15 % |
+
+| Quantity | Value |
+|---|---|
+| Transactions touching Taproot (either side) | 2,494,168 (42.39 %) |
+| Label-positive CoinJoin-like candidates | 110,352 |
+| …of those, touching Taproot | 79,386 (**71.94 %**) |
+| Corpus time range | 2022-07-13 → 2025-07-01 |
+
+**Interpretation.** The corpus is not pre-Taproot and contains no proxy
+problem. It begins eight months after Taproot activation, is roughly a quarter
+Taproot by output, and nearly three quarters of its CoinJoin-like candidates
+involve a Taproot script. The round-1 limitation was a data-processing defect
+misread as a property of the blockchain.
+
+**Consequence.** Rather than moderating the Taproot claims as the reviewers
+proposed, the study can now support them with direct evidence. This converts
+the manuscript's largest stated limitation into a genuine contribution:
+script-aware CoinJoin analysis on a modern, majority-post-Taproot corpus.

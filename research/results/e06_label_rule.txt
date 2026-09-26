@@ -1,0 +1,13 @@
+|--- output_count <= 4.50
+|   |--- output_count <= 3.50
+|   |   |--- class: 0
+|   |--- output_count >  3.50
+|   |   |--- input_count <= 3.50
+|   |   |   |--- class: 0
+|   |   |--- input_count >  3.50
+|   |   |   |--- class: 1
+|--- output_count >  4.50
+|   |--- input_count <= 3.50
+|   |   |--- class: 0
+|   |--- input_count >  3.50
+|   |   |--- class: 1

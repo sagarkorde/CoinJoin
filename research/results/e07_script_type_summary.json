@@ -1,0 +1,58 @@
+{
+  "n_transactions": 5884387,
+  "time_range": [
+    "2022-07-13 14:20:09",
+    "2025-07-01 00:21:56"
+  ],
+  "declared_flags_all_false": true,
+  "output_script_occurrences": {
+    "p2wpkh": 6336135,
+    "p2tr": 3950063,
+    "p2sh": 2557688,
+    "p2pkh": 2030365,
+    "op_return": 1121786,
+    "p2wsh": 368909,
+    "bare_multisig": 25284,
+    "witness_unknown": 2
+  },
+  "input_script_occurrences": {
+    "p2wpkh": 5511016,
+    "p2tr": 2960467,
+    "p2sh": 2542284,
+    "p2pkh": 2020071,
+    "p2wsh": 354018,
+    "p2pk": 46,
+    "bare_multisig": 4
+  },
+  "output_script_share_pct": {
+    "p2wpkh": 38.658,
+    "p2tr": 24.1001,
+    "p2sh": 15.605,
+    "p2pkh": 12.3877,
+    "op_return": 6.8442,
+    "p2wsh": 2.2508,
+    "bare_multisig": 0.1543,
+    "witness_unknown": 0.0
+  },
+  "input_script_share_pct": {
+    "p2wpkh": 41.1641,
+    "p2tr": 22.113,
+    "p2sh": 18.9894,
+    "p2pkh": 15.0888,
+    "p2wsh": 2.6443,
+    "p2pk": 0.0003,
+    "bare_multisig": 0.0
+  },
+  "tx_with_any_taproot_output": 1859019,
+  "tx_with_any_taproot_input": 2316350,
+  "tx_taproot_either_side": 2494168,
+  "tx_taproot_either_side_pct": 42.3862,
+  "coinjoin_like": {
+    "n": 110352,
+    "with_taproot_output": 77672,
+    "with_taproot_input": 74882,
+    "taproot_either_side": 79386,
+    "all_taproot_outputs_and_uniform": 21780,
+    "taproot_either_side_pct": 71.9389
+  }
+}
