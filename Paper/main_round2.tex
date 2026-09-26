@@ -2082,7 +2082,21 @@ published in each cited work.
     feature set size, and class-weighting scheme; figures
     are therefore indicative rather than directly
     commensurate. Pre-training denotes whether unsupervised
-    graph pre-training (DGI or equivalent) was applied.}
+    graph pre-training was applied.
+    Two further cautions apply specifically to this table.
+    Published entries do not all state the test window, and
+    Section~\ref{sec:temporal_drift} shows that performance on
+    this benchmark is bimodal about time step 43, so the window
+    materially determines the figure. Entries marked
+    \textsuperscript{a} use the window of the present study,
+    time steps 42 to 49; the entry marked \textsuperscript{b}
+    uses the window adopted in most of the literature, steps 35
+    to 49, and is the appropriate point of comparison with the
+    published rows. In addition, none of the published figures
+    has been audited for the feature leakage documented in
+    Section~\ref{sec:feature_withdrawal}, and the present study
+    makes no assessment of them, having no access to the
+    implementations.}
   \label{tab:benchmark}
   \centering
   \small
@@ -2105,116 +2119,147 @@ published in each cited work.
     FG-EGCN
       & \citet{han2026fg} & No  & 0.774 & -- \\
     \midrule
-    \textbf{MixTrace (DGI+GAT)}
-      & Present study & \textbf{Yes} & \textbf{0.806$\pm$0.090} & \textbf{0.992$\pm$0.005} \\
+    Fusion, frozen DGI + GAT
+      & Present study & Yes & 0.5197$\pm$0.030\textsuperscript{a} & 0.851 \\
+    GraphSAGE
+      & Present study & No  & 0.5467$\pm$0.012\textsuperscript{a} & 0.853 \\
+    Random Forest, 165 features
+      & Present study & No  & 0.6212$\pm$0.004\textsuperscript{a} & 0.847 \\
+    Random Forest, 165 features
+      & Present study & No  & \textbf{0.7634$\pm$0.026}\textsuperscript{b} & 0.913 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-MixTrace achieves a mean illicit F1 of 0.806 across five
-seeds, exceeding all compared published GCN-family methods on
-the same benchmark, including the FG-EGCN of~\citet{han2026fg}
-(F1: 0.774), while being the only evaluated approach in this
-comparison to incorporate
-self-supervised graph pre-training. FG-EGCN employs
-feature-gated temporal aggregation with full supervised
-labels on every time step, whereas MixTrace relies on
-self-supervised pre-training under severe label scarcity;
-because the compared methods report only single point
-estimates without seed-level variance, the comparison
-remains indicative rather than a formal statistical test
-against MixTrace's five-seed distribution.
-The primary cross-dataset limitation of the present work
-is that the Elliptic corpus predates widespread
-Pay-to-Taproot adoption, so transfer to live P2TR graphs
-remains unvalidated; post-Taproot evaluation constitutes a
-necessary future extension~\citep{coinjoin2024tdsc}.
-The author-collected Bitcoin corpus used for structural
-clustering (200,000 transactions) and CST linking
-(5,000 window pairs) is independent of Elliptic and
-evaluated separately, providing complementary evidence of
-the framework's generalisability across different data
-sources and task types.
+Direct comparison against published figures requires care, for
+two reasons that the present study is in a position to state
+precisely.
+
+The first is protocol. Section~\ref{sec:temporal_drift} shows
+that results on the Elliptic Data Set depend heavily on which
+time steps the test window covers, because performance is
+bimodal about step 43. The same Random Forest attains 0.7634
+under the window adopted in most of the literature and 0.6212
+under the narrower window used here. A comparison that does not
+hold the window fixed is comparing evaluation protocols as much
+as methods, and published figures rarely state the window in
+enough detail to align them.
+
+The second is leakage. The withdrawn feature described in
+Section~\ref{sec:feature_withdrawal} produced a test F1-score of
+1.0000 under two learners. Any reported figure approaching that
+range on this benchmark warrants scrutiny of how its graph
+features were constructed, since a feature seeded from labelled
+nodes carries those labels into the evaluation split. The present
+study offers no assessment of other published work, having no
+access to the implementations, but notes that the defect is easy
+to introduce and cheap to detect.
+
+For those reasons the figures obtained here are positioned as a
+leakage-free reference point under a stated protocol rather than
+as a ranking against published numbers. Under the literature
+window a Random Forest on the 165 distributed features attains
+0.7634, which is consistent with published values for that
+learner and indicates the baseline is sound. Under the window
+used throughout the present study the best graph model attains
+0.5467 and the best tabular model 0.6212. Both protocols, the
+code that produces them and the per-experiment commit hashes are
+released so that any future comparison can align its window
+explicitly.
+
+The author-curated corpus used for structural screening is
+independent of Elliptic and is evaluated separately, and
+Section~\ref{sec:screening} explains why its screening label
+cannot support a detection benchmark. The two corpora therefore
+provide evidence about different tasks rather than a
+cross-dataset validation of one model, and the manuscript does
+not claim the latter. Unlike Elliptic, the author-curated corpus
+is post-Taproot throughout, with Pay-to-Taproot accounting for
+24.10 percent of outputs, so the transfer question that concerns
+live P2TR graphs applies to the Elliptic results specifically and
+not to the screening analysis.
 
 % ─────────────────────────────────────────────────────────────
 \section{Discussion}
 \label{sec:discuss}
 % ─────────────────────────────────────────────────────────────
 
-\subsection{Contribution of DGI Pre-Training}
+\subsection{Contribution of the Frozen Self-Supervised Representation}
+\label{sec:dgi_contribution}
 
-Across five random seeds, the ablation comparison isolates
-the DGI skip connection's contribution as 32.4 percentage
-points of mean final F1-score (improvement from 0.482 to
-0.806), together with a reduction in F1 standard deviation
-from 0.205 to 0.090 -- DGI pre-training therefore improves
-both the average outcome and its reliability across
-independent training runs. The retrained standalone GAT
-achieves a mean ROC-AUC of 0.961 (versus 0.992 for MixTrace),
-confirming that the attention
-layers themselves learn substantially discriminative
-neighbourhood representations even without DGI. The gap
-between the standalone GAT's comparatively strong ranking
-quality and its markedly weaker and more volatile F1
-(precision 0.377 $\pm$ 0.234, recall 0.878 $\pm$ 0.101)
-is consistent with a
-\emph{calibration} contribution from DGI on top of a
-representation the attention layers can already learn
-unassisted: the GAT without pre-training tends to rank
-illicit
-nodes reasonably well but settles on a less stable
-operating point under class imbalance across different
-initialisations, with precision ranging from 0.136 to 0.687
-depending on seed. The DGI skip connection provides global
-topological context that both shifts the score distribution
-toward better-separated operating points on average and
-narrows the spread of outcomes across seeds. The DGI
-embeddings
-pre-trained on all 203,769 nodes encode global topological
-context that local two-hop message passing cannot recover
-from the labelled subset alone. This finding aligns with
-the self-supervised prototype learning analysis
-by~\citet{graphanomaly2024}, who documented up to 40
-percentage-point calibration improvements from unlabelled
-transaction node pre-training. An earlier version of the present study used two different
-decision rules in the same section, reporting a
-validation-calibrated threshold of $\theta^* = 0.9397$ for one
-representative run while the aggregate comparison applied a fixed
-threshold of 0.5. The two are not comparable, and the
-inconsistency is removed. A single rule now governs every arm and
-every seed: the threshold maximises validation F1-score, is
-selected independently for each run, and is frozen before the
-test split is scored. The rule is implemented in one place in the
-released code, so the two protocols cannot diverge again.
+An earlier version of the present study described self-supervised
+pre-training as the primary driver of classification
+performance, reporting a contribution of 32.4 percentage points
+of F1-score. That figure was obtained with the withdrawn features
+present and against an ablation disabled at inference rather than
+retrained. It is withdrawn, and replaced by a narrower claim that
+the corrected evidence supports.
 
-The pre-training strategy effectively exploits the 157,205
-unlabelled Elliptic nodes: structural regularities in the
-unlabelled majority translate into well-calibrated illicit
-predictions once trained on the labelled subset. This
-is a practically significant result for the blockchain
-forensics domain, where confirmed illicit labels are scarce
-relative to total transaction volume.
+Measured over twenty seeds against an ablation trained from
+scratch with the fused slot zeroed, the frozen representation
+contributes between 0.049 and 0.063 F1-score depending on the
+pre-training regime, with paired tests giving $p = 0.0041$ and
+$p = 0.0003$ respectively. The effect on stability is the more
+striking of the two. The cross-seed standard deviation falls from
+0.0594 to 0.0303, approximately a halving, so the benefit is at
+least as much a matter of reliable convergence as of mean
+accuracy. The unlabelled majority of the graph, 157,205 nodes
+carrying no class label, is what makes that possible: structural
+regularities learned from those nodes give the supervised stage a
+more stable starting representation than the labelled subset
+alone supports.
+
+What does not follow is that self-supervised pre-training is the
+decisive ingredient for this task. A GraphSAGE encoder trained
+without any pre-training reaches a mean F1-score of 0.5467,
+against 0.5197 for the fused model, and the difference is
+consistent across seeds at $p = 0.0012$. The honest statement is
+therefore that fusing a frozen self-supervised representation
+improves the graph attention architecture it is fused into, in
+both mean and variance, and that this architecture is not the
+strongest of those examined.
 
 \subsection{Comparative Analysis with Baselines}
+\label{sec:baseline_discussion}
 
-Random Forest achieves the highest mean precision (0.954) but
-mean recall of only 0.470, identifying a high-confidence subset
-while missing over half the true illicit test nodes across
-seeds. For
-financial intelligence and compliance applications, this
-recall shortfall represents unmonitored fund flows with
-regulatory consequences. MixTrace achieves competitive
-mean precision (0.713) alongside substantially higher mean recall
-(0.934), producing a mean F1 improvement of 17.6 percentage
-points over Random Forest and 32.5 points over KNN. The
-mean PR-AUC improvement from 0.640 to 0.862 indicates superior
-ranking quality across the full precision-recall curve,
-consistent with the benchmarking conclusions
-of~\citet{fan2024gnn}. K-Means exhibits a degenerate
-all-positive bias with mean precision of 0.047, confirming that
-unsupervised clustering without graph structure cannot
-discriminate illicit patterns at this imbalance
-level~\citep{xiao2025}.
+Three comparisons matter, and two of them run against the
+architecture the present study set out to advance.
+
+Among graph models, the ordering is GraphSAGE, then the fused
+model, then GCN, then the attention variants without a fused
+representation (Table~\ref{tab:model_comparison}). The spread
+between best and worst is 0.085 F1-score, which is comparable to
+the width of the bootstrap intervals in
+Table~\ref{tab:bootstrap}, so the ordering should be read as
+indicative rather than decisive except where the seed-level tests
+support it.
+
+Against tabular learners the graph models lose outright. A Random
+Forest on the same 165 features attains 0.6212 and a gradient
+boosting ensemble 0.6126, against 0.5467 for the best graph
+model. The gap holds across precision, PR-AUC and Matthews
+correlation. Section~\ref{sec:temporal_drift} supplies the likely
+reason: the evaluation window is dominated by a period in which
+the training distribution no longer applies, and message passing
+over a neighbourhood whose statistics have shifted offers no
+advantage over reading the transaction itself.
+Section~\ref{sec:xai} is consistent with this, since the graph
+model spends part of its attribution on neighbourhood summaries
+that E03 shows carry little usable signal here.
+
+Against cost, the comparison is starker still.
+Table~\ref{tab:compute_cost} shows the best graph model is also
+the cheapest, and that the fused model requires nine times the
+training time, six and a half times the peak memory and four
+times the inference latency to finish behind it.
+
+Oversampling was also examined. With a Random Forest on the same
+features, ADASYN does not improve illicit-class F1-score relative
+to class-weighted training alone, and the small decrease is
+consistent across seeds. Class-weighted loss therefore remains
+the sole imbalance-handling mechanism, and no oversampling claim
+is made.
+
 
 \subsection{Interpreting the Screening Trade-Off}
 
