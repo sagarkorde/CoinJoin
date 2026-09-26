@@ -2155,78 +2155,94 @@ virtual asset service providers.
 
 % ─────────────────────────────────────────────────────────────
 \section{Conclusion}
-\label{sec:conclude}
-% ─────────────────────────────────────────────────────────────
 
-This study presents MixTrace, a multi-modal graph attention
-framework for Bitcoin CoinJoin transaction deanonymization
-that simultaneously addresses three research gaps in the
-current literature.
+The present study set out to strengthen a three-module forensic
+framework and instead found that three of the results supporting
+it did not hold. The corrections are reported in full, because
+the failures are more instructive than the original figures.
 
-The structural DBSCAN clustering strategy, evaluated on
-multi-input P2WPKH proxies, reduces the false-positive rate
-by 79.8 percent (absolute: 2.97 percentage points, from
-3.72 to 0.75 percent) over naive CIOH, eliminating over
-5,200 incorrect attributions per 200,000 analysed
-transactions. This gain is achieved at a false-negative rate
-of 70.0 percent, a conservative precision-focused operating
-point appropriate for forensic attribution contexts where
-erroneous identifications carry regulatory consequences;
-accordingly, structural DBSCAN is recommended as a
-high-precision filter for priority investigation, deployed
-alongside naive CIOH's zero-false-negative sweep rather than
-as its replacement, so that comprehensive coverage is not
-sacrificed for precision.
+A graph feature defined as the shortest path to a confirmed
+illicit node was found to re-encode the classification target
+exactly, taking the value zero for all 4{,}545 illicit nodes and
+for no licit node. Supplied to a classifier it drives the
+illicit-class F1-score, PR-AUC and Matthews correlation to 1.0000
+on the test split under two learners with unrelated inductive
+biases. Because the Elliptic edge set contains no cross-time-step
+edges, restricting the feature to training-period labels leaves
+it constant on the evaluation splits, so no leakage-free variant
+can carry information about a test transaction. The feature is
+withdrawn rather than repaired, and with it every figure computed
+in its presence.
 
-The Multi-Dimensional Chamfer Distance formulation extends
-CST linking to four structural dimensions; on the present
-dataset this extension shows no measurable F1 improvement
-over the one-dimensional temporal baseline, identifying the
-boundary condition under which additional structural
-dimensions would yield benefit.
+The screening target used for CoinJoin analysis was found to be
+the deterministic rule requiring at least four inputs and at
+least four outputs, recovered exactly across all 5{,}884{,}387
+transactions. Deleting the two counts does not make an evaluation
+independent of them, because the counts are recoverable from
+serialised size through the protocol constants and exactly from
+the ratio of a total value to its corresponding average. Across
+six feature regimes the metric remains at or above 0.90 wherever
+such a route survives and falls to 0.2678 at the point where the
+last one closes. The corpus therefore cannot support a
+non-circular screening benchmark, and the module is reported as a
+characterisation study against a stated heuristic target.
 
-The DGI and GAT pipeline achieves a mean illicit-class F1-score
-of 0.806 (standard deviation 0.090) and mean ROC-AUC of 0.992
-across five independent random seeds, a 17.6 percentage-point
-mean F1 improvement over Random Forest (F1: 0.630 $\pm$ 0.001),
-significant at $p<0.05$ under a paired $t$-test across seeds
-(Table~\ref{tab:stats}). A properly retrained ablation study,
-in which the GAT-without-DGI variant is trained end-to-end from
-initialisation with no DGI-derived input rather than evaluated
-by zeroing the DGI input of an already DGI-trained model,
-confirms that the DGI skip connection contributes 32.4
-percentage points of mean final F1-score and more than halves
-the standard deviation of F1 across seeds (from 0.205 to
-0.090), establishing
-self-supervised pre-training on unlabelled blockchain nodes
-as the primary driver of both performance and training
-stability. A parallel ablation of ADASYN oversampling on the
-Random Forest baseline shows no benefit over class-weighted
-training alone (F1: 0.626 $\pm$ 0.001 with ADASYN versus
-0.630 $\pm$ 0.001 without, across the same five seeds),
-supporting the choice to rely solely on class-weighted loss
-in MixTrace's GAT training. The policy implications
-for FATF-compliant transaction monitoring, proportionality
-under GDPR Article~22, and admissibility under the Daubert
-and Frye evidentiary standards are analysed in Section~5.
+Classification performance on the Elliptic Data Set was found to
+be bimodal rather than gradually degrading. Mean illicit-class
+F1-score reaches 0.858 through time step 42 and falls to 0.028
+across the remaining steps, with recall collapsing from 0.789 to
+zero at the step corresponding to a major marketplace closure.
+Ranking quality degrades gently over the same interval while the
+calibrated operating point transfers not at all, which indicates
+that recalibration rather than retraining is the first remedy a
+deployment should attempt. Any pooled figure spanning the
+boundary describes no part of the data well.
 
-Three directions for future research are identified. First,
-inductive DGI variants supporting mini-batch processing
-would extend the framework to streaming blockchain data at
-exchange scale~\citep{chithanuru2025}. Second, integration
-with Lightning Network routing graphs would enable off-chain
-mixing detection alongside on-chain analysis. Third,
-federated graph training across multiple exchange compliance
-systems would scale MixTrace's coverage without centralising
-sensitive transaction data, following the architecture
-evaluated by~\citet{ahmed2024fed}.
+One stated limitation was found not to exist. The corpus had been
+reported to contain no confirmed Pay-to-Taproot transactions, and
+structural clustering had accordingly been validated on
+multi-input P2WPKH proxies. All six distributed script-type
+indicators are uniformly false, so none of them could confirm any
+script type. The node-reported descriptors show that Taproot
+accounts for 24.10 percent of outputs, that 42.39 percent of
+transactions involve a Taproot script, and that the proportion
+rises to 71.94 percent among screening candidates. The corpus is
+post-Taproot throughout, the proxy is unnecessary, and
+script-aware analysis is performed on real Taproot data.
 
-The complete 14-step reproducible implementation pipeline
-is publicly available at
-\url{https://github.com/sagarkorde/CoinJoin}
-under the MIT License.
+What survives is narrower than the original claims and better
+supported. A leakage-free tabular baseline restricted to the 165
+distributed Elliptic features attains an illicit-class F1-score
+near 0.62 on the evaluation window used here and 0.763 under the
+window adopted in the wider literature, the latter consistent
+with published figures for the same learner. Fusing a frozen
+self-supervised representation with a supervised graph attention
+representation yields a measurable gain over the same
+architecture trained without it, and the inductive and
+transductive pre-training regimes perform comparably, so the
+transductive setting is not responsible for the result. Fifteen
+topological descriptors verified label-independent by permutation
+were examined as replacements for the withdrawn features and did
+not help, a negative result reported as such. The
+four-dimensional Chamfer formulation likewise showed no
+improvement over the temporal baseline, and that boundary
+condition stands.
 
-% ─────────────────────────────────────────────────────────────
+The wider contribution is methodological. Each defect identified
+here follows from a modelling choice that recurs in the
+blockchain-forensics literature, and each is detectable with a
+cheap diagnostic: compare a derived feature against the target
+before trusting it, count the edges that cross a period boundary
+before designing a propagation feature, report a gradient across
+feature regimes rather than a single ablation, and report
+per-period metrics rather than one pooled figure. Treating a
+perfect score as a defect to be explained rather than a result to
+be reported would have caught the first of these immediately.
+Code, configurations, per-experiment commit hashes and the full
+experiment log are released so that every figure above can be
+reproduced or contested.
+
+
 \section*{Acknowledgements}
 The authors thank the Elliptic team for releasing the
 benchmark dataset, the PyTorch Geometric and scikit-learn
