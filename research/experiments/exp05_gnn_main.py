@@ -96,7 +96,10 @@ def main() -> None:
                 thr = select_threshold(y[vam], s[vam], criterion="f1")
                 m = evaluate(y[tem], s[tem], thr)
                 m.update(model=kind,
-                         dgi_regime=regime if kind in ("fusion", "gat_zero_dgi") else "n/a",
+                         # "n/a" round-trips through pandas as NaN and is then dropped by
+                         # groupby, so a non-NA sentinel is used instead.
+                         dgi_regime=regime if kind in ("fusion", "gat_zero_dgi")
+                         else "none",
                          seed=seed, seconds=r["seconds"], n_params=r["n_params"],
                          peak_mem_mb=r["peak_mem_mb"], epochs_run=r["epochs_run"],
                          best_val_ap=r["best_val_ap"])

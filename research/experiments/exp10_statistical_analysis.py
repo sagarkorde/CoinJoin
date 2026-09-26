@@ -44,7 +44,10 @@ REFERENCE = "fusion"
 
 
 def main() -> None:
-    per_run = pd.read_csv(RESULTS / "e05_gnn_main.csv")
+    # "n/a" is in pandas' default NA list, so reading it back turns the
+    # regime column into NaN and groupby then silently drops those models.
+    per_run = pd.read_csv(RESULTS / "e05_gnn_main.csv",
+                          keep_default_na=False, na_values=[""])
 
     # ----------------------------------------------------------- seed variance
     seed_rows = []
