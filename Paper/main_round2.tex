@@ -2039,16 +2039,16 @@ from the labelled subset alone. This finding aligns with
 the self-supervised prototype learning analysis
 by~\citet{graphanomaly2024}, who documented up to 40
 percentage-point calibration improvements from unlabelled
-transaction node pre-training. The single-run illustrative
-figures in Section~\ref{sec:class_results} additionally
-report a validation-calibrated decision threshold of
-$\theta^* = 0.9397$ for that representative run following
-the inference procedure of Algorithm~\ref{alg:mixtrace};
-the five-seed comparison in
-Table~\ref{tab:classification} instead uses a fixed 0.5
-decision threshold throughout to avoid introducing
-per-seed threshold-tuning as an additional, uncontrolled
-degree of freedom into the ablation.
+transaction node pre-training. An earlier version of the present study used two different
+decision rules in the same section, reporting a
+validation-calibrated threshold of $\theta^* = 0.9397$ for one
+representative run while the aggregate comparison applied a fixed
+threshold of 0.5. The two are not comparable, and the
+inconsistency is removed. A single rule now governs every arm and
+every seed: the threshold maximises validation F1-score, is
+selected independently for each run, and is frozen before the
+test split is scored. The rule is implemented in one place in the
+released code, so the two protocols cannot diverge again.
 
 The pre-training strategy effectively exploits the 157,205
 unlabelled Elliptic nodes: structural regularities in the
