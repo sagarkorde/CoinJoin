@@ -1,0 +1,57 @@
+{
+  "Q2_edge_temporal_structure": {
+    "edges_total": 234355,
+    "edges_within_timestep": 234355,
+    "edges_crossing_timestep": 0,
+    "interpretation": "Every Elliptic edge joins two transactions in the same time step. The graph is a disjoint union of 49 per-step snapshots, so no path of any length connects a training-period node to a test-period node."
+  },
+  "Q1_round1_feature_label_dependence": {
+    "illicit_seed_count": 4545,
+    "corr_spti_label": -0.9182,
+    "corr_inr_label": 0.4159,
+    "illicit_nodes_with_spti_0": 4545,
+    "illicit_nodes_total": 4545,
+    "licit_nodes_with_spti_0": 0,
+    "rule_spti0_implies_illicit_precision": 1.0,
+    "reproduces_manuscript_value": true,
+    "interpretation": "SPTI == 0 holds for every illicit node and for no licit node, because each illicit node is its own BFS source. The feature is an exact re-encoding of the positive class label, including on the test split."
+  },
+  "Q1b_self_exclusion_variant": {
+    "corr_spti_excl_self_label": -0.7269,
+    "illicit_nodes_with_spti_0": 0,
+    "interpretation": "Excluding a node's own seed status weakens but does not remove the dependence, because the remaining signal still derives from val/test labels of neighbouring nodes inside the same time step."
+  },
+  "Q3_strict_protocol_degeneracy": {
+    "train_period_illicit_seeds": 3462,
+    "per_split": {
+      "train": {
+        "spti_unique_values": [
+          0.0,
+          1.0,
+          2.0,
+          3.0,
+          4.0,
+          5.0,
+          6.0
+        ],
+        "spti_at_cap_fraction": 0.9312,
+        "inr_nonzero_fraction": 0.0358
+      },
+      "val": {
+        "spti_unique_values": [
+          6.0
+        ],
+        "spti_at_cap_fraction": 1.0,
+        "inr_nonzero_fraction": 0.0
+      },
+      "test": {
+        "spti_unique_values": [
+          6.0
+        ],
+        "spti_at_cap_fraction": 1.0,
+        "inr_nonzero_fraction": 0.0
+      }
+    },
+    "interpretation": "With seeds restricted to the training period, both features are constant on validation and test (SPTI == cap, INR == 0). Combined with Q2 this is structural rather than incidental: no leakage-free variant of either feature can carry information about a test node."
+  }
+}

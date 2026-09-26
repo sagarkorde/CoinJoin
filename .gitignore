@@ -95,3 +95,7 @@ Paper/Datasets/
 
 # ── Keep results directory structure but ignore large outputs ─────────────────
 !Paper/Implementation/results/.gitkeep
+
+# ── Round-2 revision pipeline ────────────────────────────────────────────────
+research/cache/
+research/results/*.parquet
