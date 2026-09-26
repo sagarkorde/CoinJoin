@@ -56,11 +56,21 @@ VALUE_TEMPORAL = ["total_input_value", "total_output_value", "value_difference",
                   "has_op_return"]
 RATE = ["fee_rate_sat_per_vbyte", "fee_rate_sat_per_byte"]
 
+# avg_input_value == total_input_value / input_count, so the pair of columns
+# recovers the count by division. Regime E removes the averages to close that
+# route; regime F keeps only columns with no arithmetic path to either count.
+AVERAGES = ["avg_input_value", "avg_output_value"]
+TOTALS = ["total_input_value", "total_output_value", "value_difference"]
+TEMPORAL = ["locktime", "version", "hour", "day_of_week", "rbf_enabled",
+            "has_op_return", "address_reuse"]
+
 REGIMES = {
     "A all columns": LABEL_INPUTS + SIZE_FAMILY + VALUE_TEMPORAL + RATE,
     "B column-disjoint": SIZE_FAMILY + VALUE_TEMPORAL + RATE,
     "C size-free": VALUE_TEMPORAL + RATE,
     "D value and temporal only": VALUE_TEMPORAL,
+    "E no averages": TOTALS + TEMPORAL,
+    "F temporal only": TEMPORAL,
 }
 
 TRAIN_END, VAL_END = "2023-12-31", "2024-04-30"
@@ -70,9 +80,9 @@ SEEDS = [42, 43, 44, 45, 46]
 
 def main() -> None:
     cols = sorted({c for v in REGIMES.values() for c in v})
-    df = pd.read_parquet(RAW_AUTHOR,
-                         columns=cols + ["is_coinjoin_like", "timestamp",
-                                         "input_count", "output_count"])
+    read_cols = sorted(set(cols) | {"is_coinjoin_like", "timestamp",
+                                    "input_count", "output_count"})
+    df = pd.read_parquet(RAW_AUTHOR, columns=read_cols)
     for c in cols:
         if df[c].dtype == bool:
             df[c] = df[c].astype(np.int8)
@@ -90,6 +100,23 @@ def main() -> None:
                     "intercept": round(float(lr.intercept_), 2)}
     print("  label-input reconstruction from the size family:")
     print(json.dumps(proxy, indent=2))
+
+    # The value columns recover the counts exactly by division.
+    ri = smp["total_input_value"] / smp["avg_input_value"].replace(0, np.nan)
+    ro = smp["total_output_value"] / smp["avg_output_value"].replace(0, np.nan)
+    rule = ((ri >= 3.5) & (ro >= 3.5)).fillna(False).astype(int)
+    proxy["division_route"] = {
+        "input_count_recovered_pct": round(float(
+            (np.abs(ri - smp["input_count"]) < 0.5).mean() * 100), 4),
+        "output_count_recovered_pct": round(float(
+            (np.abs(ro - smp["output_count"]) < 0.5).mean() * 100), 4),
+        "reconstructed_rule_agreement_pct": round(float(
+            (rule == smp["is_coinjoin_like"].astype(int)).mean() * 100), 4),
+        "note": ("avg_input_value == total_input_value / input_count, so the "
+                 "pair recovers the count by division and the screening label "
+                 "follows exactly."),
+    }
+    print("  division route:", json.dumps(proxy["division_route"], indent=2))
 
     t = pd.to_datetime(df["timestamp"])
     tr_m = (t <= TRAIN_END).to_numpy()

@@ -31,6 +31,7 @@ train = steps 1–34, validation = 35–41, test = 42–49.
 | E04 | Per-time-step evaluation and protocol comparison | Elliptic raw CSVs | RandomForest, 165 base features, 5 seeds, frozen threshold | **Baseline validated; collapse localised.** Literature protocol (train 1-25, test 35-49) gives F1 0.7634, consistent with published Elliptic RF results, so the leakage-free baseline is sound. Per step: mean F1 0.8582 on steps 35-42 vs 0.0283 on steps 43-49; recall falls 0.789 to 0.000 at step 43 (dark-market shutdown). The round-1 test window 42-49 lies almost entirely inside the collapsed regime. | `88365ed` |
 | E06 | Recover the undocumented `is_coinjoin_like` rule | Author corpus, 5,884,387 tx | Decision tree fitted to structural columns | **Rule recovered exactly.** Depth-3 tree reproduces the label with accuracy 1.00000000: `is_coinjoin_like == (input_count >= 4) AND (output_count >= 4)`. The label is a deterministic function of two columns that the round-1 DBSCAN detector also clusters on, confirming the circularity all three reviewers raised. | `d55d942` |
 | E07 | Reconstruct script types; test the Taproot premise | Author corpus, 5,884,387 tx | Parse `input/output_script_types` node descriptors | **Taproot premise overturned.** All six declared script flags are identically False for every row, so nothing could be confirmed through them. Parsing the descriptor columns shows P2TR is 24.10% of outputs; 2,494,168 tx (42.39%) touch Taproot, and 79,386 / 110,352 (71.94%) of label-positive CoinJoin-like candidates do. The corpus spans 2022-07 to 2025-07 and is post-Taproot throughout. | `d55d942` |
+| E08 | Non-circular CoinJoin screening: chronological split, frozen cluster map | Author corpus, 600k train / 300k test | DBSCAN eps 0.6 frozen positive-rate map; RandomForest reference; 5 seeds | **Circularity reproduced and measured past.** RF with the label's own input columns: F1 0.9978. RF column-disjoint: F1 0.9140. DBSCAN frozen, all columns: F1 0.4832 (close to the round-1 figure of 0.441). DBSCAN column-disjoint: F1 0.1649. | `1b04e03` |
 
 ---
 
@@ -301,3 +302,43 @@ misread as a property of the blockchain.
 proposed, the study can now support them with direct evidence. This converts
 the manuscript's largest stated limitation into a genuine contribution:
 script-aware CoinJoin analysis on a modern, majority-post-Taproot corpus.
+
+---
+
+## E08 — Non-circular CoinJoin screening
+
+**Question.** What does the structural screening module achieve once the
+cluster-to-class map is frozen on training data and the evaluation is
+chronologically separated?
+
+**Corrections applied.**
+
+1. *Chronological split.* Round-1 had no temporal separation. The corpus is
+   dense from 2022-07 to 2024-09, so the split is train up to 2023-12,
+   validate to 2024-04, test from 2024-05, giving 600,000 training and 300,000
+   test transactions at a 1.18 % positive rate.
+2. *Frozen cluster map* (R1 comment 4). Clusters are fitted on training rows
+   only, each cluster is scored by its training positive rate, the cut-off is
+   selected on validation and frozen, and test rows are assigned by nearest
+   fitted centroid without contributing to the map.
+3. *Scoring rule.* Round-1 used majority vote per cluster. Under a 1–2 %
+   positive class majority vote makes almost every cluster negative, which
+   reflects the imbalance rather than the clustering, so a validation-selected
+   threshold on the cluster positive rate is used instead.
+
+**Results (test split, mean over 5 seeds).**
+
+| Method | Feature regime | F1 | Precision | Recall | FPR | FNR | MCC |
+|---|---|---|---|---|---|---|---|
+| RandomForest | all columns | 0.9978 | 1.0000 | 0.9955 | 0.0000 | 0.0045 | 0.9977 |
+| RandomForest | column-disjoint | 0.9140 | 0.9167 | 0.9114 | 0.0010 | 0.0886 | 0.9130 |
+| DBSCAN (frozen) | all columns | 0.4832 | 0.3997 | 0.6109 | 0.0110 | 0.3891 | 0.4868 |
+| DBSCAN (frozen) | column-disjoint | 0.1649 | 0.1156 | 0.6725 | 0.0879 | 0.3275 | 0.2296 |
+
+**Interpretation.** With the label's own input columns present, a supervised
+learner reaches F1 0.9978, which is simply the learner recovering the
+threshold rule identified in E06. The frozen DBSCAN figure of 0.4832 is close
+to the 0.441 reported in round-1, so the round-1 number is reproduced under a
+corrected protocol; it is a conservative operating point, not superior
+detection. The column-disjoint regime appeared at first to show genuine
+residual signal at F1 0.9140. E08b shows that it does not.
