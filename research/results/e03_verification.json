@@ -1,0 +1,40 @@
+{
+  "all_features_invariant_to_label_permutation": true,
+  "per_feature": {
+    "topo_in_degree": true,
+    "topo_out_degree": true,
+    "topo_degree": true,
+    "topo_clustering": true,
+    "topo_pagerank": true,
+    "topo_core_number": true,
+    "topo_triangles": true,
+    "topo_nbr_degree_mean": true,
+    "topo_nbr_degree_max": true,
+    "topo_nbr_degree_std": true,
+    "topo_component_size": true,
+    "topo_two_hop_size": true,
+    "topo_betweenness": true,
+    "topo_is_source": true,
+    "topo_is_sink": true
+  },
+  "compute_seconds": 47.58495903015137,
+  "n_features": 15,
+  "label_correlation": {
+    "topo_in_degree": -0.0266,
+    "topo_out_degree": -0.0426,
+    "topo_degree": -0.0416,
+    "topo_clustering": -0.0339,
+    "topo_pagerank": -0.019,
+    "topo_core_number": -0.1048,
+    "topo_triangles": -0.0118,
+    "topo_nbr_degree_mean": -0.0225,
+    "topo_nbr_degree_max": -0.0435,
+    "topo_nbr_degree_std": -0.0415,
+    "topo_component_size": -0.1223,
+    "topo_two_hop_size": -0.0589,
+    "topo_betweenness": -0.0399,
+    "topo_is_source": -0.0424,
+    "topo_is_sink": 0.0549
+  },
+  "max_abs_label_correlation": 0.1223
+}

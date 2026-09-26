@@ -1,0 +1,7 @@
+model,feature_set,n_features,f1_mean,f1_std,precision_mean,recall_mean,pr_auc_mean,roc_auc_mean,mcc_mean
+HistGradientBoosting,base + topological,180,0.6133,0.0048,0.8771,0.4716,0.5547,0.8643,0.6317
+HistGradientBoosting,base 165,165,0.6126,0.0048,0.8741,0.4716,0.5561,0.865,0.6305
+HistGradientBoosting,topological only,15,0.038,0.014,0.023,0.1103,0.0358,0.3994,-0.057
+RandomForest,base + topological,180,0.6173,0.0029,0.9154,0.4657,0.5412,0.8441,0.6424
+RandomForest,base 165,165,0.6212,0.0042,0.9231,0.4681,0.5431,0.847,0.647
+RandomForest,topological only,15,0.028,0.0005,0.0167,0.0868,0.035,0.3778,-0.0788
