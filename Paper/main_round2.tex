@@ -2035,60 +2035,110 @@ Networks and DBSCAN clustering by the broader blockchain
 forensics community~\citep{motie2024,futureinternet2025}
 supports general acceptance.
 
+\subsection{Threats to Validity in Graph-Based Forensic Evaluation}
+\label{sec:threats}
+
+The three defects identified during the present re-evaluation are
+not peculiar to one implementation. Each arises from a modelling
+choice that is common in the blockchain-forensics literature, and
+each is detectable with a cheap diagnostic. The patterns are set
+out here so that the diagnostics transfer.
+
+\paragraph{Label-derived graph features.}
+A feature defined by distance or adjacency to a labelled node
+carries the label of the node that seeds it. When the seed set is
+drawn from the full dataset, the feature restates the target on
+the evaluation split, and it does so most strongly for the
+positive class. The diagnostic is inexpensive: compare the
+feature against the label directly, and treat any decision rule
+on a single feature that reaches precision near unity as a
+failure rather than a discovery. A perfect score under two
+learners with unrelated inductive biases is diagnostic of leakage
+and not of a strong predictor.
+
+\paragraph{Temporal structure that cannot support the intended
+protocol.}
+Restricting a label-derived feature to the training period is the
+natural correction, but its effectiveness depends on the graph
+actually connecting periods. In the Elliptic Data Set every edge
+joins two transactions in the same time step, so the graph is a
+disjoint union of per-step snapshots and no path reaches from the
+training period into a later one. Under the restricted protocol
+the feature becomes constant on the evaluation splits. The
+diagnostic is a single query: count the edges that cross a
+period boundary before designing any propagation-based feature.
+
+\paragraph{Targets that the features reconstruct.}
+Where a target is itself a deterministic function of recorded
+attributes, deleting those attributes does not make an evaluation
+independent, because the attributes are often recoverable from
+what remains. In the corpus examined here the screening target is
+a threshold on input and output counts, and the counts are
+recoverable both from serialised size, which is affine in them,
+and exactly from the ratio of a total to its corresponding
+average. Reporting a gradient across feature regimes of
+increasing strictness exposes this: a metric that stays flat as
+features are withdrawn and then falls sharply localises the
+dependence to the columns removed at the discontinuity.
+
+\paragraph{Aggregate metrics that conceal regime change.}
+A single pooled figure over an evaluation window assumes the
+window is homogeneous. On Elliptic it is not. Performance is
+strong through time step 42 and collapses immediately afterwards,
+so a pooled figure for a window spanning the boundary describes
+no part of the data well. Reporting per-period metrics is
+sufficient to expose this, and the shape of the failure is
+informative in itself: ranking quality degrades gently while the
+calibrated operating point transfers not at all, which indicates
+that recalibration rather than retraining is the first remedy a
+deployment should attempt.
+
 \subsection{Limitations}
 
-The author-curated dataset contains no confirmed Taproot
-transactions, requiring multi-input P2WPKH transactions as a
-structural proxy for the Gap~1 analysis; live P2TR validation
-is deferred to future work. DGI pre-training requires the
-full transaction graph simultaneously in memory, currently
-limiting scalability to approximately 500,000 nodes on 64~GB
-RAM without mini-batch extensions. The MD-CD computation is
-$O(mn)$ per window pair, which may become prohibitive at
-exchange throughput scale without approximate nearest-neighbour
-optimisation. Off-chain Lightning Network activity falls
-outside the scope of the current pipeline.
-A concrete scaling roadmap for both bottlenecks is identified
-for future work: subgraph-sampling schemes such as
-GraphSAINT or Cluster-GCN-style graph partitioning
-would allow DGI pre-training to proceed in mini-batches rather
-than requiring the full graph in memory, and approximate
-nearest-neighbour libraries such as FAISS would reduce the
-MD-CD window-pair search from exact $O(mn)$ comparison to
-sublinear retrieval, together enabling MixTrace to scale
-toward full Bitcoin network transaction volume.
+\paragraph{Screening evaluation is bounded by label provenance.}
+The author-curated corpus cannot support a non-circular benchmark
+for structural CoinJoin screening, for the reasons given in
+Section~\ref{sec:screening}. The screening results are reported
+as a characterisation of the corpus against a stated heuristic
+target, and the residual figure once every identified route to
+the label is closed is an illicit-class F1-score of 0.2678.
+Establishing genuine screening performance requires transactions
+confirmed as CoinJoin outputs by an independent source, such as
+coordinator-attributed transactions from a known mixing service.
+Such attribution was not available for the present corpus and is
+the single most valuable extension to this work.
 
-The shortest-path-to-illicit feature requires a confirmed
-set of illicit seed nodes from which breadth-first distances
-are computed. In operational deployment, intelligence agencies
-may lack a comprehensive confirmed-illicit seed set,
-particularly for novel mixing services without prior
-law-enforcement attribution. Under this condition, the
-feature's discriminative power would degrade proportionally
-to the completeness and recency of the available seed labels.
+\paragraph{No equal-value output test is possible.}
+The defining structural property of a CoinJoin is a set of
+outputs of equal value. The corpus records aggregate and average
+output values but not the individual output amounts, so the
+property cannot be tested directly. Screening therefore rests on
+counts and on value and timing statistics, which is weaker than
+the protocol-level test that per-output amounts would permit.
 
-Reported classification metrics in
-Table~\ref{tab:classification} reflect five independent
-training runs with different random seeds (1, 2, 3, 42, 123),
-each retraining the DGI encoder, the MixTrace GAT, the
-GAT-without-DGI ablation, and the classical baselines from
-scratch; Table~\ref{tab:stats} reports the resulting
-confidence intervals and paired-seed significance tests.
-A further extension to ten or more seeds would narrow these
-intervals still further but is not expected to change the
-qualitative conclusions, given that MixTrace's advantage is
-already significant at $p<0.05$ against every baseline across
-the five seeds evaluated. A related limitation concerns
-temporal stability within the test partition itself: the
-Elliptic benchmark spans 49 discrete weekly time steps, and
-the present evaluation reports metrics aggregated over the
-full test partition (time steps 42--49) rather than broken
-down step by step. Class distributions and transaction
-patterns are known to drift across the observation window,
-and confirming that MixTrace maintains stable precision and
-recall on the most recent individual time steps, rather than
-only in aggregate, is identified as a further validation
-priority.
+\paragraph{Illicit classification is evaluated on one benchmark.}
+The classification results describe the Elliptic Data Set alone.
+Its labels are supplied by a single analytics provider, its
+account of the post-shock period is sparse, and its graph
+contains no cross-period edges. Conclusions about relative model
+ordering are scoped to that benchmark and to the evaluation
+window used, and are not asserted for Bitcoin transaction graphs
+in general.
+
+\paragraph{The modules are evaluated separately.}
+Structural screening, spending-transaction linkage and illicit
+classification operate on different corpora with different label
+types and are assessed independently. No end-to-end information
+flow between them is demonstrated, and none is claimed. The
+framework is a set of parallel modules, not a jointly optimised
+pipeline.
+
+\paragraph{Concept drift is characterised, not solved.}
+The collapse documented in Section~\ref{sec:temporal_drift} is
+measured but not remedied. Adaptive recalibration, drift
+detection and periodic retraining are plausible responses and are
+left for subsequent work.
+
 
 \subsection{Ethical Considerations}
 
