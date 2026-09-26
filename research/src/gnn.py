@@ -152,7 +152,8 @@ def train_classifier(data: Data, kind: str, device: str, seed: int,
                      dgi_emb: torch.Tensor | None = None,
                      hid_dim: int = 64, heads: int = 8, dropout: float = 0.3,
                      epochs: int = 300, lr: float = 5e-3, weight_decay: float = 5e-4,
-                     patience: int = 40, verbose: bool = False) -> dict:
+                     patience: int = 40, verbose: bool = False,
+                     return_model: bool = False) -> dict:
     """
     Train a node classifier and return scores plus timing.
 
@@ -229,6 +230,9 @@ def train_classifier(data: Data, kind: str, device: str, seed: int,
     n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     peak = (torch.cuda.max_memory_allocated(device) / 1024 ** 2
             if device.startswith("cuda") else float("nan"))
-    return {"scores": scores, "best_val_ap": float(best_ap),
-            "seconds": time.time() - t0, "n_params": int(n_params),
-            "peak_mem_mb": float(peak), "epochs_run": ep + 1}
+    out = {"scores": scores, "best_val_ap": float(best_ap),
+           "seconds": time.time() - t0, "n_params": int(n_params),
+           "peak_mem_mb": float(peak), "epochs_run": ep + 1}
+    if return_model:
+        out["model"] = model
+    return out
