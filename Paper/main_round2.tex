@@ -592,63 +592,121 @@ flags, input count exceeding three, zero address reuse,
 and round output values. The mean CPS is 0.2663 with
 standard deviation 0.1307.
 
-\subsubsection{Elliptic Dataset: Four Graph-Structural Features}
+\subsubsection{Elliptic Dataset: Withdrawal of Two Label-Derived Features}
+\label{sec:feature_withdrawal}
 
-\paragraph{Graph In-Degree and Out-Degree.}
-In-degree and out-degree are computed from the directed
-edge list, with mean values of 1.150 and maximum values
-of 284 and 472 respectively, indicating a strongly
-skewed hub structure consistent with exchange and
-darknet-market transaction patterns.
+An earlier version of the present study introduced four
+graph-structural features for the Elliptic Data Set. Two of them,
+the illicit neighbour ratio and the shortest path to a confirmed
+illicit node, are derived from node labels. Both are withdrawn.
+The reasoning is set out here because the withdrawal removes the
+principal reported performance gain and because the underlying
+failure mode is likely to recur in other graph-forensic studies.
 
-\paragraph{Illicit Neighbour Ratio.}
-Equation~\eqref{eq:inr} computes the fraction of labelled
-one-hop neighbours carrying the illicit label, encoding
-the guilt-by-association principle that fraudulent
-transactions cluster in connected subgraphs.
+\paragraph{The shortest-path feature re-encodes the target.}
+The feature is computed by breadth-first search from every
+confirmed illicit node, with the distance capped at six. Since
+each illicit node is itself a search source, its distance to the
+nearest illicit node is zero by construction. Across the labelled
+portion of the dataset the value zero occurs for all 4{,}545
+illicit nodes and for none of the 42{,}019 licit nodes, so the
+decision rule requiring a distance of zero identifies the illicit
+class with precision 1.000. The correlation with the target of
+$-0.9182$ reported earlier is reproduced exactly by an
+independent reimplementation, confirming that the audit addresses
+the same computation. The feature does not describe proximity to
+illicit activity; it restates the label, and it does so on the
+test split, where the label is supposed to be unavailable.
 
-\begin{equation}
-  \text{INR}(v) = \frac{\sum_{u \in \mathcal{N}(v)}
-                  \mathbf{1}[y_u = 1]}
-                  {|\{u \in \mathcal{N}(v):y_u \neq -1\}|}.
-  \label{eq:inr}
-\end{equation}
+\paragraph{Removing self-seeding does not repair the feature.}
+Recomputing the distance to the nearest \emph{other} illicit seed
+lowers the correlation to $-0.7269$ but does not eliminate it,
+because the remaining signal is supplied by validation and test
+labels of neighbouring nodes within the same time step.
 
-INR achieves a Pearson correlation of $r = +0.4159$ with
-the ground-truth label.
+\paragraph{No leakage-free variant can exist.}
+A natural correction restricts the seed set to illicit nodes
+observed during the training period. That correction is
+ineffective for a structural reason. Every one of the 234{,}355
+edges in the Elliptic edge set joins two transactions belonging
+to the same time step, and no edge crosses a time-step boundary.
+The graph is therefore a disjoint union of 49 per-step snapshots,
+and no path of any length connects a training-period node to a
+later one. Under the restricted protocol the shortest-path
+feature equals the cap and the neighbour ratio equals zero for
+every validation and test node, so neither feature can carry any
+information about a test-period transaction. The defect is
+structural rather than incidental, and the features are removed
+rather than corrected.
 
-\paragraph{Shortest Path to Illicit.}
-A breadth-first search from each confirmed illicit source
-computes the minimum hop distance to every reachable node,
-capped at six. To prevent any label leakage into the
-evaluation partition, source nodes are restricted to
-confirmed illicit transactions from training time steps
-1--34 only; test-partition nodes at time steps 42--49
-contribute no source labels. The feature is therefore
-derived exclusively from training-split ground truth,
-maintaining the integrity of the chronological evaluation
-protocol. This feature achieves a Pearson correlation
-of $r = -0.9182$ with the illicit label, the strongest
-single-feature predictor in the augmented set, consistent
-with the financial fraud network proximity analysis
-documented by~\citet{gu2025}.
+\paragraph{Quantifying the inflation.}
+Table~\ref{tab:leakage_ablation} reports the ablation requested
+during review, comparing the 165 distributed features against the
+same set augmented with each derived feature. Two model families
+with unrelated inductive biases are used so that the outcome does
+not depend on a single learner. Supplying the shortest-path
+feature raises the illicit-class F1-score, PR-AUC and Matthews
+correlation to exactly 1.0000 on the test split. A perfect score
+under two unrelated learners is characteristic of target leakage
+rather than of a strong predictor. The neighbour ratio produces a
+smaller but equally illegitimate gain.
 
-Figure~\ref{fig:feat_imp} ranks the top features by importance
-score from the Random Forest classifier: the novel
-graph-structural features are among the highest discriminative
-contributors in the final feature set.
+\begin{table}[htbp]
+\centering
+\small
+\caption{Four-way feature ablation on the Elliptic test split.
+Mean over five seeds, chronological split, scaler fitted on
+training rows only, decision threshold selected on validation and
+frozen before the test split is scored. Supplying the
+shortest-path feature saturates every metric under both learners.}
+\label{tab:leakage_ablation}
+\begin{tabular}{llcccccc}
+\toprule
+Learner & Feature set & F1 & Precision & Recall & PR-AUC & ROC-AUC & MCC \
+\midrule
+\multirow{4}{*}{Random Forest}
+ & 165 distributed          & 0.6212 & 0.9231 & 0.4681 & 0.5431 & 0.8470 & 0.6470 \
+ & \quad + neighbour ratio  & 0.6333 & 0.9388 & 0.4779 & 0.6158 & 0.8770 & 0.6599 \
+ & \quad + shortest path    & \textbf{0.9990} & 1.0000 & 0.9980 & 1.0000 & 1.0000 & 0.9990 \
+ & \quad + both             & \textbf{0.9953} & 1.0000 & 0.9907 & 1.0000 & 1.0000 & 0.9951 \
+\midrule
+\multirow{4}{*}{Hist.\ Gradient Boosting}
+ & 165 distributed          & 0.6126 & 0.8741 & 0.4716 & 0.5561 & 0.8650 & 0.6305 \
+ & \quad + neighbour ratio  & 0.6811 & 0.9023 & 0.5475 & 0.6794 & 0.9103 & 0.6924 \
+ & \quad + shortest path    & \textbf{1.0000} & 1.0000 & 1.0000 & 1.0000 & 1.0000 & 1.0000 \
+ & \quad + both             & \textbf{1.0000} & 1.0000 & 1.0000 & 1.0000 & 1.0000 & 1.0000 \
+\bottomrule
+\end{tabular}
+\end{table}
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.85\linewidth]{fig01_feature_importance.png}
-  \caption{Top feature importance scores from the Random
-    Forest classifier trained on the augmented 169-dimensional
-    feature set. The novel shortest-path-to-illicit and
-    illicit-neighbour-ratio features rank among the highest
-    discriminative contributors, validating the feature
-    engineering step in the MixTrace pipeline.}
-  \label{fig:feat_imp}
-\end{figure}
+\paragraph{Consequences.}
+Every headline figure computed with either feature present is
+withdrawn. The leakage-free reference point for a strong tabular
+learner restricted to the 165 distributed features is an
+illicit-class F1-score near 0.62 on the evaluation window used
+here, and that value replaces the earlier figures as the baseline
+against which all later results are compared.
+
+\paragraph{Label-free replacements were examined and rejected.}
+Fifteen purely topological descriptors were constructed inside
+each node's own time-step subgraph, covering the degree family,
+local clustering, PageRank, k-core number, triangle counts,
+neighbour-degree statistics, component size, two-hop
+neighbourhood size, sampled betweenness, and source and sink
+indicators. Label independence was established mechanically
+rather than argued: every label in the dataset was permuted and
+all descriptors recomputed, and all fifteen were bit-identical.
+The largest absolute correlation with the target is 0.1223,
+against 0.9182 for the withdrawn feature. The descriptors are
+nonetheless not adopted as a contribution, because they do not
+help. Added to the 165 distributed features they change the
+F1-score by less than half a percentage point in either
+direction. Used alone they reach an F1-score below 0.04 with a
+ROC-AUC of 0.38, that is, below chance, which indicates that the
+association between topology and illicit status observed during
+the training period is reversed during the test period. That
+observation is pursued in Section~\ref{sec:temporal_drift}.
+
 
 \subsection{Multi-Dimensional Chamfer Distance}
 \label{sec:mdcd}
