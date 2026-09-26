@@ -1,0 +1,178 @@
+{
+  "protocol_comparison": [
+    {
+      "protocol": "A_this_study (train 1-34, val 35-41, test 42-49)",
+      "f1_mean": 0.6212,
+      "f1_std": 0.0042,
+      "precision": 0.9231,
+      "recall": 0.4681,
+      "pr_auc": 0.5431,
+      "roc_auc": 0.847,
+      "mcc": 0.647,
+      "n_test": 8841
+    },
+    {
+      "protocol": "B_literature (train 1-25, val 26-34, test 35-49)",
+      "f1_mean": 0.7634,
+      "f1_std": 0.0259,
+      "precision": 0.8114,
+      "recall": 0.7224,
+      "pr_auc": 0.7813,
+      "roc_auc": 0.9128,
+      "mcc": 0.7498,
+      "n_test": 16670
+    }
+  ],
+  "per_timestep_protocolB": [
+    {
+      "time_step": 35,
+      "n_nodes": 1341,
+      "n_illicit": 182,
+      "f1": 0.9566,
+      "precision": 0.9465,
+      "recall": 0.967,
+      "roc_auc": 0.9956
+    },
+    {
+      "time_step": 36,
+      "n_nodes": 1708,
+      "n_illicit": 33,
+      "f1": 0.7991,
+      "precision": 0.6691,
+      "recall": 1.0,
+      "roc_auc": 0.9998
+    },
+    {
+      "time_step": 37,
+      "n_nodes": 498,
+      "n_illicit": 40,
+      "f1": 0.7666,
+      "precision": 0.9926,
+      "recall": 0.625,
+      "roc_auc": 0.9156
+    },
+    {
+      "time_step": 38,
+      "n_nodes": 756,
+      "n_illicit": 111,
+      "f1": 0.921,
+      "precision": 0.9401,
+      "recall": 0.9027,
+      "roc_auc": 0.9637
+    },
+    {
+      "time_step": 39,
+      "n_nodes": 1183,
+      "n_illicit": 81,
+      "f1": 0.8876,
+      "precision": 0.854,
+      "recall": 0.9259,
+      "roc_auc": 0.9876
+    },
+    {
+      "time_step": 40,
+      "n_nodes": 1211,
+      "n_illicit": 112,
+      "f1": 0.7388,
+      "precision": 0.8466,
+      "recall": 0.6571,
+      "roc_auc": 0.8922
+    },
+    {
+      "time_step": 41,
+      "n_nodes": 1132,
+      "n_illicit": 116,
+      "f1": 0.9425,
+      "precision": 0.9546,
+      "recall": 0.931,
+      "roc_auc": 0.9829
+    },
+    {
+      "time_step": 42,
+      "n_nodes": 2154,
+      "n_illicit": 239,
+      "f1": 0.8535,
+      "precision": 0.9298,
+      "recall": 0.7891,
+      "roc_auc": 0.9529
+    },
+    {
+      "time_step": 43,
+      "n_nodes": 1370,
+      "n_illicit": 24,
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "roc_auc": 0.7909
+    },
+    {
+      "time_step": 44,
+      "n_nodes": 1591,
+      "n_illicit": 24,
+      "f1": 0.0316,
+      "precision": 0.0269,
+      "recall": 0.0417,
+      "roc_auc": 0.6852
+    },
+    {
+      "time_step": 45,
+      "n_nodes": 1221,
+      "n_illicit": 5,
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "roc_auc": 0.6392
+    },
+    {
+      "time_step": 46,
+      "n_nodes": 712,
+      "n_illicit": 2,
+      "f1": 0.1362,
+      "precision": 0.081,
+      "recall": 0.5,
+      "roc_auc": 0.8645
+    },
+    {
+      "time_step": 47,
+      "n_nodes": 846,
+      "n_illicit": 22,
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "roc_auc": 0.5727
+    },
+    {
+      "time_step": 48,
+      "n_nodes": 471,
+      "n_illicit": 36,
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "roc_auc": 0.6975
+    },
+    {
+      "time_step": 49,
+      "n_nodes": 476,
+      "n_illicit": 56,
+      "f1": 0.0303,
+      "precision": 0.1055,
+      "recall": 0.0179,
+      "roc_auc": 0.7032
+    }
+  ],
+  "largest_recall_drop": {
+    "time_step": 43,
+    "recall_before": 0.7891,
+    "recall_after": 0.0,
+    "delta": -0.7891
+  },
+  "pre_post_shock": {
+    "shock_step": 43,
+    "pre_mean_f1": 0.8582,
+    "post_mean_f1": 0.0283,
+    "pre_mean_recall": 0.8497,
+    "post_mean_recall": 0.0799,
+    "pre_illicit_total": 914,
+    "post_illicit_total": 169
+  }
+}
