@@ -27,6 +27,7 @@ train = steps 1–34, validation = 35–41, test = 42–49.
 |---|---|---|---|---|---|
 | E01 | Leakage audit of round-1 engineered features (INR, SPTI) | Elliptic raw CSVs | Directed-reverse BFS, cap 6, reproducing round-1 semantics | **Leak confirmed.** SPTI == 0 for 4,545/4,545 illicit and 0/42,019 licit nodes (precision 1.000); r = −0.9182 reproduced bit-identically. Zero cross-time-step edges, so strict train-only-seed variant is constant on val/test (SPTI ≡ 6, INR ≡ 0). Both features are unusable. | `7415004` |
 | E02 | Four-way feature ablation requested by Reviewer 1 | Elliptic raw CSVs | RandomForest + HistGradientBoosting, 5 seeds, val-selected frozen threshold | **Leak quantified.** Base 165 features: F1 0.621 (RF) / 0.613 (HGB). Adding SPTI drives F1, PR-AUC and MCC to **1.0000** under both model families. INR adds +0.012 (RF) / +0.069 (HGB). Leakage-free tabular ceiling is F1 ~ 0.62. | `60dca79` |
+| E03 | Label-free topological features as a replacement for the withdrawn ones | Elliptic raw CSVs | 15 descriptors computed inside each node's own time-step subgraph; permutation verification; 5 seeds x 2 models | **Clean but uninformative (negative result).** All 15 features bit-identical under full label permutation; max \|r\| with label 0.1223 (vs 0.9182 for SPTI). Adding them to the 165 base features changes F1 by -0.004 (RF) / +0.001 (HGB). Topology alone: F1 0.03, ROC-AUC 0.38 - *below chance*, indicating the topology-label relation inverts between train and test periods. | `TBD3` |
 
 ---
 
@@ -102,3 +103,46 @@ comparable to the literature and both features must be withdrawn. The
 leakage-free ceiling for a strong tabular baseline on the 165 distributed
 features is F1 ~ 0.62, which is the reference point every later experiment is
 measured against.
+
+---
+
+## E03 — Label-free topological features
+
+**Question.** Can the withdrawn features be replaced by descriptors that are
+leakage-free by construction, and do they carry legitimate signal?
+
+**Method.** `research/src/features.py` computes 15 topological descriptors
+(degree family, clustering, PageRank, k-core, triangles, neighbour-degree
+statistics, component size, two-hop size, sampled betweenness, source/sink
+indicators) inside each node's own time-step subgraph. Two independent
+guarantees apply: no label of any split enters the computation, and no
+cross-step edge exists for a path to traverse.
+
+**Verification.** Every label in the dataset was permuted and all features
+recomputed. All 15 are bit-identical (`atol = 0`), so the features are
+mechanically proven label-independent. Maximum absolute correlation with the
+target is 0.1223 (`topo_component_size`), against 0.9182 for the withdrawn
+SPTI. Compute cost: 47.6 s for all 203,769 nodes.
+
+**Ablation (test split, mean over 5 seeds).**
+
+| Model | Feature set | F1 | Precision | Recall | PR-AUC | ROC-AUC | MCC |
+|---|---|---|---|---|---|---|---|
+| RandomForest | base 165 | 0.6212 | 0.9231 | 0.4681 | 0.5431 | 0.8470 | 0.6470 |
+| RandomForest | base + topological | 0.6173 | 0.9154 | 0.4657 | 0.5412 | 0.8441 | 0.6424 |
+| RandomForest | topological only | 0.0280 | 0.0167 | 0.0868 | 0.0350 | 0.3778 | −0.0788 |
+| HistGradientBoosting | base 165 | 0.6126 | 0.8741 | 0.4716 | 0.5561 | 0.8650 | 0.6305 |
+| HistGradientBoosting | base + topological | 0.6133 | 0.8771 | 0.4716 | 0.5547 | 0.8643 | 0.6317 |
+| HistGradientBoosting | topological only | 0.0380 | 0.0230 | 0.1103 | 0.0358 | 0.3994 | −0.0570 |
+
+**Interpretation (negative result, reported as such).** The replacement
+features are clean but do not help: they move F1 by less than half a point in
+either direction. More informative is the topology-only row, where ROC-AUC
+falls *below* 0.5 on the test split. A below-chance ranking means the
+association between topology and illicit status present in the training period
+is reversed in the test period. This is direct evidence of concept drift and
+motivates E04.
+
+**Decision.** The topological features are retained in the released code and
+reported as a negative control, not promoted as a contribution. The manuscript
+will not claim a novel feature contribution on Elliptic.
