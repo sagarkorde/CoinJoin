@@ -263,7 +263,7 @@ validation corpus;
 extending CST linking to four dimensions; and (iii)~a
 two-phase graph learning pipeline applying Deep Graph Infomax
 (DGI) self-supervised pre-training before supervised Graph
-Attention Network (GAT) fine-tuning with class-weighted
+Attention Network (GAT) training with class-weighted
 cross-entropy and ADASYN oversampling.
 
 Experiments on the public Elliptic Bitcoin Dataset and an
@@ -482,7 +482,7 @@ corresponding datasets.
     \textbf{Gap~3} (DGI\,+\,GAT, purple right lane):
     unsupervised Deep Graph Infomax pre-training on all
     203,769 nodes is followed by supervised Graph Attention
-    Network fine-tuning; the fused representation
+    Network training; the fused representation
     $[\mathbf{H}_2 \,\|\, \mathbf{Z}^*] \in \mathbb{R}^{N\times256}$
     achieves mean illicit-class F1\,=\,0.806 and
     mean ROC-AUC\,=\,0.992 on the Elliptic test set,
@@ -756,8 +756,38 @@ outside all cluster radii receive the naive CIOH prediction
 as fallback. Cluster CoinJoin labels are assigned by
 majority vote over ground-truth labels of cluster members.
 
-\subsection{MixTrace: DGI Pre-Training and GAT Fine-Tuning}
+\subsection{MixTrace: Fusion of a Frozen Self-Supervised Representation with a Supervised One}
 \label{sec:mixtrace_method}
+
+\paragraph{Terminology.}
+An earlier description of this architecture used the phrase
+``DGI pre-training followed by GAT fine-tuning''. That phrasing
+does not describe the computation performed. The Deep Graph
+Infomax encoder is trained under a self-supervised objective and
+is then frozen: no encoder weight is subsequently updated by the
+supervised loss, and the Graph Attention Network is not
+initialised from the encoder. The two representations are
+produced independently and concatenated before the classifier
+head. The accurate description is therefore fusion of a frozen
+self-supervised representation with a supervised one, and the
+terminology is corrected throughout the present study. The
+implementation class is named accordingly so that code and
+manuscript remain aligned.
+
+\paragraph{Pre-training regime.}
+Self-supervised pre-training over the complete graph is
+transductive, because unlabelled nodes belonging to later
+validation and test periods contribute features and topology to
+representation learning. That is compatible with a chronological
+evaluation of the supervised stage, but it is not a strictly
+prospective setting, and describing the chronological split as
+preventing temporal leakage without qualification would be
+misleading. Both regimes are therefore trained and reported side
+by side. In the transductive regime the encoder observes the
+whole graph. In the inductive regime the encoder is fitted on the
+training-period subgraph alone, and embeddings for later nodes
+are obtained from a forward pass of the frozen encoder, so no
+future node influences any weight.
 
 \subsubsection{Phase 1: Deep Graph Infomax Pre-Training}
 
@@ -832,7 +862,7 @@ throughout pre-training.
   \label{fig:dgi_loss}
 \end{figure}
 
-\subsubsection{Phase 2: Graph Attention Network Fine-Tuning}
+\subsubsection{Phase 2: Supervised Graph Attention Network}
 
 The MixTrace GAT architecture~\citep{velickovic2018gat}
 processes the full 169-dimensional feature matrix through
@@ -898,7 +928,7 @@ MixTrace's GAT training.
 
 Algorithm~\ref{alg:mixtrace} summarises the complete
 MixTrace training and inference procedure, consolidating
-the DGI pre-training phase, GAT fine-tuning phase, and
+the DGI pre-training phase, the supervised GAT phase, and
 threshold-calibrated inference into a single unified
 specification.
 
@@ -940,7 +970,7 @@ specification.
   \Comment{freeze DGI embeddings}
 
 \vspace{2pt}
-\Statex \textit{Phase 2: GAT Supervised Fine-Tuning}
+\Statex \textit{Phase 2: Supervised GAT Training}
 \State best\_val\_F1 $\leftarrow 0$;\ no\_improve $\leftarrow 0$
 \For{$\text{epoch} \leftarrow 1$ \textbf{to} $500$}
   \State $\mathbf{H}_1 \leftarrow
@@ -1227,7 +1257,7 @@ performance of MixTrace.
   \label{fig:confusion}
 \end{figure}
 
-\subsection{DGI Pre-Training and GAT Fine-Tuning Dynamics}
+\subsection{Self-Supervised Pre-Training and Supervised Training Dynamics}
 
 This subsection describes epoch-level training dynamics for
 the original single representative seed used to generate
@@ -1235,7 +1265,7 @@ Figure~\ref{fig:training_curves}; Table~\ref{tab:classification}
 and Table~\ref{tab:stats} report the aggregate five-seed
 statistics. The DGI encoder was pre-trained for 300 epochs. Initial
 loss at epoch 1 was 1.459, reflecting random encoder
-weights. GAT fine-tuning began at learning rate
+weights. Supervised GAT training began at learning rate
 $5 \times 10^{-4}$. At epoch 5, training F1 reached 0.8423
 and validation F1 reached 0.5094. By epoch 20, training F1
 improved to 0.8844 and validation F1 to 0.5847. Convergence
@@ -1245,16 +1275,16 @@ was recorded at epoch 235. The optimal decision threshold
 was $\theta^* = 0.9397$.
 
 Figure~\ref{fig:training_curves} traces the training and
-validation F1-score curves across fine-tuning epochs: both
+validation F1-score curves across supervised training epochs: both
 improve steadily, confirming stable convergence without
 overfitting under early stopping.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.85\linewidth]{fig07_training_curves.png}
-  \caption{\textbf{Single representative run (seed 42).} GAT fine-tuning training curves showing training
+  \caption{\textbf{Single representative run (seed 42).} Supervised GAT training curves showing training
     F1-score, validation F1-score, and learning rate
-    schedule across fine-tuning epochs. Both metrics follow
+    schedule across supervised training epochs. Both metrics follow
     a consistent upward trajectory, training reaching 0.9550
     by epoch 220 and validation reaching a best macro F1 of
     0.8864 at epoch 235, with the learning rate reduction
@@ -1270,7 +1300,7 @@ distinct regions of the 128-dimensional embedding space,
 confirming that the unsupervised DGI pre-training on all
 203,769 nodes learns a latent representation that separates
 illicit from licit transaction topology even before
-supervised fine-tuning.
+supervised training.
 
 \begin{figure}[htbp]
   \centering
@@ -1652,7 +1682,7 @@ degree of freedom into the ablation.
 The pre-training strategy effectively exploits the 157,205
 unlabelled Elliptic nodes: structural regularities in the
 unlabelled majority translate into well-calibrated illicit
-predictions once fine-tuned on the labelled subset. This
+predictions once trained on the labelled subset. This
 is a practically significant result for the blockchain
 forensics domain, where confirmed illicit labels are scarce
 relative to total transaction volume.
