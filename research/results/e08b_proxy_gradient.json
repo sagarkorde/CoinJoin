@@ -24,6 +24,12 @@
       "coef_input": 0.0,
       "coef_output": 0.0,
       "intercept": 0.0
+    },
+    "division_route": {
+      "input_count_recovered_pct": 99.9633,
+      "output_count_recovered_pct": 99.9825,
+      "reconstructed_rule_agreement_pct": 100.0,
+      "note": "avg_input_value == total_input_value / input_count, so the pair recovers the count by division and the screening label follows exactly."
     }
   },
   "aggregate": [
@@ -70,6 +76,28 @@
       "pr_auc": 0.9684,
       "roc_auc": 0.9994,
       "mcc": 0.8979
+    },
+    {
+      "regime": "E no averages",
+      "n_features": 10,
+      "f1": 0.2678,
+      "f1_std": 0.0068,
+      "precision": 0.3056,
+      "recall": 0.239,
+      "pr_auc": 0.2065,
+      "roc_auc": 0.9243,
+      "mcc": 0.2624
+    },
+    {
+      "regime": "F temporal only",
+      "n_features": 7,
+      "f1": 0.1592,
+      "f1_std": 0.0013,
+      "precision": 0.0889,
+      "recall": 0.7616,
+      "pr_auc": 0.0819,
+      "roc_auc": 0.89,
+      "mcc": 0.2394
     }
   ]
 }
