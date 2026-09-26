@@ -34,6 +34,9 @@ train = steps 1–34, validation = 35–41, test = 42–49.
 | E08 | Non-circular CoinJoin screening: chronological split, frozen cluster map | Author corpus, 600k train / 300k test | DBSCAN eps 0.6 frozen positive-rate map; RandomForest reference; 5 seeds | **Circularity reproduced and measured past.** RF with the label's own input columns: F1 0.9978. RF column-disjoint: F1 0.9140. DBSCAN frozen, all columns: F1 0.4832 (close to the round-1 figure of 0.441). DBSCAN column-disjoint: F1 0.1649. | `1b04e03` |
 | E08b | Leakage gradient: how far the screening label survives feature removal | Author corpus, 600k train / 300k test | RandomForest, 6 regimes of increasing strictness, 5 seeds | **Circularity is arithmetic, not incidental.** `total_input_value / avg_input_value` recovers `input_count` for 99.96 % of rows and the reconstructed rule matches the distributed label for **100.0000 %** of sampled transactions. F1 stays at 0.90-1.00 for every regime that retains an arithmetic route, then collapses to **0.2678** once the average-value columns are removed, and to 0.1592 with temporal columns alone. | `868130c` |
 | E05 | Main GNN experiment, leakage-free features, both DGI regimes | Elliptic raw CSVs, 165 distributed features | 20 seeds x 7 model/regime arms (140 runs), val-selected frozen threshold, model selection on validation PR-AUC | **Fusion helps its own architecture but is not the best model.** GraphSAGE 0.5467 > fusion-inductive 0.5197 > fusion-transductive 0.5186 > GCN 0.4997 > GAT-zero-DGI 0.4711 > GAT 0.4620. Fusion beats its own zero-DGI ablation by +0.06 F1 and halves cross-seed SD (0.030 vs 0.059). Inductive and transductive are indistinguishable. All GNNs trail the tabular baseline (0.6212). | `0db03f6` |
+| E09 | Attribution and failure analysis | Elliptic, leakage-free features | Permutation importance (10 repeats) and integrated gradients (32 steps), primary seed | **Failure is a regime change, not diffuse decay.** Detected illicit transactions sit at mean time step 42.10, missed ones at 45.52, with missed cases scored 0.1882 against a 0.8292 threshold. False positives skew to hubs (mean degree 6.28 against 3.28). Tabular top-15 features are 15/15 local; graph top-15 is 9 local and 6 aggregated. | `654f1c5` |
+| E10 | Uncertainty quantification | E05 outputs, Elliptic test split | 20-seed paired t-tests (df = 19) and 2,000-resample test-set bootstrap | **Two analyses, stated separately.** Seed level: GraphSAGE beats fusion (p = 0.0012); fusion beats every attention variant (p < 0.005); regimes indistinguishable (p = 0.8148). Bootstrap on the primary seed puts fusion ahead of GraphSAGE by 0.0430; intervals are ~0.09 wide, so sub-0.05 differences are not resolvable. The disagreement is reported and explained. | `654f1c5` |
+| E11 | Computational cost on an idle device | Elliptic graph | Single process, refuses to run if another CUDA process is present | **The cheapest model is also the most accurate.** GraphSAGE: 8.1 s training, 947 MB peak, 29,570 params, 20.1 ms full-graph inference. Fusion: 73.1 s, 6,296 MB, 131,588 params, 78.7 ms. Attention dominates memory at ~6.3 GB against under 1 GB for the other encoders. | `654f1c5` |
 
 ---
 
@@ -485,3 +488,110 @@ epoch, not ablated at inference.
 **Timings not reported.** The per-model wall-clock and peak-memory figures in
 this run are contaminated by a duplicate process that shared the GPU for part
 of it, as recorded in the incident note. Computational cost is measured in E11.
+
+---
+
+## E09 — Attribution and failure analysis
+
+**Question.** Which features do the leakage-free models rely on, and what
+characterises the cases they get wrong?
+
+**Method.** Permutation importance on the tabular reference, shuffling each of
+the 165 features in turn on the test split over ten repetitions and measuring
+the loss in average precision. Integrated gradients for the fused graph model
+with respect to node features, all-zero baseline, 32 steps, averaged over 400
+sampled test nodes.
+
+**Feature reliance.** Read against the documented Elliptic layout, which
+separates local transaction attributes from aggregated neighbourhood features,
+the two families behave differently. All fifteen of the tabular model's most
+important features are local. The graph model splits nine local against six
+aggregated. Five features appear in both top-fifteen lists. The graph model
+distributes part of its reliance onto neighbourhood summaries, and still scores
+lower, which is consistent with E03: the neighbourhood signal in this benchmark
+is weaker than the local signal.
+
+**Failure profile (fused model, threshold 0.8292).**
+
+| Outcome | Count | Mean time step | Mean degree | Mean score |
+|---|---|---|---|---|
+| True positive | 182 | 42.10 | 2.29 | 0.9724 |
+| False negative | 226 | 45.52 | 1.81 | 0.1882 |
+| False positive | 109 | 44.00 | 6.28 | 0.9023 |
+| True negative | 8,324 | 44.45 | 3.28 | 0.0803 |
+
+**Interpretation.** The errors are distributed in time. Correctly detected
+illicit transactions sit at mean step 42.10 and missed ones at 45.52, so the
+model finds illicit activity before the shock of E04 and misses it afterwards.
+Missed cases are scored 0.1882, far below the threshold rather than marginally
+under it, so they are confident errors and no threshold adjustment recovers
+them. False positives skew toward hubs, mean degree 6.28 against 3.28, an
+intelligible consequence of message passing that argues for a higher evidential
+bar on well-connected transactions in operational use.
+
+---
+
+## E10 — Uncertainty quantification
+
+**Question.** What do repeated seeds establish, what does test-set resampling
+establish, and do the two agree?
+
+**Seed level (20 seeds, df = 19, against inductive fusion).**
+
+| Compared arm | Mean F1 | Difference | t | p |
+|---|---|---|---|---|
+| GraphSAGE | 0.5467 | −0.0270 | −3.799 | 0.0012 |
+| Fusion, transductive | 0.5186 | +0.0011 | 0.238 | 0.8148 |
+| GCN | 0.4997 | +0.0200 | 2.654 | 0.0157 |
+| GAT, zeroed, transductive | 0.4711 | +0.0486 | 3.261 | 0.0041 |
+| GAT | 0.4620 | +0.0577 | 6.075 | 0.0000 |
+| GAT, zeroed, inductive | 0.4568 | +0.0629 | 4.354 | 0.0003 |
+
+**Test-set bootstrap (2,000 resamples, primary seed).** Percentile intervals
+span roughly 0.09 F1 for every system, so differences below about 0.05 are not
+resolvable on a test split of 8,841 labelled nodes. Fusion is placed above
+GraphSAGE by 0.0430 with an interval excluding zero.
+
+**The two disagree, and the manuscript says so.** The bootstrap describes one
+trained model across test samples; the paired test averages over twenty
+training runs. The primary seed happens to favour fusion and twenty seeds do
+not. The twenty-seed result is taken as the conclusion, since the question is
+whether an architecture is better in general. This is itself a demonstration of
+the single-run hazard R3 raised.
+
+**Bug found and fixed.** E05 wrote the string `n/a` for models with no DGI
+regime. That value is in the pandas default NA list, so reading the CSV back
+produced NaN and `groupby` silently dropped those rows: GraphSAGE, GCN and GAT
+were missing from the first seed-level table. The reader now disables default
+NA conversion, and E05 writes a non-NA sentinel.
+
+---
+
+## E11 — Computational cost
+
+Measured with a single process on an idle device. The benchmark refuses to
+start if any other process holds the accelerator, because contention
+invalidated the timings recorded inside E05.
+
+| Component | Train (s) | Epochs | Peak (MB) | Params | Inference (ms) |
+|---|---|---|---|---|---|
+| DGI, transductive | 25.36 | 200 | 1,688.5 | 54,272 | n/a |
+| DGI, inductive | 15.05 | 200 | 1,312.3 | 54,272 | n/a |
+| Fusion | 73.13 | 229 | 6,296.4 | 131,588 | 78.67 |
+| GAT, zeroed | 15.46 | 49 | 6,298.0 | 123,396 | 76.66 |
+| GAT | 38.41 | 124 | 6,298.3 | 119,106 | 75.80 |
+| GCN | 9.99 | 217 | 962.2 | 14,914 | 14.14 |
+| GraphSAGE | 8.12 | 152 | 946.8 | 29,570 | 20.13 |
+
+Graph construction over 203,769 nodes and 468,710 directed edges takes 0.47 s.
+Inference is a full-graph forward pass, averaged over twenty repetitions after
+warm-up.
+
+**Two points for deployment.** Attention dominates memory: the three
+attention-based arms each hold about 6.3 GB at peak against under 1 GB for the
+convolutional and sampling-based encoders, because per-edge coefficients must
+be materialised across all 468,710 directed edges. On an 8 GB device that
+leaves little headroom and a larger graph would require neighbourhood sampling.
+And the cheapest model is also the most accurate: GraphSAGE trains in 8.12 s
+and answers a full-graph query in 20.13 ms, against 73.13 s and 78.67 ms for a
+fused model that scores lower.
