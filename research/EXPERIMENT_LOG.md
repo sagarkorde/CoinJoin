@@ -32,6 +32,7 @@ train = steps 1–34, validation = 35–41, test = 42–49.
 | E06 | Recover the undocumented `is_coinjoin_like` rule | Author corpus, 5,884,387 tx | Decision tree fitted to structural columns | **Rule recovered exactly.** Depth-3 tree reproduces the label with accuracy 1.00000000: `is_coinjoin_like == (input_count >= 4) AND (output_count >= 4)`. The label is a deterministic function of two columns that the round-1 DBSCAN detector also clusters on, confirming the circularity all three reviewers raised. | `d55d942` |
 | E07 | Reconstruct script types; test the Taproot premise | Author corpus, 5,884,387 tx | Parse `input/output_script_types` node descriptors | **Taproot premise overturned.** All six declared script flags are identically False for every row, so nothing could be confirmed through them. Parsing the descriptor columns shows P2TR is 24.10% of outputs; 2,494,168 tx (42.39%) touch Taproot, and 79,386 / 110,352 (71.94%) of label-positive CoinJoin-like candidates do. The corpus spans 2022-07 to 2025-07 and is post-Taproot throughout. | `d55d942` |
 | E08 | Non-circular CoinJoin screening: chronological split, frozen cluster map | Author corpus, 600k train / 300k test | DBSCAN eps 0.6 frozen positive-rate map; RandomForest reference; 5 seeds | **Circularity reproduced and measured past.** RF with the label's own input columns: F1 0.9978. RF column-disjoint: F1 0.9140. DBSCAN frozen, all columns: F1 0.4832 (close to the round-1 figure of 0.441). DBSCAN column-disjoint: F1 0.1649. | `1b04e03` |
+| E08b | Leakage gradient: how far the screening label survives feature removal | Author corpus, 600k train / 300k test | RandomForest, 6 regimes of increasing strictness, 5 seeds | **Circularity is arithmetic, not incidental.** `total_input_value / avg_input_value` recovers `input_count` for 99.96 % of rows and the reconstructed rule matches the distributed label for **100.0000 %** of sampled transactions. F1 stays at 0.90-1.00 for every regime that retains an arithmetic route, then collapses to **0.2678** once the average-value columns are removed, and to 0.1592 with temporal columns alone. | `868130c` |
 
 ---
 
@@ -342,3 +343,62 @@ to the 0.441 reported in round-1, so the round-1 number is reproduced under a
 corrected protocol; it is a conservative operating point, not superior
 detection. The column-disjoint regime appeared at first to show genuine
 residual signal at F1 0.9140. E08b shows that it does not.
+
+---
+
+## E08b — The leakage gradient
+
+**Question.** E08 removed the columns the screening label is computed from and
+a supervised learner still reached F1 0.914. Is that residual signal genuine
+detection, or does the label survive through a proxy?
+
+**Finding: two arithmetic routes back to the label.**
+
+*Route 1, serialised size.* A Bitcoin transaction's size is an affine function
+of its input and output counts. Regressing the counts on the size family
+recovers the protocol constants directly:
+
+| Target | Fit | R² |
+|---|---|---|
+| `vsize` | 20.5 + 90.75·n_in + 35.15·n_out | 0.817 |
+| `weight` | 80.4 + 363.00·n_in + 140.58·n_out | 0.817 |
+| `size` | 71.3 + 163.62·n_in + 36.32·n_out | 0.595 |
+
+`weight` is exactly four times `vsize`, as the consensus rule requires.
+
+*Route 2, value averages.* `avg_input_value` is `total_input_value` divided by
+`input_count`, so the quotient of the two columns returns the count itself.
+Measured over 500,000 sampled transactions:
+
+| Quantity | Result |
+|---|---|
+| `total_input_value / avg_input_value` recovers `input_count` | 99.96 % of rows |
+| `total_output_value / avg_output_value` recovers `output_count` | 99.98 % of rows |
+| Rule rebuilt from those quotients vs the distributed label | **100.0000 % agreement** |
+
+**Gradient (test split, mean over 5 seeds).**
+
+| Regime | Features | F1 | Precision | Recall | PR-AUC | ROC-AUC | MCC |
+|---|---|---|---|---|---|---|---|
+| A all columns | 31 | 0.9977 | 1.0000 | 0.9954 | 1.0000 | 1.0000 | 0.9977 |
+| B column-disjoint | 18 | 0.9122 | 0.9145 | 0.9099 | 0.9729 | 0.9991 | 0.9111 |
+| C size-free | 14 | 0.9085 | 0.9431 | 0.8764 | 0.9702 | 0.9994 | 0.9081 |
+| D value and temporal | 12 | 0.8991 | 0.8908 | 0.9075 | 0.9684 | 0.9994 | 0.8979 |
+| **E no averages** | 10 | **0.2678** | 0.3056 | 0.2390 | 0.2065 | 0.9243 | 0.2624 |
+| F temporal only | 7 | 0.1592 | 0.0889 | 0.7616 | 0.0819 | 0.8900 | 0.2394 |
+
+**Interpretation.** Performance is flat at 0.90 or above across every regime
+that retains an arithmetic path to the counts, and falls by 63 points the
+moment the average-value columns are removed. The cliff sits exactly where the
+division route closes, which identifies the mechanism rather than merely
+suggesting one. Regimes A to D therefore do not measure detection; they measure
+reconstruction of a threshold rule.
+
+**Consequence for the manuscript.** The author-curated corpus cannot support a
+non-circular benchmark for structural CoinJoin screening, because the label is
+a deterministic function of two counts that nearly every remaining column
+encodes. The honest residual figure, once every identified route is closed, is
+F1 0.2678. The screening module is reported as a characterisation study against
+a stated heuristic target, and the gradient itself is reported as a
+transferable diagnostic: a metric that stays flat as features are removed and
+then falls off a cliff localises the leak to the columns removed at the cliff.

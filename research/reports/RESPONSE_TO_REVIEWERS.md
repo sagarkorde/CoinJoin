@@ -32,13 +32,33 @@ training-period node to a test-period node. Under a strict protocol both
 features become constant on validation and test. This is structural, not
 incidental.
 
-**3. The CoinJoin label is a two-variable threshold rule.** The rule was never
-documented, so we recovered it: a depth-3 decision tree reproduces
-`is_coinjoin_like` with accuracy `1.00000000` across all 5,884,387
-transactions, and the identity `is_coinjoin_like == (input_count >= 4) AND
-(output_count >= 4)` holds for every row. Both counts were among the features
-the round-1 detector clustered on. The reviewers' circularity concern is
-confirmed mechanically.
+**3. The CoinJoin label is a two-variable threshold rule, and the circularity
+cannot be removed by feature selection.** The rule was never documented, so we
+recovered it: a depth-3 decision tree reproduces `is_coinjoin_like` with
+accuracy `1.00000000` across all 5,884,387 transactions, and the identity
+`is_coinjoin_like == (input_count >= 4) AND (output_count >= 4)` holds for
+every row. Both counts were among the features the round-1 detector clustered
+on, so the reviewers' circularity concern is confirmed mechanically.
+
+We then tried to repair the evaluation by removing those columns, and found
+that this is not sufficient. The label's defining variables are recoverable by
+arithmetic from the remaining ones along at least two routes. Transaction size
+is an affine function of the counts, and regressing the counts on the size
+family recovers the Bitcoin serialisation constants directly
+(`vsize ~ 20.5 + 90.75*n_in + 35.15*n_out`, R^2 = 0.817; `weight` is exactly
+four times `vsize`). More decisively, `avg_input_value` is
+`total_input_value / input_count`, so dividing one by the other recovers
+`input_count` exactly for 99.97 % of rows and `output_count` for 99.98 %; the
+rule reconstructed from those quotients agrees with the distributed label for
+**100.0000 %** of sampled transactions.
+
+The consequence is stated plainly in the revised manuscript: this corpus
+cannot support a non-circular benchmark for a structural CoinJoin screening
+heuristic, because the label is a deterministic function of two counts that
+almost every other column encodes. The screening module is therefore reported
+as a characterisation study with a stated heuristic target, not as a detection
+benchmark, and a leakage gradient across progressively stricter feature
+regimes is reported so the reader can see how the dependence persists.
 
 **4. The Taproot limitation does not exist.** All three reviewers asked us to
 moderate the Taproot claims because the corpus reportedly contained no
@@ -231,11 +251,16 @@ now scoped to the evaluated dataset and conditions.
 
 **1. Title/scope mismatch.** Accepted; see Reviewer 1 comment 7.
 
-**2. Circularity in ground truth.** Confirmed mechanically — the label is
-exactly `(input_count >= 4) AND (output_count >= 4)`. We now report both a
-regime that reproduces the circularity and one whose features are provably
-disjoint from the label's inputs, so the reader can see the difference
-directly. See E06, E08.
+**2. Circularity in ground truth.** Confirmed mechanically, and it proved
+deeper than column selection can reach. The label is exactly
+`(input_count >= 4) AND (output_count >= 4)`, and the two counts are
+recoverable by arithmetic from the remaining columns: from the size family via
+the Bitcoin serialisation constants, and exactly from the value columns, since
+`total_input_value / avg_input_value` returns `input_count` for 99.97 % of
+rows and reproduces the label for 100.0000 % of sampled transactions. We
+therefore report a gradient across progressively stricter feature regimes
+rather than claiming any single regime is clean, and the module is reframed as
+a characterisation study. See E06, E08, E08b.
 
 **3. Pre-Taproot limitation.** The limitation was an artefact of broken
 columns; the corpus is post-Taproot throughout and is 24.10 % P2TR by output.
