@@ -1178,18 +1178,21 @@ across labelled nodes in the Elliptic Bitcoin Dataset: the
 severe 9.2:1 licit-to-illicit imbalance motivates the
 class-weighted loss function and ADASYN diagnostic
 implemented in the MixTrace pipeline.
-
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.75\linewidth]{fig03_class_distribution.png}
-  \caption{Class distribution of labelled nodes in the
-    Elliptic Bitcoin Dataset. The 4,545 illicit and 42,019
-    licit labelled transactions span 49 time steps,
-    highlighting the 9.2:1 licit-to-illicit imbalance ratio
-    that serves as the central motivation for the
-    class-weighted cross-entropy loss defined in
-    Equation~\eqref{eq:loss} and the ADASYN oversampling
-    diagnostic.}
+  \includegraphics[width=0.92\linewidth]{fig_class_distribution.png}
+  \caption{Class composition of the Elliptic Data Set. The left
+    panel shows only the 46,564 labelled nodes, 4,545 illicit
+    and 42,019 licit, giving a licit-to-illicit ratio of 9.2 to
+    1; the 157,205 unlabelled nodes are excluded from the panel
+    and from every loss and metric, and take part solely in
+    message passing. An earlier version of this figure plotted
+    unlabelled nodes alongside a caption describing labelled
+    nodes, and the inconsistency is corrected here. The right
+    panel shows that the illicit rate among labelled nodes falls
+    from 11.58 percent in the training period to 8.62 percent in
+    validation and 4.62 percent in test, so the class balance is
+    not stationary across the chronological split.}
   \label{fig:class_dist}
 \end{figure}
 
