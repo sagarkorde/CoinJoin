@@ -678,19 +678,19 @@ shortest-path feature saturates every metric under both learners.}
 \label{tab:leakage_ablation}
 \begin{tabular}{llcccccc}
 \toprule
-Learner & Feature set & F1 & Precision & Recall & PR-AUC & ROC-AUC & MCC \
+Learner & Feature set & F1 & Precision & Recall & PR-AUC & ROC-AUC & MCC \\
 \midrule
 \multirow{4}{*}{Random Forest}
- & 165 distributed          & 0.6212 & 0.9231 & 0.4681 & 0.5431 & 0.8470 & 0.6470 \
- & \quad + neighbour ratio  & 0.6333 & 0.9388 & 0.4779 & 0.6158 & 0.8770 & 0.6599 \
- & \quad + shortest path    & \textbf{0.9990} & 1.0000 & 0.9980 & 1.0000 & 1.0000 & 0.9990 \
- & \quad + both             & \textbf{0.9953} & 1.0000 & 0.9907 & 1.0000 & 1.0000 & 0.9951 \
+ & 165 distributed          & 0.6212 & 0.9231 & 0.4681 & 0.5431 & 0.8470 & 0.6470 \\
+ & \quad + neighbour ratio  & 0.6333 & 0.9388 & 0.4779 & 0.6158 & 0.8770 & 0.6599 \\
+ & \quad + shortest path    & \textbf{0.9990} & 1.0000 & 0.9980 & 1.0000 & 1.0000 & 0.9990 \\
+ & \quad + both             & \textbf{0.9953} & 1.0000 & 0.9907 & 1.0000 & 1.0000 & 0.9951 \\
 \midrule
 \multirow{4}{*}{Hist.\ Gradient Boosting}
- & 165 distributed          & 0.6126 & 0.8741 & 0.4716 & 0.5561 & 0.8650 & 0.6305 \
- & \quad + neighbour ratio  & 0.6811 & 0.9023 & 0.5475 & 0.6794 & 0.9103 & 0.6924 \
- & \quad + shortest path    & \textbf{1.0000} & 1.0000 & 1.0000 & 1.0000 & 1.0000 & 1.0000 \
- & \quad + both             & \textbf{1.0000} & 1.0000 & 1.0000 & 1.0000 & 1.0000 & 1.0000 \
+ & 165 distributed          & 0.6126 & 0.8741 & 0.4716 & 0.5561 & 0.8650 & 0.6305 \\
+ & \quad + neighbour ratio  & 0.6811 & 0.9023 & 0.5475 & 0.6794 & 0.9103 & 0.6924 \\
+ & \quad + shortest path    & \textbf{1.0000} & 1.0000 & 1.0000 & 1.0000 & 1.0000 & 1.0000 \\
+ & \quad + both             & \textbf{1.0000} & 1.0000 & 1.0000 & 1.0000 & 1.0000 & 1.0000 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -849,14 +849,14 @@ average-value columns.}
 \label{tab:leakage_gradient}
 \begin{tabular}{llcccccc}
 \toprule
-Regime & Columns retained & $k$ & F1 & Precision & Recall & PR-AUC & MCC \
+Regime & Columns retained & $k$ & F1 & Precision & Recall & PR-AUC & MCC \\
 \midrule
-A & all structural columns        & 31 & 0.9977 & 1.0000 & 0.9954 & 1.0000 & 0.9977 \
-B & label inputs removed          & 18 & 0.9122 & 0.9145 & 0.9099 & 0.9729 & 0.9111 \
-C & size family also removed      & 14 & 0.9085 & 0.9431 & 0.8764 & 0.9702 & 0.9081 \
-D & value and temporal only       & 12 & 0.8991 & 0.8908 & 0.9075 & 0.9684 & 0.8979 \
-E & value averages also removed   & 10 & \textbf{0.2678} & 0.3056 & 0.2390 & 0.2065 & 0.2624 \
-F & temporal only                 &  7 & 0.1592 & 0.0889 & 0.7616 & 0.0819 & 0.2394 \
+A & all structural columns        & 31 & 0.9977 & 1.0000 & 0.9954 & 1.0000 & 0.9977 \\
+B & label inputs removed          & 18 & 0.9122 & 0.9145 & 0.9099 & 0.9729 & 0.9111 \\
+C & size family also removed      & 14 & 0.9085 & 0.9431 & 0.8764 & 0.9702 & 0.9081 \\
+D & value and temporal only       & 12 & 0.8991 & 0.8908 & 0.9075 & 0.9684 & 0.8979 \\
+E & value averages also removed   & 10 & \textbf{0.2678} & 0.3056 & 0.2390 & 0.2065 & 0.2624 \\
+F & temporal only                 &  7 & 0.1592 & 0.0889 & 0.7616 & 0.0819 & 0.2394 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1259,15 +1259,15 @@ distributed indicator columns were found to be uniformly false.}
 \label{tab:script_composition}
 \begin{tabular}{lr}
 \toprule
-Output script type & Share of outputs \
+Output script type & Share of outputs \\
 \midrule
-P2WPKH (\texttt{witness\_v0\_keyhash})        & 38.66\,\% \
-\textbf{P2TR (\texttt{witness\_v1\_taproot})} & \textbf{24.10\,\%} \
-P2SH (\texttt{scripthash})                    & 15.61\,\% \
-P2PKH (\texttt{pubkeyhash})                   & 12.39\,\% \
-OP\_RETURN (\texttt{nulldata})                &  6.84\,\% \
-P2WSH (\texttt{witness\_v0\_scripthash})      &  2.25\,\% \
-Bare multisig                                 &  0.15\,\% \
+P2WPKH (\texttt{witness\_v0\_keyhash})        & 38.66\,\% \\
+\textbf{P2TR (\texttt{witness\_v1\_taproot})} & \textbf{24.10\,\%} \\
+P2SH (\texttt{scripthash})                    & 15.61\,\% \\
+P2PKH (\texttt{pubkeyhash})                   & 12.39\,\% \\
+OP\_RETURN (\texttt{nulldata})                &  6.84\,\% \\
+P2WSH (\texttt{witness\_v0\_scripthash})      &  2.25\,\% \\
+Bare multisig                                 &  0.15\,\% \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1604,10 +1604,10 @@ window is a property of the window rather than of the baseline.}
 \label{tab:protocol_comparison}
 \begin{tabular}{lcccccc}
 \toprule
-Evaluation window & F1 & Precision & Recall & PR-AUC & ROC-AUC & MCC \
+Evaluation window & F1 & Precision & Recall & PR-AUC & ROC-AUC & MCC \\
 \midrule
-Steps 42--49 (present study) & 0.6212 & 0.9231 & 0.4681 & 0.5431 & 0.8470 & 0.6470 \
-Steps 35--49 (literature)    & 0.7634 & 0.8114 & 0.7224 & 0.7813 & 0.9128 & 0.7498 \
+Steps 42--49 (present study) & 0.6212 & 0.9231 & 0.4681 & 0.5431 & 0.8470 & 0.6470 \\
+Steps 35--49 (literature)    & 0.7634 & 0.8114 & 0.7224 & 0.7813 & 0.9128 & 0.7498 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1634,24 +1634,24 @@ validation and frozen. Performance is bimodal about step 43.}
 \label{tab:per_timestep}
 \begin{tabular}{rrrcccc}
 \toprule
-Step & Nodes & Illicit & F1 & Precision & Recall & ROC-AUC \
+Step & Nodes & Illicit & F1 & Precision & Recall & ROC-AUC \\
 \midrule
-35 & 1{,}341 & 182 & 0.9566 & 0.9465 & 0.9670 & 0.9956 \
-36 & 1{,}708 &  33 & 0.7991 & 0.6691 & 1.0000 & 0.9998 \
-37 &    498  &  40 & 0.7666 & 0.9926 & 0.6250 & 0.9156 \
-38 &    756  & 111 & 0.9210 & 0.9401 & 0.9027 & 0.9637 \
-39 & 1{,}183 &  81 & 0.8876 & 0.8540 & 0.9259 & 0.9876 \
-40 & 1{,}211 & 112 & 0.7388 & 0.8466 & 0.6571 & 0.8922 \
-41 & 1{,}132 & 116 & 0.9425 & 0.9546 & 0.9310 & 0.9829 \
-42 & 2{,}154 & 239 & 0.8535 & 0.9298 & 0.7891 & 0.9529 \
+35 & 1{,}341 & 182 & 0.9566 & 0.9465 & 0.9670 & 0.9956 \\
+36 & 1{,}708 &  33 & 0.7991 & 0.6691 & 1.0000 & 0.9998 \\
+37 &    498  &  40 & 0.7666 & 0.9926 & 0.6250 & 0.9156 \\
+38 &    756  & 111 & 0.9210 & 0.9401 & 0.9027 & 0.9637 \\
+39 & 1{,}183 &  81 & 0.8876 & 0.8540 & 0.9259 & 0.9876 \\
+40 & 1{,}211 & 112 & 0.7388 & 0.8466 & 0.6571 & 0.8922 \\
+41 & 1{,}132 & 116 & 0.9425 & 0.9546 & 0.9310 & 0.9829 \\
+42 & 2{,}154 & 239 & 0.8535 & 0.9298 & 0.7891 & 0.9529 \\
 \midrule
-\textbf{43} & 1{,}370 & 24 & \textbf{0.0000} & 0.0000 & \textbf{0.0000} & 0.7909 \
-44 & 1{,}591 & 24 & 0.0316 & 0.0269 & 0.0417 & 0.6852 \
-45 & 1{,}221 &  5 & 0.0000 & 0.0000 & 0.0000 & 0.6392 \
-46 &   712   &  2 & 0.1362 & 0.0810 & 0.5000 & 0.8645 \
-47 &   846   & 22 & 0.0000 & 0.0000 & 0.0000 & 0.5727 \
-48 &   471   & 36 & 0.0000 & 0.0000 & 0.0000 & 0.6975 \
-49 &   476   & 56 & 0.0303 & 0.1055 & 0.0179 & 0.7032 \
+\textbf{43} & 1{,}370 & 24 & \textbf{0.0000} & 0.0000 & \textbf{0.0000} & 0.7909 \\
+44 & 1{,}591 & 24 & 0.0316 & 0.0269 & 0.0417 & 0.6852 \\
+45 & 1{,}221 &  5 & 0.0000 & 0.0000 & 0.0000 & 0.6392 \\
+46 &   712   &  2 & 0.1362 & 0.0810 & 0.5000 & 0.8645 \\
+47 &   846   & 22 & 0.0000 & 0.0000 & 0.0000 & 0.5727 \\
+48 &   471   & 36 & 0.0000 & 0.0000 & 0.0000 & 0.6975 \\
+49 &   476   & 56 & 0.0303 & 0.1055 & 0.0179 & 0.7032 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1721,12 +1721,12 @@ over five seeds.}
 \label{tab:screening_results}
 \begin{tabular}{llcccccc}
 \toprule
-Method & Columns & F1 & Precision & Recall & FPR & FNR & MCC \
+Method & Columns & F1 & Precision & Recall & FPR & FNR & MCC \\
 \midrule
-Density-based & all           & 0.4832 & 0.3997 & 0.6109 & 0.0110 & 0.3891 & 0.4868 \
-Density-based & label-free    & 0.1649 & 0.1156 & 0.6725 & 0.0879 & 0.3275 & 0.2296 \
-Supervised    & all           & 0.9978 & 1.0000 & 0.9955 & 0.0000 & 0.0045 & 0.9977 \
-Supervised    & label-free    & 0.9140 & 0.9167 & 0.9114 & 0.0010 & 0.0886 & 0.9130 \
+Density-based & all           & 0.4832 & 0.3997 & 0.6109 & 0.0110 & 0.3891 & 0.4868 \\
+Density-based & label-free    & 0.1649 & 0.1156 & 0.6725 & 0.0879 & 0.3275 & 0.2296 \\
+Supervised    & all           & 0.9978 & 1.0000 & 0.9955 & 0.0000 & 0.0045 & 0.9977 \\
+Supervised    & label-free    & 0.9140 & 0.9167 & 0.9114 & 0.0010 & 0.0886 & 0.9130 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -2500,21 +2500,21 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
 % ─────────────────────────────────────────────────────────────
 \begin{thebibliography}{30}
 
-\bibitem{lo2023}
+\bibitem[Lo et al.(2023)]{lo2023}
   Lo, S.K., Xu, X., Chiam, Y.K., Lu, Q.:
   Blockchain and Machine Learning for Anti-Money
   Laundering: A Synergistic Approach.
   \textit{IEEE Access} \textbf{11}, 15114--15129 (2023).
   \url{https://doi.org/10.1109/ACCESS.2023.3244700}
 
-\bibitem{ahmed2024fed}
+\bibitem[Ahmed et al.(2024)]{ahmed2024fed}
   Ahmed, A.A., Alabi, O.O.:
   Secure and Scalable Blockchain-Based Federated Learning
   for Cryptocurrency Fraud Detection: A Systematic Review.
   \textit{IEEE Access} \textbf{12}, 102219--102241 (2024).
   \url{https://doi.org/10.1109/ACCESS.2024.3429205}
 
-\bibitem{motie2024}
+\bibitem[Motie et al.(2024)]{motie2024}
   Motie, S., Raahemi, B.:
   Financial Fraud Detection Using Graph Neural Networks:
   A Systematic Review.
@@ -2522,14 +2522,14 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   122156 (2024).
   \url{https://doi.org/10.1016/j.eswa.2023.122156}
 
-\bibitem{ouyang2024btc}
+\bibitem[Ouyang et al.(2024)]{ouyang2024btc}
   Ouyang, S., Bai, Q., Feng, H., Hu, B.:
   Bitcoin Money Laundering Detection via Subgraph
   Contrastive Learning.
   \textit{Entropy} \textbf{26}(3), 211 (2024).
   \url{https://doi.org/10.3390/e26030211}
 
-\bibitem{coinjoin2024tdsc}
+\bibitem[Wahrst\"atter et al.(2024)]{coinjoin2024tdsc}
   Wahrst\"atter, A., Taudes, A., Svetinovic, D.:
   Reducing Privacy of CoinJoin Transactions: Quantitative
   Bitcoin Network Analysis.
@@ -2537,21 +2537,21 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   Computing} \textbf{21}(5), 4543--4558 (2024).
   \url{https://doi.org/10.1109/TDSC.2024.3353803}
 
-\bibitem{lee2024}
+\bibitem[Lee et al.(2024)]{lee2024}
   Lee, S., Kim, J., Seo, M., Na, S.H., Shin, S., Kim, J.:
   CENSor: Detecting Illicit Bitcoin Operation via
   GCN-Based Hyperedge Classification.
   \textit{IEEE Access} \textbf{12}, 152330--152346 (2024).
   \url{https://doi.org/10.1109/ACCESS.2024.3466650}
 
-\bibitem{asiri2025}
+\bibitem[Asiri et al.(2025)]{asiri2025}
   Asiri, A., Somasundaram, K.:
   Graph Convolution Network for Fraud Detection in
   Bitcoin Transactions.
   \textit{Scientific Reports} \textbf{15}, 11076 (2025).
   \url{https://doi.org/10.1038/s41598-025-95672-w}
 
-\bibitem{chen2025multi}
+\bibitem[Chen et al.(2025)]{chen2025multi}
   Chen, S., Liu, Y., Zhang, Q., Shao, Z., Wang, Z.:
   Multi-Distance Spatial-Temporal Graph Neural Network
   for Anomaly Detection in Blockchain Transactions.
@@ -2559,14 +2559,14 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   (2025).
   \url{https://doi.org/10.1002/aisy.202400898}
 
-\bibitem{fan2024gnn}
+\bibitem[Cheng et al.(2024)]{fan2024gnn}
   Cheng, D., Zou, Y., Xiang, S., Jiang, C.:
   Graph Neural Networks for Financial Fraud Detection:
   A Review.
   \textit{Frontiers of Computer Science} (2024).
   \url{https://doi.org/10.1007/s11704-024-40474-y}
 
-\bibitem{alarab2024}
+\bibitem[Alarab et al.(2024)]{alarab2024}
   Alarab, I., Prakoonwit, S.:
   Robust Recurrent Graph Convolutional Network Approach
   Based Sequential Prediction of Illicit Transactions in
@@ -2575,14 +2575,14 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   58449--58464 (2024).
   \url{https://doi.org/10.1007/s11042-023-17323-4}
 
-\bibitem{han2026fg}
+\bibitem[Han et al.(2026)]{han2026fg}
   Han, N., Zhang, R., Liu, X., Zhang, H.:
   Illicit Bitcoin Transaction Detection via Feature-Gated
   Temporal Graph Learning.
   \textit{Scientific Reports}, in press (2026).
   \url{https://doi.org/10.1038/s41598-026-53783-y}
 
-\bibitem{xiao2025}
+\bibitem[Xiao et al.(2025)]{xiao2025}
   Xiao, B., Yin, W.:
   Balanced-BiEGCN: A Bidirectional EvolveGCN with a
   Class-Balanced Learning Network for Dynamic Anomaly
@@ -2590,7 +2590,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Entropy} \textbf{27}(10), 1045 (2025).
   \url{https://doi.org/10.3390/e27101045}
 
-\bibitem{futureinternet2025}
+\bibitem[P\'erez-Cano et al.(2025)]{futureinternet2025}
   P\'erez-Cano, V., Jurado, F.:
   Fraud Detection in Cryptocurrency Networks: An
   Exploration Using Anomaly Detection and Heterogeneous
@@ -2598,7 +2598,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Future Internet} \textbf{17}(1), 44 (2025).
   \url{https://doi.org/10.3390/fi17010044}
 
-\bibitem{kiani2024}
+\bibitem[Kiani et al.(2024)]{kiani2024}
   Kiani, R., Sheng, V.S.:
   Ethereum Smart Contract Vulnerability Detection and
   Machine Learning-Driven Solutions: A Systematic
@@ -2606,7 +2606,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Electronics} \textbf{13}(12), 2295 (2024).
   \url{https://doi.org/10.3390/electronics13122295}
 
-\bibitem{chen2024}
+\bibitem[Chen et al.(2024)]{chen2024}
   Chen, Z., Liu, S.-Z., Huang, J., Xiu, Y.-H., Zhang, H.,
   Long, H.-X.:
   Ethereum Phishing Scam Detection Based on Data
@@ -2615,7 +2615,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Sensors} \textbf{24}(12), 4022 (2024).
   \url{https://doi.org/10.3390/s24124022}
 
-\bibitem{choi2024}
+\bibitem[Choi et al.(2024)]{choi2024}
   Choi, S.-H., Buu, S.-J.:
   Learning to Traverse Cryptocurrency Transaction Graphs
   Based on Transformer Network for Phishing Scam
@@ -2623,7 +2623,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Electronics} \textbf{13}(7), 1298 (2024).
   \url{https://doi.org/10.3390/electronics13071298}
 
-\bibitem{velickovic2019dgi}
+\bibitem[Veli\v{c}kovi\'{c} et al.(2019)]{velickovic2019dgi}
   Veli\v{c}kovi\'{c}, P., Fedus, W., Hamilton, W.L.,
   Li\`{o}, P., Bengio, Y., Hjelm, R.D.:
   Deep Graph Infomax.
@@ -2631,7 +2631,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   Representations (ICLR)} (2019).
   \url{https://openreview.net/forum?id=rklz9iAcKQ}
 
-\bibitem{graphanomaly2024}
+\bibitem[Kang et al.(2024)]{graphanomaly2024}
   Kang, J., Buu, S.-J.:
   Graph Anomaly Detection with Disentangled Prototypical
   Autoencoder for Phishing Scam Detection in
@@ -2639,7 +2639,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{IEEE Access} \textbf{12}, 91075--91088 (2024).
   \url{https://doi.org/10.1109/ACCESS.2024.3419152}
 
-\bibitem{wei2025}
+\bibitem[Wei et al.(2025)]{wei2025}
   Wei, S., Lee, S.:
   Internet Fraud Transaction Detection Based on
   Temporal-Aware Heterogeneous Graph Oversampling and
@@ -2647,7 +2647,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{PLOS ONE} \textbf{20}(12), e0337208 (2025).
   \url{https://doi.org/10.1371/journal.pone.0337208}
 
-\bibitem{baabdullah2024}
+\bibitem[Baabdullah et al.(2024)]{baabdullah2024}
   Baabdullah, T., Alzahrani, A., Rawat, D.B., Liu, C.:
   Efficiency of Federated Learning and Blockchain in
   Preserving Privacy and Enhancing the Performance of
@@ -2655,7 +2655,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{Future Internet} \textbf{16}(6), 196 (2024).
   \url{https://doi.org/10.3390/fi16060196}
 
-\bibitem{ileberi2024}
+\bibitem[Ileberi et al.(2024)]{ileberi2024}
   Ileberi, E., Sun, Y.:
   Advancing Model Performance with ADASYN and Recurrent
   Feature Elimination and Cross-Validation in Machine
@@ -2664,7 +2664,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{IEEE Access} \textbf{12}, 133315--133327 (2024).
   \url{https://doi.org/10.1109/ACCESS.2024.3457922}
 
-\bibitem{malhotra2025}
+\bibitem[Malhotra et al.(2025)]{malhotra2025}
   Malhotra, A., Hada, B.S., Mishra, A., Chandan,
   Basha, M.S.A.:
   Credit Card Fraud Detection with ADASYN Oversampling
@@ -2676,7 +2676,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   IEEE (2025).
   \url{https://doi.org/10.1109/ICICV64824.2025.11085904}
 
-\bibitem{albalawi2025}
+\bibitem[Albalawi et al.(2025)]{albalawi2025}
   Albalawi, T., Dardouri, S.:
   Enhancing Credit Card Fraud Detection Using Traditional
   and Deep Learning Models with Class Imbalance
@@ -2685,7 +2685,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   1643292 (2025).
   \url{https://doi.org/10.3389/frai.2025.1643292}
 
-\bibitem{chithanuru2025}
+\bibitem[Chithanuru et al.(2025)]{chithanuru2025}
   Chithanuru, V., Ramaiah, M.:
   Proactive Detection of Anomalous Behavior in Ethereum
   Accounts Using XAI-Enabled Ensemble Stacking with
@@ -2693,21 +2693,21 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   \textit{PeerJ Computer Science} \textbf{11}, e2630 (2025).
   \url{https://doi.org/10.7717/peerj-cs.2630}
 
-\bibitem{gu2025}
+\bibitem[Gu et al.(2025)]{gu2025}
   Gu, Z., Dib, O.:
   Enhancing Fraud Detection in the Ethereum Blockchain
   Using Ensemble Learning.
   \textit{PeerJ Computer Science} \textbf{11}, e2716 (2025).
   \url{https://doi.org/10.7717/peerj-cs.2716}
 
-\bibitem{ethereum2025xai}
+\bibitem[Ertam(2025)]{ethereum2025xai}
   Ertam, F.:
   Near Real-Time Ethereum Fraud Detection Using
   Explainable AI in Blockchain Networks.
   \textit{Applied Sciences} \textbf{15}(19), 10841 (2025).
   \url{https://doi.org/10.3390/app151910841}
 
-\bibitem{ester1996}
+\bibitem[Ester et al.(1996)]{ester1996}
   Ester, M., Kriegel, H.-P., Sander, J., Xu, X.:
   A Density-Based Algorithm for Discovering Clusters in
   Large Spatial Databases with Noise.
@@ -2715,7 +2715,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   Conference on Knowledge Discovery and Data Mining
   (KDD)}, pp.\ 226--231. AAAI Press (1996).
 
-\bibitem{velickovic2018gat}
+\bibitem[Veli\v{c}kovi\'{c} et al.(2018)]{velickovic2018gat}
   Veli\v{c}kovi\'{c}, P., Cucurull, G., Casanova, A.,
   Romero, A., Li\`{o}, P., Bengio, Y.:
   Graph Attention Networks.
@@ -2723,7 +2723,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   Representations (ICLR)} (2018).
   \url{https://openreview.net/forum?id=rJXMpikCZ}
 
-\bibitem{weber2019}
+\bibitem[Weber et al.(2019)]{weber2019}
   Weber, M., Domeniconi, G., Chen, J., Weidele, D.K.I.,
   Bellei, C., Robinson, T., Leiserson, C.E.:
   Anti-Money Laundering in Bitcoin: Experimenting with
@@ -2732,7 +2732,7 @@ Full pipeline: \url{https://github.com/sagarkorde/CoinJoin}
   Finance} (2019).
   arXiv:1908.02591
 
-\bibitem{bellei2024}
+\bibitem[Bellei et al.(2024)]{bellei2024}
   Bellei, C., Xu, M., Phillips, R., Robinson, T.,
   Weber, M., Kaler, T., Leiserson, C.E., Arvind,
   Chen, J.:

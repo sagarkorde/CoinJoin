@@ -99,3 +99,15 @@ Paper/Datasets/
 # ── Round-2 revision pipeline ────────────────────────────────────────────────
 research/cache/
 research/results/*.parquet
+
+# LaTeX build artifacts
+Paper/*.aux
+Paper/*.out
+Paper/*.toc
+Paper/*.lof
+Paper/*.lot
+Paper/*.fls
+Paper/*.fdb_latexmk
+Paper/*.synctex.gz
+Paper/main_round2.log
+Paper/main_round2.pdf

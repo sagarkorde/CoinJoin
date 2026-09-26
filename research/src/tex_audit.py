@@ -58,7 +58,8 @@ def check(path: Path) -> int:
                   f"{lines[:10]}{' ...' if len(lines) > 10 else ''}")
 
     # Citation integrity.
-    keys = re.findall(r"\\bibitem\{([^}]+)\}", src)
+    # natbib entries carry an optional author-year label: \bibitem[Lo(2023)]{lo2023}
+    keys = re.findall(r"\\bibitem(?:\[[^\]]*\])?\{([^}]+)\}", src)
     cited: set[str] = set()
     for m in re.findall(r"\\cite[a-zA-Z]*\{([^}]+)\}", src):
         cited.update(k.strip() for k in m.split(","))
