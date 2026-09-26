@@ -698,10 +698,11 @@ rather than argued: every label in the dataset was permuted and
 all descriptors recomputed, and all fifteen were bit-identical.
 The largest absolute correlation with the target is 0.1223,
 against 0.9182 for the withdrawn feature. The descriptors are
-nonetheless not adopted as a contribution, because they do not
-help. Added to the 165 distributed features they change the
-F1-score by less than half a percentage point in either
-direction. Used alone they reach an F1-score below 0.04 with a
+nonetheless not adopted as a contribution, because the measured
+benefit is absent. Added to the 165 distributed features, the
+descriptors change the F1-score by less than half a percentage
+point in either direction. Used alone, the set reaches an
+F1-score below 0.04 with a
 ROC-AUC of 0.38, that is, below chance, which indicates that the
 association between topology and illicit status observed during
 the training period is reversed during the test period. That
@@ -750,69 +751,138 @@ A candidate window pair $(W_i, W_j)$ is predicted as a
 linked CoinJoin-spend pair if $d_C(W_i, W_j) < \theta^*$,
 where $\theta^*$ maximises F1-score on the validation set.
 
-\subsection{Structural DBSCAN Clustering}
-\label{sec:taproot_method}
+\subsection{Structural CoinJoin Screening}
+\label{sec:screening}
 
-\subsubsection{Naive CIOH Baseline}
+\subsubsection{Provenance of the Screening Label}
 
-Equation~\eqref{eq:cioh} encodes the naive Common Input
-Ownership Heuristic prediction rule, which flags every
-transaction exceeding input and output count thresholds
-as a CoinJoin candidate regardless of script type.
+The author-curated corpus carries a binary field named
+\texttt{is\_coinjoin\_like}. No definition accompanied the data,
+so the rule was recovered empirically. Decision trees of
+increasing depth were fitted to predict the field from
+thirty-four structural and behavioural columns across all
+5{,}884{,}387 transactions. A tree of depth three reproduces the
+field with training accuracy 1.00000000, and the identity in
+Equation~\eqref{eq:cjrule} was then verified directly against
+every row.
 
 \begin{equation}
-  \hat{y}_\text{CIOH}(t)
-    = \mathbf{1}[|\mathcal{A}| > 2]
-    \cdot \mathbf{1}[|\mathcal{B}| > 2].
-  \label{eq:cioh}
+  \texttt{is\_coinjoin\_like} \;=\;
+  \bigl(n_{\text{in}} \geq 4\bigr) \;\wedge\;
+  \bigl(n_{\text{out}} \geq 4\bigr)
+  \label{eq:cjrule}
 \end{equation}
 
-This rule achieves perfect recall but accumulates false
-positives that scale with P2TR adoption.
+The field is therefore a deterministic threshold on two count
+variables, with a positive rate of 1.88 percent. It is a
+structural screening heuristic, not confirmed CoinJoin ground
+truth, and the present study names it as such throughout. An
+earlier description of the field as ground truth is withdrawn.
 
-\subsubsection{Structural DBSCAN Clustering}
+\subsubsection{Why the Evaluation Cannot Be Made Circular-Free}
 
-The proposed method clusters transactions using
-DBSCAN~\citep{ester1996} on the six-dimensional structural
-feature vector defined in Equation~\eqref{eq:psi}, which
-encodes the combined structural behaviour profile of a
-transaction: UTXO topology, fee-rate positioning, and
-mixing-related indicators. Every dimension of $\psi(t)$ is
-derived from transaction-level structural and behavioural
-properties; none depends on script-signature characteristics
-such as the key-aggregation scheme, so the clustering rule
-is not specific to a particular script type by construction.
-The evaluation corpus nonetheless contains no confirmed P2TR
-transactions, so the present evaluation remains a benchmark
-of this structural approach under pre-Taproot conditions;
-whether Schnorr/MuSig2 key aggregation alters the underlying
-UTXO-topology statistics enough to affect cluster
-separability on live Taproot data is identified as a
-necessary empirical question for future work.
+Both counts appearing in Equation~\eqref{eq:cjrule} were among
+the features clustered on in the earlier evaluation, which makes
+the reported agreement partly a restatement of the target. The
+obvious correction is to delete those two columns. That
+correction is insufficient, because the counts are recoverable by
+arithmetic from the columns that remain, along two independent
+routes.
 
-\begin{multline}
-  \psi(t) = \bigl[
-    \text{input\_count},\;
-    \text{output\_count},\;
-    \text{fee\_rate},\\
-    \text{value\_concentration},\;
-    \text{address\_reuse},\;
-    \text{mixing\_index}
-  \bigr]^\top.
-  \label{eq:psi}
-\end{multline}
+The first route is transaction size. A serialised Bitcoin
+transaction grows by a fixed number of bytes per input and per
+output, so size is affine in the two counts. Regressing the
+counts on the size family recovers the protocol constants
+directly, with virtual size fitted as
+$20.5 + 90.75\,n_{\text{in}} + 35.15\,n_{\text{out}}$ at
+$R^2 = 0.817$, and weight equal to exactly four times virtual
+size as the consensus rule requires.
 
-All features are standardised before clustering. DBSCAN
-is configured with $\varepsilon = 0.6$ and
-$\text{min\_samples} = 5$ using a $k$-d tree index.
-To address the $O(n^2)$ memory complexity at dataset scale,
-DBSCAN is fitted on a stratified subsample of 30,000
-transactions; cluster labels are propagated to the full
-200,000-transaction analysis set via nearest-centroid
-assignment within the $\varepsilon$ radius. Points falling
-outside all cluster radii receive the naive CIOH prediction
-as fallback. Cluster CoinJoin labels are assigned by
-majority vote over ground-truth labels of cluster members.
+The second route is exact. The corpus reports both
+\texttt{total\_input\_value} and \texttt{avg\_input\_value}, and
+the second is the first divided by the input count, so the
+quotient of the two columns returns the count itself. Across
+500{,}000 sampled transactions the quotient recovers the input
+count for 99.96 percent of rows and the output count for 99.98
+percent, and the rule rebuilt from those quotients agrees with
+the distributed field for 100.0000 percent of sampled
+transactions.
+
+\subsubsection{The Leakage Gradient}
+
+Because no single feature subset can be declared clean by
+inspection, screening performance is reported as a gradient
+across six regimes of increasing strictness rather than as one
+number. Table~\ref{tab:leakage_gradient} gives the result. The
+metric remains at or above 0.90 for every regime that retains an
+arithmetic route to the counts, and falls by sixty-three points
+at the moment the average-value columns are removed. The
+discontinuity coincides exactly with the closure of the division
+route, which identifies the mechanism rather than merely
+suggesting one.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Screening performance across feature regimes of
+increasing strictness. Chronological split of the author corpus,
+600{,}000 training and 300{,}000 test transactions, threshold
+selected on validation and frozen, mean over five seeds. The
+discontinuity between regimes D and E locates the leak in the
+average-value columns.}
+\label{tab:leakage_gradient}
+\begin{tabular}{llcccccc}
+\toprule
+Regime & Columns retained & $k$ & F1 & Precision & Recall & PR-AUC & MCC \
+\midrule
+A & all structural columns        & 31 & 0.9977 & 1.0000 & 0.9954 & 1.0000 & 0.9977 \
+B & label inputs removed          & 18 & 0.9122 & 0.9145 & 0.9099 & 0.9729 & 0.9111 \
+C & size family also removed      & 14 & 0.9085 & 0.9431 & 0.8764 & 0.9702 & 0.9081 \
+D & value and temporal only       & 12 & 0.8991 & 0.8908 & 0.9075 & 0.9684 & 0.8979 \
+E & value averages also removed   & 10 & \textbf{0.2678} & 0.3056 & 0.2390 & 0.2065 & 0.2624 \
+F & temporal only                 &  7 & 0.1592 & 0.0889 & 0.7616 & 0.0819 & 0.2394 \
+\bottomrule
+\end{tabular}
+\end{table}
+
+The gradient itself is offered as a transferable diagnostic. A
+metric that stays flat while features are withdrawn and then
+falls sharply localises the dependence to the columns removed at
+the discontinuity, which is more informative than any single
+ablation.
+
+\subsubsection{Clustering Protocol}
+
+Clustering is retained as a characterisation of the corpus rather
+than as a detection benchmark, and the protocol is corrected in
+three respects. The corpus is split chronologically, with
+training drawn from transactions up to December 2023, validation
+to April 2024, and testing from May 2024 onward; the earlier
+evaluation had no temporal separation. Clusters are fitted on
+training transactions alone, each cluster is scored by the
+positive rate of its training members, that mapping is frozen,
+and held-out transactions are assigned to the nearest fitted
+centroid without contributing to the mapping. The earlier
+procedure assigned cluster classes by majority vote over members
+that were themselves scored, which is corrected here.
+
+The scoring rule is also changed. Majority vote over cluster
+members is unsuitable at a positive rate near one percent,
+because it renders almost every cluster negative for reasons of
+prevalence rather than structure. Each cluster is therefore
+scored by its training positive rate, with the cut-off selected
+on validation and frozen, matching the protocol applied to every
+other model in the present study.
+
+Under the corrected protocol, frozen DBSCAN attains an
+illicit-class F1-score of 0.4832 with the full column set, close
+to the figure reported earlier, and 0.1649 once the label's own
+input columns are withdrawn. The result is a conservative,
+high-precision operating point rather than superior detection,
+and Section~\ref{sec:screening_results} reports the full
+precision-recall and false-positive to false-negative trade-off
+across parameter settings rather than a single point.
+
 
 \subsection{MixTrace: Fusion of a Frozen Self-Supervised Representation with a Supervised One}
 \label{sec:mixtrace_method}
