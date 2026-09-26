@@ -1,0 +1,34 @@
+{
+  "n_transactions": 5884387,
+  "n_positive": 110352,
+  "positive_rate": 0.018753355277278668,
+  "recovered_exactly": true,
+  "tree_depth": 3,
+  "rule_text": "|--- output_count <= 4.50\n|   |--- output_count <= 3.50\n|   |   |--- class: 0\n|   |--- output_count >  3.50\n|   |   |--- input_count <= 3.50\n|   |   |   |--- class: 0\n|   |   |--- input_count >  3.50\n|   |   |   |--- class: 1\n|--- output_count >  4.50\n|   |--- input_count <= 3.50\n|   |   |--- class: 0\n|   |--- input_count >  3.50\n|   |   |--- class: 1\n",
+  "features_used": [
+    "input_count",
+    "output_count"
+  ],
+  "textbook_heuristic_checks": {
+    "input_count>=2 AND output_count>=3": {
+      "exact_match": false,
+      "precision": 0.514363,
+      "recall": 1.0
+    },
+    "input_count>=3 AND output_count>=3": {
+      "exact_match": false,
+      "precision": 0.77019,
+      "recall": 1.0
+    },
+    "input_count>=2 AND output_count>=2": {
+      "exact_match": false,
+      "precision": 0.158947,
+      "recall": 1.0
+    },
+    "input_count>=5 AND output_count>=5": {
+      "exact_match": false,
+      "precision": 1.0,
+      "recall": 0.533801
+    }
+  }
+}
