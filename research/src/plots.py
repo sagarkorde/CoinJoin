@@ -110,26 +110,46 @@ def fig_temporal_collapse(per_step_csv: Path, out: Path,
     return out
 
 
-def fig_model_comparison(agg_csv: Path, out: Path) -> Path:
-    """Seed-aggregated model comparison with error bars."""
-    df = pd.read_csv(agg_csv)
-    df = df.sort_values("f1_mean")
-    labels = [f"{r.model}" + (f"\n({r.dgi_regime})"
-                              if r.dgi_regime not in ("n/a", "nan") else "")
-              for r in df.itertuples()]
+def fig_model_comparison(agg_csv: Path, out: Path,
+                         reference: float | None = None,
+                         reference_label: str = "") -> Path:
+    """
+    Seed-aggregated model comparison with error bars.
 
-    fig, ax = plt.subplots(figsize=(6.6, 3.4))
+    `reference` draws a vertical marker for a non-graph baseline, so the
+    graph models are not read in isolation from the tabular result.
+    """
+    pretty = {"sage": "GraphSAGE", "gcn": "GCN", "gat": "GAT",
+              "fusion": "Fusion (frozen DGI + GAT)",
+              "gat_zero_dgi": "GAT, DGI slot zeroed"}
+    df = pd.read_csv(agg_csv).sort_values("f1_mean")
+    labels = []
+    for r in df.itertuples():
+        name = pretty.get(r.model, r.model)
+        regime = str(r.dgi_regime)
+        suffix = f"\n({regime})" if regime not in ("n/a", "nan", "") else ""
+        labels.append(name + suffix)
+
+    fig, ax = plt.subplots(figsize=(6.8, 3.6))
     ys = np.arange(len(df))
     colors = [C_ACCENT if m == "fusion" else C_PRIMARY for m in df["model"]]
-    ax.barh(ys, df["f1_mean"], xerr=df["f1_std"].fillna(0), capsize=3,
-            color=colors, alpha=0.9, edgecolor="white", linewidth=0.8)
+    err = df["f1_std"].fillna(0).to_numpy()
+    ax.barh(ys, df["f1_mean"], xerr=err, capsize=3, color=colors, alpha=0.9,
+            edgecolor="white", linewidth=0.8, error_kw={"lw": 0.9})
     ax.set_yticks(ys)
-    ax.set_yticklabels(labels, fontsize=8)
-    ax.set_xlabel("Test $F_1$ (illicit), mean ± sd over seeds")
+    ax.set_yticklabels(labels, fontsize=7.5)
+    ax.set_xlabel("Test $F_1$ (illicit), mean $\pm$ sd over 20 seeds")
     ax.set_title("Model comparison, leakage-free features")
-    for y, v in zip(ys, df["f1_mean"]):
-        ax.text(v + 0.006, y, f"{v:.3f}", va="center", fontsize=7.5)
-    ax.set_xlim(0, max(df["f1_mean"]) * 1.22)
+
+    xmax = float((df["f1_mean"] + err).max())
+    if reference is not None:
+        xmax = max(xmax, reference)
+        ax.axvline(reference, color=C_MUTED, ls="--", lw=1.1)
+        ax.text(reference, len(df) - 0.35, f" {reference_label} {reference:.3f}",
+                fontsize=7.5, color=C_MUTED, va="top")
+    for y, v, e in zip(ys, df["f1_mean"], err):
+        ax.text(v + e + xmax * 0.018, y, f"{v:.3f}", va="center", fontsize=7.5)
+    ax.set_xlim(0, xmax * 1.20)
     fig.savefig(out)
     plt.close(fig)
     return out

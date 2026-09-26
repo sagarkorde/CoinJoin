@@ -1,0 +1,8 @@
+component,train_seconds,epochs,peak_mem_mb,n_params,inference_ms,us_per_node
+DGI pre-training (transductive),25.36,200,1688.5,54272,,
+DGI pre-training (inductive),15.05,200,1312.3,54272,,
+fusion,73.13,229,6296.4,131588,78.67,0.3861
+gat_zero_dgi,15.46,49,6298.0,123396,76.66,0.3762
+gat,38.41,124,6298.3,119106,75.8,0.372
+gcn,9.99,217,962.2,14914,14.14,0.0694
+sage,8.12,152,946.8,29570,20.13,0.0988

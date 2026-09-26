@@ -1314,142 +1314,205 @@ weight in the ablation model is trained against a genuinely
 DGI-free objective from initialisation.
 
 \subsection{Illicit Transaction Detection Results}
+\label{sec:detection_results}
 \label{sec:class_results}
 
-Table~\ref{tab:classification} presents test-set classification
-performance for all evaluated methods on the Elliptic held-out
-partition containing 408 illicit and 8,433 licit labelled nodes,
-aggregated as mean $\pm$ standard deviation across five
-independent random seeds (1, 2, 3, 42, 123). For each seed, the
-DGI encoder, the MixTrace GAT, and the GAT-without-DGI ablation
-were retrained from scratch; K-Means, KNN, and Random Forest
-were correspondingly refitted. The GAT-without-DGI ablation is
-a genuinely separate model trained end-to-end with the DGI skip
-connection replaced by a zero tensor from epoch 1 onward, rather
-than a single DGI-equipped model evaluated with its skip input
-zeroed only at test time.
+All results in this subsection use the 165 distributed Elliptic
+features. The two engineered features are withdrawn for the
+reasons given in Section~\ref{sec:feature_withdrawal}, and every
+figure reported before that withdrawal is superseded.
+
+The protocol is uniform across every arm. Scaler statistics come
+from labelled training nodes only. Model selection uses
+validation PR-AUC, which is the appropriate criterion under an
+illicit-class prevalence near ten percent. The decision threshold
+is selected independently for each run by maximising validation
+F1-score and is frozen before the test split is scored. Twenty
+random seeds are used per arm, giving 140 runs in total. The
+no-DGI ablation is trained from scratch with the fused slot
+zeroed from the first epoch, rather than having the
+representation removed at inference, which addresses the
+inconsistency identified during review.
+
+\subsubsection{Model Comparison}
+
+Table~\ref{tab:model_comparison} and
+Figure~\ref{fig:model_comparison} report the comparison.
 
 \begin{table}[htbp]
-  \caption{Illicit transaction detection results on the
-    Elliptic test set (time steps 42--49), reporting
-    precision, recall, illicit F1, macro F1, PR-AUC, and
-    ROC-AUC for all methods as mean $\pm$ standard deviation
-    across five random seeds (1, 2, 3, 42, 123). Best result
-    per column appears in \textbf{bold}; K-Means' trivial
-    recall of 1.000 reflects an all-positive degenerate
-    classifier and is excluded from bolding on that basis.}
-  \label{tab:classification}
-  \centering
-  \scriptsize
-  \setlength{\tabcolsep}{3.5pt}
-  \begin{tabular}{lcccccc}
-    \toprule
-    \textbf{Method}
-      & \textbf{Prec.} & \textbf{Rec.}
-      & \textbf{F1} & \textbf{F1\textsubscript{mac}}
-      & \textbf{PR-AUC} & \textbf{ROC-AUC} \\
-    \midrule
-    K-Means
-      & 0.047$\pm$.002 & 1.000$\pm$.000 & 0.090$\pm$.003 & 0.070$\pm$.034 & 0.000$\pm$.000 & -- \\
-    KNN
-      & 0.510$\pm$.000 & 0.456$\pm$.000 & 0.481$\pm$.000 & 0.729$\pm$.000 & 0.447$\pm$.000 & 0.794$\pm$.000 \\
-    Random Forest
-      & \textbf{0.954$\pm$.005} & 0.470$\pm$.001 & 0.630$\pm$.001 & 0.808$\pm$.001 & 0.640$\pm$.004 & 0.937$\pm$.002 \\
-    GAT (no DGI, retrained)
-      & 0.377$\pm$.234 & 0.878$\pm$.101 & 0.482$\pm$.205 & 0.705$\pm$.134 & 0.813$\pm$.037 & 0.961$\pm$.021 \\
-    \textbf{MixTrace (DGI+GAT)}
-      & 0.713$\pm$.115 & \textbf{0.934$\pm$.047} & \textbf{0.806$\pm$.090} & \textbf{0.897$\pm$.048}
-      & \textbf{0.862$\pm$.124} & \textbf{0.992$\pm$.005} \\
-    \bottomrule
-  \end{tabular}
+\centering
+\small
+\caption{Test-split performance on the Elliptic Data Set, mean
+over twenty seeds, threshold selected on validation and frozen.
+The tabular reference is a Random Forest on the same features.
+Wall-clock figures are reported separately in
+Table~\ref{tab:compute_cost}.}
+\label{tab:model_comparison}
+\label{tab:classification}
+\begin{tabular}{llcccccc}
+\toprule
+Model & DGI regime & F1 & SD & Precision & Recall & PR-AUC & MCC \\
+\midrule
+GraphSAGE              & n/a           & \textbf{0.5467} & 0.0123 & 0.7686 & 0.4257 & 0.4985 & 0.5569 \\
+Fusion                 & inductive     & 0.5197 & 0.0303 & 0.7290 & 0.4064 & 0.4943 & 0.5275 \\
+Fusion                 & transductive  & 0.5186 & 0.0296 & 0.7168 & 0.4091 & 0.4917 & 0.5243 \\
+GCN                    & n/a           & 0.4997 & 0.0195 & 0.7549 & 0.3748 & 0.4839 & 0.5165 \\
+GAT, DGI slot zeroed   & transductive  & 0.4711 & 0.0593 & 0.5812 & 0.4069 & 0.4568 & 0.4610 \\
+GAT                    & n/a           & 0.4620 & 0.0253 & 0.6015 & 0.3805 & 0.4517 & 0.4564 \\
+GAT, DGI slot zeroed   & inductive     & 0.4568 & 0.0594 & 0.5486 & 0.4048 & 0.4473 & 0.4438 \\
+\midrule
+Random Forest          & n/a           & 0.6212 & 0.0042 & 0.9231 & 0.4681 & 0.5431 & 0.6470 \\
+Hist.\ Gradient Boosting & n/a         & 0.6126 & 0.0048 & 0.8741 & 0.4716 & 0.5561 & 0.6305 \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-MixTrace achieves the highest mean illicit F1-score (0.806),
-macro F1 (0.897), PR-AUC (0.862), and ROC-AUC (0.992) across
-the five seeds.
-Random Forest attains the highest precision (0.954) at the
-cost of recall (0.470). The retrained standalone GAT without
-DGI shows high-recall, low-precision behaviour on average
-(recall 0.878, precision 0.377, F1 0.482) with substantial
-across-seed variability (F1 standard deviation 0.205, versus
-0.090 for MixTrace), confirming that
-graph attention layers alone collapse toward near-unconditional
-positive prediction without structural pre-training context
-under the 9.2:1 imbalance ratio~\citep{alarab2024}.
-
-Figures~\ref{fig:pr_curves}--\ref{fig:confusion} illustrate
-curve- and matrix-level behaviour for a single representative
-seed rather than the five-seed aggregate; the corresponding
-GAT-without-DGI curves reflect the original single-run ablation
-protocol (DGI skip zeroed only at inference on an already-DGI-trained
-model) that Table~\ref{tab:classification} supersedes with a
-properly retrained ablation, so the exact values below should
-not be read as the paper's headline multi-seed statistics.
-Figure~\ref{fig:pr_curves} plots the precision-recall curves
-for all methods on that representative run: MixTrace maintains
-superior precision across
-the full recall spectrum compared to all baselines.
-Figure~\ref{fig:roc_curves} presents the corresponding ROC
-curves for the same run, illustrating MixTrace's ranking
-quality.
-
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.85\linewidth]{fig04_pr_curves.png}
-  \caption{\textbf{Single representative run (seed 42); see
-    Table~\ref{tab:classification} for the five-seed mean
-    $\pm$ standard deviation.} Precision-recall curves for all evaluated methods
-    on the Elliptic test set. MixTrace (DGI+GAT) maintains
-    substantially higher precision across the full range of
-    recall values compared to all baseline methods, with a
-    PR-AUC of 0.7167 versus 0.6316 for the best competing
-    method (Random Forest) in this run, reflecting superior
-    ranking quality of illicit-class probability scores.}
-  \label{fig:pr_curves}
+  \includegraphics[width=\linewidth]{fig_model_comparison.png}
+  \caption{Model comparison on the Elliptic test split, mean over
+    twenty seeds with error bars giving one standard deviation.
+    The dashed line marks the Random Forest reference on the same
+    features. Every graph model falls short of it, and the fused
+    arms carry visibly narrower error bars than the same
+    architecture trained with the fused slot zeroed.}
+  \label{fig:model_comparison}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.85\linewidth]{fig05_roc_curves.png}
-  \caption{\textbf{Single representative run (seed 42), same
-    run as Figure~\ref{fig:pr_curves}; see
-    Table~\ref{tab:classification} for the five-seed mean
-    $\pm$ standard deviation.} Receiver operating characteristic curves for all
-    evaluated methods. MixTrace achieves the highest area
-    under the ROC curve (0.9868 in this run) among all evaluated
-    approaches; the GAT trained under the original single-run
-    ablation protocol (DGI skip zeroed only at inference) attains a lower ROC-AUC
-    of 0.9319 despite its high raw recall. The properly
-    retrained GAT-without-DGI ablation of
-    Table~\ref{tab:classification} tells a fuller story:
-    mean ROC-AUC of 0.961 with substantially higher variance
-    than MixTrace across seeds.}
-  \label{fig:roc_curves}
+  \includegraphics[width=\linewidth]{fig_curves.png}
+  \caption{Precision-recall and receiver operating characteristic
+    curves on the Elliptic test split for the primary seed. These
+    are threshold-free diagnostics and are reported alongside,
+    not in place of, the twenty-seed aggregates in
+    Table~\ref{tab:model_comparison}.}
+  \label{fig:curves}
 \end{figure}
 
-Figure~\ref{fig:confusion} presents the confusion matrices for
-all five evaluated methods on that same representative run,
-laying out the decision-boundary
-characteristics of each approach and the transition from the
-degenerate all-positive patterns of K-Means and
-the original single-run GAT-without-DGI ablation to the balanced true-positive/true-negative
-performance of MixTrace.
+\subsubsection{Contribution of the Frozen Representation}
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\linewidth]{fig06_confusion_matrices.png}
-  \caption{\textbf{Single representative run (seed 42); see
-    Table~\ref{tab:classification} for the five-seed mean
-    $\pm$ standard deviation.} Confusion matrices for all evaluated methods on
-    the Elliptic test set (408 illicit, 8,433 licit nodes).
-    The progression runs from degenerate all-positive
-    prediction in K-Means (22 TN, 8,433 FP) and the original
-    single-run GAT-without-DGI ablation, through the high-precision but low-recall behaviour
-    of Random Forest, to the balanced classification of
-    MixTrace with 310 TP, 8,306 TN, 98 FN, and 127 FP
-    (precision $= 310/437 = 0.709$) in this run.}
-  \label{fig:confusion}
-\end{figure}
+Fusing the frozen self-supervised representation with the
+supervised one improves the architecture it is fused into. The
+fused model exceeds its own zeroed ablation by 0.049 F1-score in
+the transductive regime and by 0.063 in the inductive regime.
+The effect on stability is larger than the effect on the mean:
+the cross-seed standard deviation falls from 0.0594 to 0.0303, a
+reduction of roughly one half. An earlier version of the present
+study reported a comparable halving of variance, and that
+observation survives the correction, now measured against an
+ablation trained from scratch rather than one disabled at
+inference.
+
+\subsubsection{The Transductive Regime Does Not Explain the Result}
+
+Pre-training over the complete graph is transductive, since
+unlabelled nodes from later periods contribute features and
+topology to representation learning. To determine whether the
+gain depends on that access, the encoder was refitted on the
+training-period subgraph alone, with embeddings for later nodes
+produced by a forward pass of the frozen encoder.
+
+The two regimes are indistinguishable. Inductive fusion attains
+0.5197 and transductive fusion 0.5186, a difference of 0.0011,
+well inside the 0.03 standard deviation of either arm.
+Restricting pre-training to the training period therefore costs
+essentially nothing, and the reported benefit is not an artefact
+of allowing the encoder to observe future nodes. The distinction
+is nonetheless stated explicitly rather than left implicit, since
+the two settings answer different questions.
+
+\subsubsection{Graph Models Do Not Outperform the Tabular Baseline}
+
+The strongest graph model reaches 0.5467, against 0.6212 for a
+Random Forest on the same features. The gap is consistent across
+precision, PR-AUC and Matthews correlation. Two observations
+follow.
+
+First, the round-1 claim that self-supervised pre-training is the
+primary driver of performance is withdrawn. What the evidence
+supports is narrower: the frozen representation improves the
+graph attention arm specifically, in both mean and variance, and
+that arm is not the strongest model examined. A GraphSAGE
+encoder with 29,570 parameters outperforms a fused model with
+131,588.
+
+Second, the comparison is scoped. These figures describe one
+benchmark under one evaluation window, and
+Section~\ref{sec:temporal_drift} shows that the window is
+dominated by a regime in which the training distribution no
+longer holds. No claim is made about relative model ordering on
+Bitcoin transaction graphs in general.
+
+
+\subsection{Computational Cost}
+\label{sec:compute_cost}
+
+Deployment cost was requested during review and is reported in
+Table~\ref{tab:compute_cost}. The measurements were taken with a
+single process on an otherwise idle device; the benchmark refuses
+to start if any other process holds the accelerator, because an
+earlier run of the main experiment was affected by contention and
+its timings are consequently not reported.
+
+Hardware: NVIDIA GeForce RTX 4060 Laptop GPU with 8\,GB of video
+memory and 24 multiprocessors, an Intel Core i9 processor of the
+13th generation, 64\,GB of system memory, Windows 11, Python
+3.10.10, PyTorch 2.7.1 with CUDA 12.8, and PyTorch Geometric
+2.7.0. Graph construction over all 203,769 nodes and 468,710
+directed edges takes 0.47 seconds.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Computational cost measured on an idle device. Training
+time covers the full run to early stopping. Inference is a
+full-graph forward pass over all 203,769 nodes, averaged over
+twenty repetitions after warm-up.}
+\label{tab:compute_cost}
+\begin{tabular}{lrrrrr}
+\toprule
+Component & Train (s) & Epochs & Peak (MB) & Params & Inference (ms) \\
+\midrule
+DGI pre-training, transductive & 25.36 & 200 & 1{,}688.5 & 54{,}272 & --- \\
+DGI pre-training, inductive    & 15.05 & 200 & 1{,}312.3 & 54{,}272 & --- \\
+\midrule
+Fusion                & 73.13 & 229 & 6{,}296.4 & 131{,}588 & 78.67 \\
+GAT, DGI slot zeroed  & 15.46 &  49 & 6{,}298.0 & 123{,}396 & 76.66 \\
+GAT                   & 38.41 & 124 & 6{,}298.3 & 119{,}106 & 75.80 \\
+GCN                   &  9.99 & 217 &   962.2 &  14{,}914 & 14.14 \\
+GraphSAGE             &  8.12 & 152 &   946.8 &  29{,}570 & 20.13 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two points bear on practical use. First, attention is the
+dominant cost. The three attention-based arms each hold
+approximately 6.3\,GB at peak, against under 1\,GB for the
+convolutional and sampling-based encoders, because per-edge
+attention coefficients must be materialised across all 468,710
+directed edges. On an 8\,GB device that leaves little headroom,
+and a larger graph would require neighbourhood sampling rather
+than full-batch training.
+
+Second, the cheapest model is also the most accurate. GraphSAGE
+trains in 8.12 seconds with 29,570 parameters and answers a
+full-graph query in 20.13 milliseconds, which is 0.099
+microseconds per node. The fused model requires nine times the
+training time, six and a half times the peak memory and four
+times the inference latency, for a lower F1-score
+(Table~\ref{tab:model_comparison}). Where a forensic pipeline
+must rescore a large graph repeatedly, that difference is
+material and favours the simpler encoder.
+
+Asymptotically, a graph convolution or DGI layer costs
+$O(EF + NFH)$ per forward pass for $N$ nodes, $E$ edges, $F$
+input features and hidden width $H$. Attention adds a per-edge
+term, giving $O(EKH + NFKH)$ for $K$ heads, which is the source
+of the memory gap above. The fusion head adds
+$O(N(H+D)H)$ for a frozen representation of width $D$ and adds
+nothing to the message-passing cost, since the encoder is not
+re-run during supervised training.
 
 \subsection{Self-Supervised Pre-Training and Supervised Training Dynamics}
 

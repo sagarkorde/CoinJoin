@@ -1,0 +1,81 @@
+{
+  "hardware": {
+    "platform": "Windows-10-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "python": "3.10.10",
+    "torch": "2.7.1+cu128",
+    "cuda": "12.8",
+    "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "gpu_total_memory_gb": 8.0,
+    "gpu_multiprocessors": 24
+  },
+  "graph_build_seconds": 0.47,
+  "n_nodes": 203769,
+  "n_edges_directed": 468710,
+  "n_features": 165,
+  "components": [
+    {
+      "component": "DGI pre-training (transductive)",
+      "train_seconds": 25.36,
+      "epochs": 200,
+      "peak_mem_mb": 1688.5,
+      "n_params": 54272,
+      "inference_ms": null
+    },
+    {
+      "component": "DGI pre-training (inductive)",
+      "train_seconds": 15.05,
+      "epochs": 200,
+      "peak_mem_mb": 1312.3,
+      "n_params": 54272,
+      "inference_ms": null
+    },
+    {
+      "component": "fusion",
+      "train_seconds": 73.13,
+      "epochs": 229,
+      "peak_mem_mb": 6296.4,
+      "n_params": 131588,
+      "inference_ms": 78.67
+    },
+    {
+      "component": "gat_zero_dgi",
+      "train_seconds": 15.46,
+      "epochs": 49,
+      "peak_mem_mb": 6298.0,
+      "n_params": 123396,
+      "inference_ms": 76.66
+    },
+    {
+      "component": "gat",
+      "train_seconds": 38.41,
+      "epochs": 124,
+      "peak_mem_mb": 6298.3,
+      "n_params": 119106,
+      "inference_ms": 75.8
+    },
+    {
+      "component": "gcn",
+      "train_seconds": 9.99,
+      "epochs": 217,
+      "peak_mem_mb": 962.2,
+      "n_params": 14914,
+      "inference_ms": 14.14
+    },
+    {
+      "component": "sage",
+      "train_seconds": 8.12,
+      "epochs": 152,
+      "peak_mem_mb": 946.8,
+      "n_params": 29570,
+      "inference_ms": 20.13
+    }
+  ],
+  "complexity": {
+    "gcn_or_dgi_layer": "O(E F + N F H)",
+    "gat_layer": "O(E K H + N F K H)",
+    "fusion_head": "O(N (H + D) H), encoder not re-run",
+    "full_batch_training": "per-epoch cost times epoch count"
+  },
+  "note": "Measured with a single process on an idle device. E05 timings are not reported because a duplicate process shared the GPU during part of that run."
+}
