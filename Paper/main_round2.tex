@@ -1514,6 +1514,95 @@ $O(N(H+D)H)$ for a frozen representation of width $D$ and adds
 nothing to the message-passing cost, since the encoder is not
 re-run during supervised training.
 
+\subsection{Attribution and Failure Analysis}
+\label{sec:xai}
+
+Model explainability and an account of failure cases were
+requested during review. Both are reported here for the
+leakage-free models only, since attribution computed over a
+leaked feature would merely rediscover the leak.
+
+\subsubsection{Which Features Are Used}
+
+Two attribution methods are applied, one per model family.
+Permutation importance is computed for the tabular reference by
+shuffling each feature in turn on the test split and measuring
+the loss in average precision, over ten repetitions. Integrated
+gradients are computed for the fused graph model with respect to
+node features, using an all-zero baseline, which after
+standardisation corresponds to a transaction with training-set
+average attributes.
+
+The Elliptic feature set is anonymised, but its documented layout
+distinguishes local transaction attributes from features
+aggregated over a node's neighbourhood. Read against that layout,
+the two models behave differently. Every one of the fifteen
+features the tabular model relies on most is a local attribute.
+For the graph model, nine of the top fifteen are local and six
+are aggregated neighbourhood features. Five features appear in
+both lists.
+
+The reading is straightforward. A model with no access to graph
+structure extracts what it can from the transaction in isolation,
+whereas the graph model distributes part of its reliance onto the
+neighbourhood summaries and onto structure reached through
+message passing. That the graph model nonetheless scores lower
+(Table~\ref{tab:model_comparison}) suggests the neighbourhood
+signal available in this benchmark is weaker than the local
+signal, which is consistent with the finding in
+Section~\ref{sec:feature_withdrawal} that purely topological
+descriptors carry almost no usable information here.
+
+\subsubsection{Where the Model Fails}
+
+Table~\ref{tab:error_profile} profiles the four outcome groups
+for the fused model at its validation-selected threshold of
+0.8292.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Outcome profile on the Elliptic test split for the fused
+model at a validation-selected, frozen threshold. Node degree is
+measured on the undirected graph.}
+\label{tab:error_profile}
+\begin{tabular}{lrrrr}
+\toprule
+Outcome & Count & Mean time step & Mean degree & Mean score \\
+\midrule
+True positive  &   182 & 42.10 & 2.29 & 0.9724 \\
+False negative &   226 & 45.52 & 1.81 & 0.1882 \\
+False positive &   109 & 44.00 & 6.28 & 0.9023 \\
+True negative  & 8{,}324 & 44.45 & 3.28 & 0.0803 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two patterns stand out, and both connect to results reported
+elsewhere in the present study.
+
+The errors are distributed in time, not spread evenly. Correctly
+detected illicit transactions sit at a mean time step of 42.10,
+while missed ones sit at 45.52. The model finds illicit activity
+before the marketplace closure documented in
+Section~\ref{sec:temporal_drift} and largely misses it
+afterwards. The failure is not a diffuse loss of accuracy but a
+regime change, visible here at the level of individual errors.
+The mean score assigned to a false negative is 0.1882, far below
+the threshold rather than marginally under it, so these are
+confident errors rather than borderline calls, and a modest
+threshold adjustment would not recover them.
+
+False positives are structurally distinctive, with a mean degree
+of 6.28 against 3.28 for correctly rejected transactions, so the
+model over-flags well-connected hubs. That is an intelligible
+consequence of message passing, since a node with many
+neighbours aggregates evidence from a wider neighbourhood and is
+more easily pushed across the boundary by a few illicit
+neighbours. For forensic use the implication is practical: hub
+transactions such as exchange deposit addresses warrant a higher
+evidential bar before an automated flag is escalated.
+
 \subsection{Self-Supervised Pre-Training and Supervised Training Dynamics}
 
 This subsection describes epoch-level training dynamics for
@@ -1859,71 +1948,119 @@ tests.
 \subsection{Statistical Validation of Classification Results}
 \label{sec:stats}
 
-Table~\ref{tab:stats} reports the true across-seed 95\,\%
-confidence interval for illicit F1 (Student's $t$-distribution
-applied directly to the five per-seed values reported in
-Table~\ref{tab:classification}, rather than a single-run
-analytical approximation) together with a paired $t$-test
-comparing each baseline's five seed-level F1 values against
-MixTrace's five seed-level F1 values, seed-for-seed. This
-directly tests whether MixTrace's advantage holds up once
-seed-to-seed variability is taken into account, addressing the
-single-run limitation of the original evaluation protocol.
+Repeated seeds and repeated test samples measure different
+quantities, and an earlier version of the present study conflated
+them. Seeds quantify the stochasticity of training on one fixed
+partition and are not independent draws of generalisation
+performance, so a paired test over five of them, with four
+degrees of freedom, cannot support a population-level claim. Both
+sources of variation are therefore reported here, separately, and
+each is given an explicit scope.
+
+\subsubsection{Seed-Level Consistency}
+
+Table~\ref{tab:stats} gives paired $t$-tests over twenty seeds,
+with nineteen degrees of freedom, comparing each arm against the
+fused model trained under the inductive regime. These figures
+describe how consistently one configuration outperforms another
+across training runs on a fixed split, and nothing more.
 
 \begin{table}[htbp]
-  \caption{Statistical validation of classification results on
-    the Elliptic test set (408 illicit, 8,433 licit nodes),
-    using the same five random seeds (1, 2, 3, 42, 123) as
-    Table~\ref{tab:classification}. The 95\,\% CI is computed
-    directly from the five per-seed F1 values via the
-    $t$-distribution. The paired $t$-test compares each
-    baseline's five seed-level F1 values against MixTrace's,
-    seed-for-seed ($df=4$); $p<0.05$ rejects the null
-    hypothesis that the two methods have equal mean F1.}
-  \label{tab:stats}
-  \centering
-  \small
-  \setlength{\tabcolsep}{5pt}
-  \begin{tabular}{lcccc}
-    \toprule
-    \textbf{Method}
-      & \textbf{F1 (mean $\pm$ std)}
-      & \textbf{95\,\% CI}
-      & \textbf{Paired $t$}
-      & \textbf{$p$-value} \\
-    \midrule
-    K-Means
-      & 0.090$\pm$0.003 & $(0.087,\ 0.094)$ & 18.35 & $<0.001$ \\
-    KNN
-      & 0.481$\pm$0.000 & $(0.481,\ 0.481)$ & 8.11  & $0.001$  \\
-    Random Forest
-      & 0.630$\pm$0.001 & $(0.628,\ 0.632)$ & 4.47  & $0.011$  \\
-    GAT (no DGI, retrained)
-      & 0.482$\pm$0.205 & $(0.227,\ 0.737)$ & 3.14  & $0.035$  \\
-    \textbf{MixTrace}
-      & \textbf{0.806$\pm$0.090} & \textbf{(0.695, 0.917)}
-      & \multicolumn{2}{c}{(reference)} \\
-    \bottomrule
-  \end{tabular}
+\centering
+\small
+\caption{Seed-level paired $t$-tests over twenty seeds,
+$df = 19$, against the inductive fused model. A positive
+difference favours the fused model. These test consistency across
+training runs on a fixed partition, not generalisation to new
+data.}
+\label{tab:stats}
+\begin{tabular}{lccrr}
+\toprule
+Compared arm & Mean F1 & Difference & $t$ & $p$ \\
+\midrule
+GraphSAGE                    & 0.5467 & $-0.0270$ & $-3.799$ & 0.0012 \\
+Fusion, transductive         & 0.5186 & $+0.0011$ & $0.238$  & 0.8148 \\
+GCN                          & 0.4997 & $+0.0200$ & $2.654$  & 0.0157 \\
+GAT, DGI slot zeroed, trans. & 0.4711 & $+0.0486$ & $3.261$  & 0.0041 \\
+GAT                          & 0.4620 & $+0.0577$ & $6.075$  & 0.0000 \\
+GAT, DGI slot zeroed, ind.   & 0.4568 & $+0.0629$ & $4.354$  & 0.0003 \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-All four baselines are significantly outperformed by MixTrace
-under the paired $t$-test ($p < 0.05$ in every case, $df=4$).
-The closest competitor by mean F1, the retrained GAT without
-DGI, is rejected at $t = 3.14$ ($p = 0.035$) despite its wide
-confidence interval overlapping MixTrace's: the paired
-seed-for-seed comparison shows MixTrace outperforms it on all
-five individual seeds, which a naive comparison of overlapping
-marginal intervals would obscure. Random Forest, with
-near-zero variance across seeds, is rejected more sharply
-($t = 4.47$, $p = 0.011$) despite a numerically smaller mean
-gap, because its low variance makes even a modest and
-consistent advantage statistically detectable. These results
-directly answer the concern that a single fixed-seed
-evaluation cannot establish statistical significance: with
-five independent seeds, MixTrace's advantage over every
-baseline is significant at the conventional $\alpha = 0.05$
-threshold.
+Three readings follow. The fused model is consistently ahead of
+every graph attention variant, including its own properly
+retrained ablation, at $p < 0.005$. The two pre-training regimes
+are statistically indistinguishable, $p = 0.8148$, which is the
+clearest available answer to the question of whether transductive
+access explains the result. And GraphSAGE is consistently ahead
+of the fused model, $p = 0.0012$, which is why the claim that
+self-supervised pre-training drives overall performance is
+withdrawn.
+
+\subsubsection{Test-Set Uncertainty}
+
+Seed-level agreement says nothing about how far a figure would
+move on a different sample of transactions. That question is
+addressed by resampling the test split itself. Percentile
+intervals from 2{,}000 bootstrap resamples of the 8{,}841
+labelled test nodes are reported in Table~\ref{tab:bootstrap},
+together with paired differences in which both systems are scored
+on the same resampled nodes, so that test-set composition is
+removed as a source of variance.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Test-set bootstrap, 2{,}000 resamples of the 8{,}841
+labelled test nodes, for models trained under the primary seed.
+The paired difference column scores both systems on the same
+resampled nodes and is stated relative to the inductive fused
+model.}
+\label{tab:bootstrap}
+\begin{tabular}{lccc}
+\toprule
+System & F1 (95\,\% CI) & Paired difference (95\,\% CI) & $p$ \\
+\midrule
+Fusion, inductive     & 0.5613 (0.5149, 0.6087) & reference & n/a \\
+Fusion, transductive  & 0.5542 (0.5074, 0.5997) & $+0.0071$ $(-0.0106, 0.0236)$ & 0.427 \\
+GAT, zeroed, trans.   & 0.5408 (0.4947, 0.5841) & $+0.0205$ $(-0.0028, 0.0437)$ & 0.086 \\
+GraphSAGE             & 0.5183 (0.4706, 0.5650) & $+0.0430$ $(0.0115, 0.0754)$ & 0.010 \\
+GAT, zeroed, ind.     & 0.5183 (0.4723, 0.5629) & $+0.0430$ $(0.0189, 0.0689)$ & 0.000 \\
+GCN                   & 0.4821 (0.4321, 0.5297) & $+0.0792$ $(0.0450, 0.1148)$ & 0.000 \\
+GAT                   & 0.4608 (0.4126, 0.5084) & $+0.1005$ $(0.0734, 0.1297)$ & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The intervals are wide. A 95 percent interval spanning roughly
+0.09 F1 for every system means that differences smaller than
+about 0.05 are not resolvable on a test split of this size, which
+is worth stating plainly alongside any ranking.
+
+\subsubsection{The Two Analyses Disagree, and That Is Informative}
+
+Table~\ref{tab:bootstrap} places the fused model above GraphSAGE
+by 0.0430 with an interval excluding zero, while
+Table~\ref{tab:stats} places GraphSAGE above the fused model by
+0.0270 at $p = 0.0012$. The contradiction is not an error in
+either analysis. The bootstrap describes models trained under one
+seed and asks how the comparison would move on different test
+transactions; the paired $t$-test averages over twenty training
+runs and asks how the comparison moves across initialisations.
+The primary seed happens to favour the fused model, and twenty
+seeds do not.
+
+That is a direct demonstration of the hazard identified during
+review, that single-run figures presented beside multi-seed
+aggregates can convey an impression the aggregate does not
+support. The present study resolves it by taking the twenty-seed
+result as the conclusion, since the question of interest is
+whether an architecture is better in general rather than whether
+one particular training run was. Single-seed material is reported
+only as a threshold-free diagnostic and is labelled as such
+wherever it appears.
+
 
 \subsection{Cross-Dataset Benchmarking}
 \label{sec:crossdataset}
