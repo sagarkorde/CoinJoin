@@ -228,10 +228,11 @@ positives~\citep{lee2024}. Even before Taproot, multi-input
 P2WPKH transactions share structural properties with
 CoinJoin outputs, making the clustering problem inherent to
 the UTXO model rather than exclusive to a single script
-type~\citep{asiri2025}. The present study evaluates the
-structural clustering solution on pre-Taproot P2WPKH
-proxies; validation on live P2TR transactions is identified
-as a necessary future extension.
+type~\citep{asiri2025}. The present study evaluates structural
+screening on a corpus that is post-Taproot throughout, in which
+Pay-to-Taproot accounts for 24.10 percent of outputs and appears
+in 71.94 percent of screening candidates, so no pre-Taproot
+substitute is required.
 
 \textbf{Gap~2 -- One-Dimensional CST Linking.}
 CoinJoin Spending Transaction (CST) deanonymization requires
@@ -256,9 +257,10 @@ methods discard.
 
 To address all three gaps, the present study introduces
 \textbf{MixTrace}, comprising: (i)~a structural DBSCAN
-clustering strategy on multi-dimensional transaction features,
-evaluated on pre-Taproot P2WPKH proxies as the Gap~1
-validation corpus;
+screening strategy on multi-dimensional transaction features,
+evaluated on post-Taproot data and reported as a gradient across
+feature regimes of increasing strictness rather than as a single
+detection score;
 (ii)~a Multi-Dimensional Chamfer Distance (MD-CD) formulation
 extending CST linking to four dimensions; and (iii)~a
 two-phase graph learning pipeline applying Deep Graph Infomax
@@ -1195,21 +1197,67 @@ A corpus of 5,884,387 Bitcoin transactions with 53
 engineered features including script-type indicators,
 fee rates, input and output counts, address-reuse flags,
 and value metrics was assembled. The ground-truth label
-\texttt{is\_coinjoin\_like}, derived from structural
-heuristics validated against known mixing-service patterns,
-identifies 110,352 transactions (1.88 percent) as probable
-CoinJoin participants. Because the corpus predates
-widespread Pay-to-Taproot adoption, the dataset contains
-zero confirmed P2TR transactions. Accordingly, the Gap 1
-clustering analysis is conducted on multi-input P2WPKH
-transactions as structural proxies that reproduce the
-multi-owner coordination profile described in the
-introduction, without the added Schnorr-signature
-indistinguishability of post-Taproot outputs. The
-clustering evaluation thus quantifies structural
-discriminability under controlled pre-Taproot conditions;
-validation on live P2TR data constitutes a necessary
-future extension.
+\texttt{is\_coinjoin\_like} identifies 110,352 transactions
+(1.88 percent) as screening candidates. Section~\ref{sec:screening}
+establishes that the field is the deterministic rule in
+Equation~\eqref{eq:cjrule} rather than a heuristic validated
+against known mixing services, and the earlier description is
+corrected accordingly.
+
+\paragraph{Correction to the reported script coverage.}
+An earlier version of the present study reported that the corpus
+predates widespread Pay-to-Taproot adoption and contains zero
+confirmed P2TR transactions, and structural clustering was
+therefore conducted on multi-input P2WPKH proxies. That statement
+was incorrect, and the correction matters because it removes the
+principal limitation previously attached to the clustering
+analysis.
+
+The corpus carries six boolean script-type indicators, covering
+P2PK, P2PKH, P2SH, P2WPKH, P2WSH and Taproot. Every one of the
+six is \texttt{False} for every one of the 5{,}884{,}387 rows, so
+no script type could be confirmed through them, and the absence
+of confirmed Taproot was an artefact of the indicator columns
+rather than a property of the data. Script information is in fact
+present in the corpus, in the \texttt{input\_script\_types} and
+\texttt{output\_script\_types} fields, which carry the script
+descriptors reported by the node.
+
+Parsing those descriptors gives the composition in
+Table~\ref{tab:script_composition}. Taproot accounts for 24.10
+percent of outputs; 2{,}494{,}168 transactions, or 42.39 percent
+of the corpus, involve a Taproot script on at least one side; and
+among the 110,352 screening candidates the proportion rises to
+71.94 percent. The corpus spans 13 July 2022 to 1 July 2025,
+beginning roughly eight months after Taproot activation at block
+709{,}632, and is post-Taproot throughout.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Output script composition of the author-curated corpus,
+reconstructed from node-reported script descriptors after the six
+distributed indicator columns were found to be uniformly false.}
+\label{tab:script_composition}
+\begin{tabular}{lr}
+\toprule
+Output script type & Share of outputs \
+\midrule
+P2WPKH (\texttt{witness\_v0\_keyhash})        & 38.66\,\% \
+\textbf{P2TR (\texttt{witness\_v1\_taproot})} & \textbf{24.10\,\%} \
+P2SH (\texttt{scripthash})                    & 15.61\,\% \
+P2PKH (\texttt{pubkeyhash})                   & 12.39\,\% \
+OP\_RETURN (\texttt{nulldata})                &  6.84\,\% \
+P2WSH (\texttt{witness\_v0\_scripthash})      &  2.25\,\% \
+Bare multisig                                 &  0.15\,\% \
+\bottomrule
+\end{tabular}
+\end{table}
+
+The P2WPKH proxy is therefore unnecessary, and the claims made
+for script-agnostic structural screening are supported by direct
+measurement on post-Taproot data rather than by extrapolation
+from a pre-Taproot substitute.
 
 \subsection{Baseline Methods}
 
