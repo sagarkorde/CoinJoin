@@ -402,3 +402,30 @@ F1 0.2678. The screening module is reported as a characterisation study against
 a stated heuristic target, and the gradient itself is reported as a
 transferable diagnostic: a metric that stays flat as features are removed and
 then falls off a cliff localises the leak to the columns removed at the cliff.
+
+---
+
+## Incident note: duplicate E05 process (2026-09-27)
+
+A first attempt to launch E05 in the background used a `nohup ... &` form that
+the task runner reported as failed. The shell reported failure only because a
+subsequent `ls` ran in a different working directory; the detached Python
+process itself survived and continued running.
+
+A second, intentional launch was then started. Both processes ran the same
+script against the same output paths for roughly 67 minutes, sharing one GPU.
+The duplicate (PID 5420, started 00:36:55) was identified through its command
+line and terminated; the intended run (PID 26444, started 00:37:30) was allowed
+to finish.
+
+**Effect on results.** None on correctness. Both processes write their CSV and
+JSON outputs only after all seeds complete, so only the surviving process wrote
+them. The per-seed score arrays written during the run are produced from fixed
+seeds under the same configuration.
+
+**Effect on measurements.** The per-model wall-clock timings and peak-memory
+figures recorded inside E05 are contaminated for every seed that ran during the
+overlap, because two processes contended for the same device. Those figures are
+therefore **not reported**. Computational cost is measured separately in E11,
+which runs a single process on an idle device and refuses to start if any other
+CUDA process is detected.
