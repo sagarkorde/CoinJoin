@@ -108,11 +108,19 @@ features are withdrawn from the manuscript. See E01, E02.
 **2. The transductive nature of DGI pre-training should be explicitly
 acknowledged.**
 
-Accepted. We now run and report both regimes side by side: transductive (DGI
-sees the whole graph) and inductive (DGI is fitted on the training-period
-subgraph only, with embeddings for later nodes produced by a forward pass of
-the frozen encoder). Results for the two are reported together rather than one
-being presented as "the" protocol. See E05.
+Accepted, and now settled empirically. Both regimes are trained and reported
+side by side across 20 seeds: transductive (the encoder sees the whole graph)
+and inductive (the encoder is fitted on the training-period subgraph alone,
+with embeddings for later nodes produced by a forward pass of the frozen
+encoder).
+
+The two are indistinguishable. Inductive fusion reaches F1 0.5197 and
+transductive fusion 0.5186, a difference of 0.0011 with a paired t-test giving
+t = 0.24, p = 0.815 over 20 seeds. Restricting pre-training to the training
+period costs essentially nothing, so the reported benefit is not an artefact of
+letting the encoder observe future nodes. The distinction is nonetheless stated
+explicitly in the manuscript, since the two settings answer different
+questions. See E05.
 
 **3. The status of the CoinJoin labels requires clarification.**
 
@@ -165,8 +173,14 @@ a threshold, so the inconsistency cannot recur.
 **9. The GAT-without-DGI ablation should be made fully consistent.**
 
 Accepted. The no-DGI arm is trained from scratch with the fused slot zeroed
-from the first epoch, not ablated at inference. Every figure is regenerated
-from the final protocol; no figure from the superseded run survives.
+from the first epoch, not ablated at inference, and every figure is regenerated
+from the final protocol. No figure from the superseded run survives.
+
+Measured against that corrected ablation over 20 seeds, the fused model
+exceeds it by 0.049 F1 (transductive) and 0.063 (inductive), with paired
+t-tests of 3.26 (p = 0.0041) and 4.35 (p = 0.00034). The variance claim also
+survives: the cross-seed standard deviation falls from 0.0594 to 0.0303,
+approximately a halving.
 
 **10. The terminology "DGI pre-training followed by GAT fine-tuning" should be
 reconsidered.**
@@ -231,10 +245,26 @@ and the exact rule is stated. See E06.
 is now marked on the curve with the corresponding independent test performance
 annotated.
 
-**Computational cost.** Added: per-model training and inference time, parameter
-counts, peak GPU memory, and hardware specification (NVIDIA RTX 4060 Laptop,
-8 GB VRAM; Intel i9 13th generation; 64 GB RAM; Windows 11), together with
-complexity for each module.
+**Computational cost.** Added, measured with a single process on an idle
+device. Hardware: NVIDIA RTX 4060 Laptop GPU (8 GB VRAM, 24 multiprocessors),
+Intel Core i9 13th generation, 64 GB RAM, Windows 11, Python 3.10.10, PyTorch
+2.7.1 with CUDA 12.8, PyG 2.7.0.
+
+| Component | Train (s) | Peak (MB) | Params | Inference (ms) |
+|---|---|---|---|---|
+| DGI, transductive | 25.4 | 1,688 | 54,272 | n/a |
+| DGI, inductive | 15.1 | 1,312 | 54,272 | n/a |
+| Fusion | 73.1 | 6,296 | 131,588 | 78.7 |
+| GAT, DGI slot zeroed | 15.5 | 6,298 | 123,396 | 76.7 |
+| GAT | 38.4 | 6,298 | 119,106 | 75.8 |
+| GCN | 10.0 | 962 | 14,914 | 14.1 |
+| GraphSAGE | 8.1 | 947 | 29,570 | 20.1 |
+
+Inference is a full-graph forward pass over all 203,769 nodes. Per-layer
+complexity is stated in the manuscript. Two points are worth drawing out:
+attention dominates memory (roughly 6.3 GB against under 1 GB for the other
+encoders, because per-edge coefficients must be materialised across 468,710
+directed edges), and the cheapest model is also the most accurate.
 
 **Explainability.** Added: feature attribution for the tabular models and a
 GNN attribution analysis, with an error analysis of the failure cases.
@@ -286,9 +316,25 @@ Sander and Xu (1996).
 **9. Writing quality.** A full editorial pass has been made.
 
 **10. Positive contributions.** We are grateful for the encouragement, but we
-must correct one item. The reviewer lists the two graph-structural features as
-a genuine strength to be retained. Our audit shows they are a label leak, and
-they are withdrawn. We would rather lose the contribution than keep a result we
-cannot defend. The honest reporting of the Chamfer-distance null result is
-retained, and the study now contains several further negative results reported
-in the same spirit.
+must correct two items.
+
+The reviewer lists the two graph-structural features as a genuine strength to
+be retained. Our audit shows they are a label leak, and they are withdrawn. We
+would rather lose the contribution than keep a result we cannot defend.
+
+The reviewer also notes the DGI ablation showing reduced cross-seed variance.
+That specific finding does survive, and is now measured against a properly
+retrained ablation. But the broader claim it supported does not: across 20
+seeds a plain GraphSAGE baseline reaches F1 0.5467 against 0.5197 for the fused
+model, using 29,570 parameters instead of 131,588, one ninth of the training
+time and one sixth of the peak memory. Every graph model trails a Random Forest
+on the same features (0.6212). We have therefore withdrawn the claim that
+self-supervised pre-training is the primary performance driver, and replaced it
+with the narrower claim the evidence supports: it improves the graph attention
+arm specifically, in both mean and variance, and that arm is not the strongest
+model examined.
+
+The honest reporting of the Chamfer-distance null result is retained, and the
+study now contains several further negative results reported in the same
+spirit, including the failure of the label-free topological features we
+developed as replacements.
