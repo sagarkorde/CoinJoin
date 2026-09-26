@@ -194,6 +194,10 @@ def fig_script_composition(summary_json: Path, out: Path) -> Path:
 def fig_operating_points(sweep_csv: Path, out: Path) -> Path:
     """FPR-FNR and precision-recall trade-off across parameter settings."""
     df = pd.read_csv(sweep_csv)
+    # Print-friendly regime names.
+    short = {"all (reproduces round-1)": "all columns",
+             "disjoint from label": "label-free columns"}
+    df["regime"] = df["regime"].map(lambda r: short.get(r, r))
     fig, axes = plt.subplots(1, 2, figsize=(7.6, 3.2))
     for regime, col in zip(sorted(df["regime"].unique()), [C_PRIMARY, C_ACCENT]):
         sub = df[df["regime"] == regime]
@@ -208,8 +212,10 @@ def fig_operating_points(sweep_csv: Path, out: Path) -> Path:
         axes[1].scatter(db["fpr"], db["fnr"], s=26, marker="D", color=col,
                         edgecolor="white", linewidth=0.6)
     axes[0].set_xlabel("Recall"); axes[0].set_ylabel("Precision")
-    axes[0].set_title("Operating points")
-    axes[0].legend(fontsize=7)
+    axes[0].set_title("Precision against recall")
+    axes[0].set_ylim(-0.03, 1.05)
+    axes[0].legend(fontsize=6.5, loc="lower left", ncol=1,
+                   handlelength=1.4, borderpad=0.2, labelspacing=0.3)
     axes[1].set_xlabel("False positive rate"); axes[1].set_ylabel("False negative rate")
     axes[1].set_title("FPR–FNR trade-off")
     fig.savefig(out)
