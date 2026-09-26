@@ -1,0 +1,392 @@
+{
+  "reference_system": "fusion_inductive",
+  "n_test_nodes": 8841,
+  "n_bootstrap": 2000,
+  "seed_tests": [
+    {
+      "comparison": "fusion vs fusion (transductive)",
+      "n_seeds": 20,
+      "mean_reference": 0.5197,
+      "mean_other": 0.5186,
+      "mean_difference": 0.0011,
+      "sd_reference": 0.0303,
+      "sd_other": 0.0296,
+      "paired_t": 0.2375,
+      "p_value": 0.814778
+    },
+    {
+      "comparison": "fusion vs gat_zero_dgi (inductive)",
+      "n_seeds": 20,
+      "mean_reference": 0.5197,
+      "mean_other": 0.4568,
+      "mean_difference": 0.0629,
+      "sd_reference": 0.0303,
+      "sd_other": 0.0594,
+      "paired_t": 4.3539,
+      "p_value": 0.000342
+    },
+    {
+      "comparison": "fusion vs gat_zero_dgi (transductive)",
+      "n_seeds": 20,
+      "mean_reference": 0.5197,
+      "mean_other": 0.4711,
+      "mean_difference": 0.0486,
+      "sd_reference": 0.0303,
+      "sd_other": 0.0593,
+      "paired_t": 3.2605,
+      "p_value": 0.004115
+    }
+  ],
+  "bootstrap_ci": [
+    {
+      "metric": "f1_illicit",
+      "point": 0.5612903225806452,
+      "ci_lo": 0.514881022597691,
+      "ci_hi": 0.6087081459270365,
+      "n_boot": 2000,
+      "system": "fusion_inductive"
+    },
+    {
+      "metric": "pr_auc",
+      "point": 0.5568375126405412,
+      "ci_lo": 0.50934313639519,
+      "ci_hi": 0.6034067710590593,
+      "n_boot": 2000,
+      "system": "fusion_inductive"
+    },
+    {
+      "metric": "mcc",
+      "point": 0.5786938442372441,
+      "ci_lo": 0.5359193712497508,
+      "ci_hi": 0.6218511972748711,
+      "n_boot": 2000,
+      "system": "fusion_inductive"
+    },
+    {
+      "metric": "f1_illicit",
+      "point": 0.5541795665634675,
+      "ci_lo": 0.5074135090609555,
+      "ci_hi": 0.5996889952153109,
+      "n_boot": 2000,
+      "system": "fusion_transductive"
+    },
+    {
+      "metric": "pr_auc",
+      "point": 0.5603023361338093,
+      "ci_lo": 0.5137098136503069,
+      "ci_hi": 0.6064937630829297,
+      "n_boot": 2000,
+      "system": "fusion_transductive"
+    },
+    {
+      "metric": "mcc",
+      "point": 0.5596533154477787,
+      "ci_lo": 0.5151324399656765,
+      "ci_hi": 0.6043677125030604,
+      "n_boot": 2000,
+      "system": "fusion_transductive"
+    },
+    {
+      "metric": "f1_illicit",
+      "point": 0.4608150470219436,
+      "ci_lo": 0.412555683819503,
+      "ci_hi": 0.5083727746139244,
+      "n_boot": 2000,
+      "system": "gat_transductive"
+    },
+    {
+      "metric": "pr_auc",
+      "point": 0.455135997414562,
+      "ci_lo": 0.4074927367178338,
+      "ci_hi": 0.503111245173442,
+      "n_boot": 2000,
+      "system": "gat_transductive"
+    },
+    {
+      "metric": "mcc",
+      "point": 0.4619114767417299,
+      "ci_lo": 0.4136003803476,
+      "ci_hi": 0.5089073663956927,
+      "n_boot": 2000,
+      "system": "gat_transductive"
+    },
+    {
+      "metric": "f1_illicit",
+      "point": 0.5182926829268293,
+      "ci_lo": 0.4722608301916508,
+      "ci_hi": 0.5628575705731395,
+      "n_boot": 2000,
+      "system": "gat_zero_dgi_inductive"
+    },
+    {
+      "metric": "pr_auc",
+      "point": 0.48866707004341875,
+      "ci_lo": 0.44030594456132355,
+      "ci_hi": 0.539207162114438,
+      "n_boot": 2000,
+      "system": "gat_zero_dgi_inductive"
+    },
+    {
+      "metric": "mcc",
+      "point": 0.5176811364867975,
+      "ci_lo": 0.47289080966082525,
+      "ci_hi": 0.5621940994522132,
+      "n_boot": 2000,
+      "system": "gat_zero_dgi_inductive"
+    },
+    {
+      "metric": "f1_illicit",
+      "point": 0.540785498489426,
+      "ci_lo": 0.49468303076505005,
+      "ci_hi": 0.5840765846882074,
+      "n_boot": 2000,
+      "system": "gat_zero_dgi_transductive"
+    },
+    {
+      "metric": "pr_auc",
+      "point": 0.5142161340670897,
+      "ci_lo": 0.4664878906879723,
+      "ci_hi": 0.5609326627564,
+      "n_boot": 2000,
+      "system": "gat_zero_dgi_transductive"
+    },
+    {
+      "metric": "mcc",
+      "point": 0.5398612340420101,
+      "ci_lo": 0.49272420100968917,
+      "ci_hi": 0.5828300617097663,
+      "n_boot": 2000,
+      "system": "gat_zero_dgi_transductive"
+    },
+    {
+      "metric": "f1_illicit",
+      "point": 0.4820846905537459,
+      "ci_lo": 0.4320751438390547,
+      "ci_hi": 0.5296824037834311,
+      "n_boot": 2000,
+      "system": "gcn_transductive"
+    },
+    {
+      "metric": "pr_auc",
+      "point": 0.4948076306522924,
+      "ci_lo": 0.4474869825360361,
+      "ci_hi": 0.5418280427199369,
+      "n_boot": 2000,
+      "system": "gcn_transductive"
+    },
+    {
+      "metric": "mcc",
+      "point": 0.49493082372821945,
+      "ci_lo": 0.44700670001954323,
+      "ci_hi": 0.542135794221024,
+      "n_boot": 2000,
+      "system": "gcn_transductive"
+    },
+    {
+      "metric": "f1_illicit",
+      "point": 0.5182829888712241,
+      "ci_lo": 0.47058377220387393,
+      "ci_hi": 0.565008025682183,
+      "n_boot": 2000,
+      "system": "sage_transductive"
+    },
+    {
+      "metric": "pr_auc",
+      "point": 0.4713039670654882,
+      "ci_lo": 0.4187130537357357,
+      "ci_hi": 0.5250240321944188,
+      "n_boot": 2000,
+      "system": "sage_transductive"
+    },
+    {
+      "metric": "mcc",
+      "point": 0.5276635834121474,
+      "ci_lo": 0.48076801235346583,
+      "ci_hi": 0.5729443389688772,
+      "n_boot": 2000,
+      "system": "sage_transductive"
+    }
+  ],
+  "paired_bootstrap": [
+    {
+      "metric": "f1_illicit",
+      "difference": 0.0071107560171776996,
+      "ci_lo": -0.010592725905170205,
+      "ci_hi": 0.02361514076898705,
+      "p_bootstrap": 0.427,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "fusion_transductive"
+    },
+    {
+      "metric": "pr_auc",
+      "difference": -0.0034648234932681543,
+      "ci_lo": -0.013514370169911588,
+      "ci_hi": 0.0056580086164728744,
+      "p_bootstrap": 0.478,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "fusion_transductive"
+    },
+    {
+      "metric": "mcc",
+      "difference": 0.019040528789465383,
+      "ci_lo": -0.0011787952380864965,
+      "ci_hi": 0.03878169464666738,
+      "p_bootstrap": 0.071,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "fusion_transductive"
+    },
+    {
+      "metric": "f1_illicit",
+      "difference": 0.10047527555870156,
+      "ci_lo": 0.07344817330666759,
+      "ci_hi": 0.1296554486944559,
+      "p_bootstrap": 0.0,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "gat_transductive"
+    },
+    {
+      "metric": "pr_auc",
+      "difference": 0.10170151522597914,
+      "ci_lo": 0.08079974980782183,
+      "ci_hi": 0.12295683361960288,
+      "p_bootstrap": 0.0,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "gat_transductive"
+    },
+    {
+      "metric": "mcc",
+      "difference": 0.11678236749551424,
+      "ci_lo": 0.08644292108237292,
+      "ci_hi": 0.14985256680888387,
+      "p_bootstrap": 0.0,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "gat_transductive"
+    },
+    {
+      "metric": "f1_illicit",
+      "difference": 0.04299763965381587,
+      "ci_lo": 0.018946369629791383,
+      "ci_hi": 0.06889138252013567,
+      "p_bootstrap": 0.0,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "gat_zero_dgi_inductive"
+    },
+    {
+      "metric": "pr_auc",
+      "difference": 0.0681704425971224,
+      "ci_lo": 0.043164124959380226,
+      "ci_hi": 0.0949643540572719,
+      "p_bootstrap": 0.0,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "gat_zero_dgi_inductive"
+    },
+    {
+      "metric": "mcc",
+      "difference": 0.06101270775044665,
+      "ci_lo": 0.03316313118692851,
+      "ci_hi": 0.09041527210462402,
+      "p_bootstrap": 0.0,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "gat_zero_dgi_inductive"
+    },
+    {
+      "metric": "f1_illicit",
+      "difference": 0.02050482409121912,
+      "ci_lo": -0.0027844147216823543,
+      "ci_hi": 0.043651588717217985,
+      "p_bootstrap": 0.086,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "gat_zero_dgi_transductive"
+    },
+    {
+      "metric": "pr_auc",
+      "difference": 0.042621378573451496,
+      "ci_lo": 0.02868820042482313,
+      "ci_hi": 0.05705956532485842,
+      "p_bootstrap": 0.0,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "gat_zero_dgi_transductive"
+    },
+    {
+      "metric": "mcc",
+      "difference": 0.038832610195233985,
+      "ci_lo": 0.01303380596259331,
+      "ci_hi": 0.06545685084031999,
+      "p_bootstrap": 0.003,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "gat_zero_dgi_transductive"
+    },
+    {
+      "metric": "f1_illicit",
+      "difference": 0.07920563202689923,
+      "ci_lo": 0.0449657966290143,
+      "ci_hi": 0.11481828708155607,
+      "p_bootstrap": 0.0,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "gcn_transductive"
+    },
+    {
+      "metric": "pr_auc",
+      "difference": 0.06202988198824877,
+      "ci_lo": 0.03783714818700543,
+      "ci_hi": 0.08627028505118516,
+      "p_bootstrap": 0.0,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "gcn_transductive"
+    },
+    {
+      "metric": "mcc",
+      "difference": 0.08376302050902468,
+      "ci_lo": 0.046782075591750405,
+      "ci_hi": 0.1216553403093502,
+      "p_bootstrap": 0.0,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "gcn_transductive"
+    },
+    {
+      "metric": "f1_illicit",
+      "difference": 0.043007333709421,
+      "ci_lo": 0.011534245144980434,
+      "ci_hi": 0.07544158479464304,
+      "p_bootstrap": 0.01,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "sage_transductive"
+    },
+    {
+      "metric": "pr_auc",
+      "difference": 0.08553354557505294,
+      "ci_lo": 0.04990092546132025,
+      "ci_hi": 0.12000027244340088,
+      "p_bootstrap": 0.0,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "sage_transductive"
+    },
+    {
+      "metric": "mcc",
+      "difference": 0.05103026082509676,
+      "ci_lo": 0.01594318796323035,
+      "ci_hi": 0.08625357150564056,
+      "p_bootstrap": 0.009,
+      "n_boot": 2000,
+      "reference": "fusion_inductive",
+      "other": "sage_transductive"
+    }
+  ]
+}

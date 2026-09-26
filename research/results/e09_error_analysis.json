@@ -1,0 +1,111 @@
+{
+  "threshold": 0.8291756408088593,
+  "test_metrics": {
+    "threshold": 0.8291756408088593,
+    "precision": 0.6254295532646048,
+    "recall": 0.44607843137254904,
+    "f1_illicit": 0.5207439198855508,
+    "f1_macro": 0.7505091559623244,
+    "mcc": 0.5093694872280149,
+    "tp": 182,
+    "fp": 109,
+    "tn": 8324,
+    "fn": 226,
+    "fpr": 0.012925412071623382,
+    "fnr": 0.5539215686274496,
+    "roc_auc": 0.8421697091026618,
+    "pr_auc": 0.5087227820007579
+  },
+  "groups": [
+    {
+      "group": "true_positive",
+      "n": 182,
+      "mean_time_step": 42.1,
+      "mean_degree": 2.29,
+      "median_degree": 2.0,
+      "mean_score": 0.9724
+    },
+    {
+      "group": "false_negative",
+      "n": 226,
+      "mean_time_step": 45.52,
+      "mean_degree": 1.81,
+      "median_degree": 1.0,
+      "mean_score": 0.1882
+    },
+    {
+      "group": "false_positive",
+      "n": 109,
+      "mean_time_step": 44.0,
+      "mean_degree": 6.28,
+      "median_degree": 2.0,
+      "mean_score": 0.9023
+    },
+    {
+      "group": "true_negative",
+      "n": 8324,
+      "mean_time_step": 44.45,
+      "mean_degree": 3.28,
+      "median_degree": 2.0,
+      "mean_score": 0.0803
+    }
+  ],
+  "per_time_step": [
+    {
+      "time_step": 42,
+      "n": 2154,
+      "n_illicit": 239,
+      "recall": 0.7448,
+      "n_false_positive": 35
+    },
+    {
+      "time_step": 43,
+      "n": 1370,
+      "n_illicit": 24,
+      "recall": 0.0,
+      "n_false_positive": 12
+    },
+    {
+      "time_step": 44,
+      "n": 1591,
+      "n_illicit": 24,
+      "recall": 0.0417,
+      "n_false_positive": 24
+    },
+    {
+      "time_step": 45,
+      "n": 1221,
+      "n_illicit": 5,
+      "recall": 0.0,
+      "n_false_positive": 21
+    },
+    {
+      "time_step": 46,
+      "n": 712,
+      "n_illicit": 2,
+      "recall": 0.5,
+      "n_false_positive": 5
+    },
+    {
+      "time_step": 47,
+      "n": 846,
+      "n_illicit": 22,
+      "recall": 0.0,
+      "n_false_positive": 2
+    },
+    {
+      "time_step": 48,
+      "n": 471,
+      "n_illicit": 36,
+      "recall": 0.0556,
+      "n_false_positive": 5
+    },
+    {
+      "time_step": 49,
+      "n": 476,
+      "n_illicit": 56,
+      "recall": 0.0,
+      "n_false_positive": 5
+    }
+  ]
+}
