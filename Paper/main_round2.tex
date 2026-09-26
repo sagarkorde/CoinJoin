@@ -268,14 +268,25 @@ two-phase graph learning pipeline applying Deep Graph Infomax
 Attention Network (GAT) training with class-weighted
 cross-entropy and ADASYN oversampling.
 
-Experiments on the public Elliptic Bitcoin Dataset and an
-author-curated corpus of 5,884,387 Bitcoin transactions
-demonstrate that MixTrace achieves a mean illicit-class F1-score
-of 0.806 (standard deviation 0.090 across five random seeds)
-and mean ROC-AUC of 0.992, representing 17.6 percentage
-points improvement over the strongest conventional baseline
-and a 79.8 percent relative reduction in clustering
-false-positive rate (absolute: 2.97 percentage points).
+Experiments on the public Elliptic Data Set and on an
+author-curated corpus of 5,884,387 Bitcoin transactions yielded
+three findings that required earlier results to be withdrawn. A
+graph feature defined as the shortest path to a confirmed illicit
+node was found to re-encode the classification target exactly,
+and supplying it drives every test metric to 1.0000 under two
+unrelated learners. The screening target used for CoinJoin
+analysis was found to be a deterministic threshold on two count
+variables that the remaining columns reconstruct by arithmetic.
+Classification performance on Elliptic was found to be bimodal,
+with a mean illicit-class F1-score of 0.858 through time step 42
+and 0.028 across the steps that follow. A fourth finding removed
+a stated limitation rather than a result: the corpus had been
+reported to contain no confirmed Pay-to-Taproot transactions, but
+the indicator columns supporting that statement are uniformly
+false, and the corpus is in fact 24.10 percent Taproot by output.
+The corrected protocols, the leakage-free baselines and the
+diagnostics that expose each defect are the substance of the
+present study.
 
 The manuscript proceeds as follows: Section~\ref{sec:related}
 reviews the literature; Section~\ref{sec:method} presents
@@ -473,22 +484,25 @@ corresponding datasets.
     Author-Curated Corpus (5.88\,M transactions) into a shared
     Feature Engineering stage that produces a
     169-dimensional feature matrix.
-    \textbf{Gap~1} (Structural DBSCAN, purple left lane):
-    a six-dimensional clustering vector $\psi(t)$
-    reduces the false-positive rate from 3.72\,\% to 0.75\,\%
-    ($-$79.8\,\% relative) across 200\,k P2WPKH transactions.
-    \textbf{Gap~2} (MD-CD, purple centre lane):
+    \textbf{Module~1} (structural screening, left lane):
+    a multi-dimensional clustering vector $\psi(t)$ over
+    transaction structure and behaviour, evaluated on
+    post-Taproot data under a chronological split with a frozen
+    cluster-to-score mapping, and reported as a gradient across
+    feature regimes because the screening target is
+    reconstructible from the features.
+    \textbf{Module~2} (spending-transaction linkage, centre lane):
     a four-dimensional Chamfer-distance linker yields a null
     result ($\Delta$F1 $= -0.006$), identifying temporal
     clustering as the dominant signal.
-    \textbf{Gap~3} (DGI\,+\,GAT, purple right lane):
-    unsupervised Deep Graph Infomax pre-training on all
-    203,769 nodes is followed by supervised Graph Attention
-    Network training; the fused representation
-    $[\mathbf{H}_2 \,\|\, \mathbf{Z}^*] \in \mathbb{R}^{N\times256}$
-    achieves mean illicit-class F1\,=\,0.806 and
-    mean ROC-AUC\,=\,0.992 on the Elliptic test set,
-    averaged across five random seeds.
+    \textbf{Module~3} (representation fusion, right lane):
+    a Deep Graph Infomax encoder trained under a self-supervised
+    objective and then frozen, whose representation is
+    concatenated with a separately trained supervised Graph
+    Attention Network representation,
+    $[\mathbf{H}_2 \,\|\, \mathbf{Z}^*]$, evaluated under both
+    transductive and inductive pre-training regimes on the 165
+    distributed Elliptic features.
     \textit{Bottom row}: four quantitative output summaries
     with bootstrap confidence intervals.}
   \label{fig:architecture}
