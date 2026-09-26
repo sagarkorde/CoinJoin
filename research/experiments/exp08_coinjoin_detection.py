@@ -68,9 +68,13 @@ DISJOINT_COLS = ["total_input_value", "total_output_value", "fee",
 
 ALL_COLS = sorted(set(LABEL_INPUTS + DISJOINT_COLS))
 
-TRAIN_END = "2024-06-30"
-VAL_END = "2024-12-31"
+# The corpus is dense from 2022-07 to 2024-09 and effectively stops there
+# (2024-10 contains 102 rows, with a handful in 2025). The split is placed
+# inside the dense region so the test period carries a usable positive count.
+TRAIN_END = "2023-12-31"
+VAL_END = "2024-04-30"
 SAMPLE_N = 600_000      # stratified working sample; DBSCAN is O(n^2) in memory
+TEST_N = 300_000        # test sample; the dense test period holds ~1.55 M rows
 DBSCAN_FIT_N = 40_000   # transactions DBSCAN itself is fitted on
 SEEDS = [42, 43, 44, 45, 46]
 
@@ -92,13 +96,18 @@ def chrono_split(df: pd.DataFrame):
            (t > VAL_END).to_numpy()
 
 
-def dbscan_frozen(Xtr, ytr, Xte, eps: float, min_samples: int, seed: int):
+def dbscan_frozen(Xtr, ytr, Xva, Xte, eps: float, min_samples: int, seed: int):
     """
-    Fit DBSCAN on training data, freeze the cluster-to-class map, then assign
-    test points to the nearest fitted cluster centroid.
+    Fit DBSCAN on training data, freeze a cluster-to-score map, then assign
+    validation and test points to the nearest fitted centroid.
 
-    Returns test predictions. Noise points (label -1) are treated as negative,
-    and test points whose nearest centroid is a negative cluster are negative.
+    Round-1 labelled each cluster by majority vote over its members. Under a
+    2 % positive class majority vote makes almost every cluster negative, which
+    is an artefact of the imbalance rather than a property of the clustering.
+    Each cluster is therefore scored by its *training* positive rate, and the
+    cut-off on that score is selected on validation and frozen, exactly as for
+    every other model in this study. Noise points keep the global training
+    positive rate.
     """
     rng = np.random.default_rng(seed)
     idx = rng.choice(len(Xtr), size=min(DBSCAN_FIT_N, len(Xtr)), replace=False)
@@ -107,28 +116,31 @@ def dbscan_frozen(Xtr, ytr, Xte, eps: float, min_samples: int, seed: int):
     db = DBSCAN(eps=eps, min_samples=min_samples, algorithm="kd_tree", n_jobs=-1)
     lab = db.fit_predict(Xf)
 
-    centroids, cls = [], []
+    centroids, score = [], []
     for c in sorted(set(lab)):
         if c == -1:
             continue
         m = lab == c
         centroids.append(Xf[m].mean(axis=0))
-        # Majority vote over TRAINING members only; frozen from here on.
-        cls.append(int(np.round(yf[m].mean())))
+        # Positive rate over TRAINING members only; frozen from here on.
+        score.append(float(yf[m].mean()))
     if not centroids:
-        return np.zeros(len(Xte), dtype=int), 0
+        z = np.full(len(Xte), float(yf.mean()))
+        return np.full(len(Xva), float(yf.mean())), z, 0
 
     C = np.vstack(centroids)
-    cls = np.asarray(cls)
+    score = np.asarray(score, dtype=float)
 
-    # Nearest-centroid assignment, chunked to bound memory.
-    out = np.empty(len(Xte), dtype=int)
-    step = 20_000
-    for i in range(0, len(Xte), step):
-        blk = Xte[i:i + step]
-        d = ((blk[:, None, :] - C[None, :, :]) ** 2).sum(axis=2)
-        out[i:i + step] = cls[d.argmin(axis=1)]
-    return out, len(centroids)
+    def assign(X):
+        out = np.empty(len(X), dtype=float)
+        step = 20_000
+        for i in range(0, len(X), step):
+            blk = X[i:i + step]
+            d = ((blk[:, None, :] - C[None, :, :]) ** 2).sum(axis=2)
+            out[i:i + step] = score[d.argmin(axis=1)]
+        return out
+
+    return assign(Xva), assign(Xte), len(centroids)
 
 
 def main() -> None:
@@ -147,8 +159,8 @@ def main() -> None:
         return ix if len(ix) <= n else rng.choice(ix, size=n, replace=False)
 
     itr = sub(tr_m, SAMPLE_N)
-    iva = sub(va_m, SAMPLE_N // 3)
-    ite = sub(te_m, SAMPLE_N // 3)
+    iva = sub(va_m, TEST_N)
+    ite = sub(te_m, TEST_N)
     y = df["is_coinjoin_like"].astype(int).to_numpy()
     print(f"  working sample: {len(itr):,} / {len(iva):,} / {len(ite):,}  "
           f"(positive rate train {y[itr].mean():.4f}, test {y[ite].mean():.4f})")
@@ -165,9 +177,10 @@ def main() -> None:
 
         # -- structural DBSCAN with a frozen cluster-to-class map ------------
         for seed in SEEDS:
-            pred, n_cl = dbscan_frozen(Xtr, ytr, Xte, eps=0.6,
-                                       min_samples=5, seed=seed)
-            m = evaluate(yte, pred.astype(float), 0.5)
+            s_va, s_te, n_cl = dbscan_frozen(Xtr, ytr, Xva, Xte, eps=0.6,
+                                             min_samples=5, seed=seed)
+            thr = select_threshold(yva, s_va, criterion="f1")
+            m = evaluate(yte, s_te, thr)
             m.update(method="DBSCAN (frozen map)", regime=regime, seed=seed,
                      n_clusters=n_cl)
             rows.append(m)
@@ -201,10 +214,11 @@ def main() -> None:
                     sweep_rows.append(mm)
 
         # -- DBSCAN eps sweep, primary seed ----------------------------------
-        for eps in (0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.5, 2.0):
-            pred, n_cl = dbscan_frozen(Xtr, ytr, Xte, eps=eps,
-                                       min_samples=5, seed=SEEDS[0])
-            mm = evaluate(yte, pred.astype(float), 0.5)
+        for eps in (0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.5, 2.0, 3.0):
+            s_va, s_te, n_cl = dbscan_frozen(Xtr, ytr, Xva, Xte, eps=eps,
+                                             min_samples=5, seed=SEEDS[0])
+            thr = select_threshold(yva, s_va, criterion="f1")
+            mm = evaluate(yte, s_te, thr)
             mm.update(method="DBSCAN", regime=regime, eps=eps, n_clusters=n_cl)
             sweep_rows.append(mm)
 
