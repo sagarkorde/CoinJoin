@@ -33,6 +33,7 @@ train = steps 1–34, validation = 35–41, test = 42–49.
 | E07 | Reconstruct script types; test the Taproot premise | Author corpus, 5,884,387 tx | Parse `input/output_script_types` node descriptors | **Taproot premise overturned.** All six declared script flags are identically False for every row, so nothing could be confirmed through them. Parsing the descriptor columns shows P2TR is 24.10% of outputs; 2,494,168 tx (42.39%) touch Taproot, and 79,386 / 110,352 (71.94%) of label-positive CoinJoin-like candidates do. The corpus spans 2022-07 to 2025-07 and is post-Taproot throughout. | `d55d942` |
 | E08 | Non-circular CoinJoin screening: chronological split, frozen cluster map | Author corpus, 600k train / 300k test | DBSCAN eps 0.6 frozen positive-rate map; RandomForest reference; 5 seeds | **Circularity reproduced and measured past.** RF with the label's own input columns: F1 0.9978. RF column-disjoint: F1 0.9140. DBSCAN frozen, all columns: F1 0.4832 (close to the round-1 figure of 0.441). DBSCAN column-disjoint: F1 0.1649. | `1b04e03` |
 | E08b | Leakage gradient: how far the screening label survives feature removal | Author corpus, 600k train / 300k test | RandomForest, 6 regimes of increasing strictness, 5 seeds | **Circularity is arithmetic, not incidental.** `total_input_value / avg_input_value` recovers `input_count` for 99.96 % of rows and the reconstructed rule matches the distributed label for **100.0000 %** of sampled transactions. F1 stays at 0.90-1.00 for every regime that retains an arithmetic route, then collapses to **0.2678** once the average-value columns are removed, and to 0.1592 with temporal columns alone. | `868130c` |
+| E05 | Main GNN experiment, leakage-free features, both DGI regimes | Elliptic raw CSVs, 165 distributed features | 20 seeds x 7 model/regime arms (140 runs), val-selected frozen threshold, model selection on validation PR-AUC | **Fusion helps its own architecture but is not the best model.** GraphSAGE 0.5467 > fusion-inductive 0.5197 > fusion-transductive 0.5186 > GCN 0.4997 > GAT-zero-DGI 0.4711 > GAT 0.4620. Fusion beats its own zero-DGI ablation by +0.06 F1 and halves cross-seed SD (0.030 vs 0.059). Inductive and transductive are indistinguishable. All GNNs trail the tabular baseline (0.6212). | `0db03f6` |
 
 ---
 
@@ -429,3 +430,58 @@ overlap, because two processes contended for the same device. Those figures are
 therefore **not reported**. Computational cost is measured separately in E11,
 which runs a single process on an idle device and refuses to start if any other
 CUDA process is detected.
+
+---
+
+## E05 — Main GNN experiment
+
+**Question.** With the leaked features withdrawn, how do the graph models
+compare, does the frozen self-supervised representation help, and does the
+transductive pre-training regime account for any of the result?
+
+**Protocol.** 165 distributed Elliptic features only. Chronological split.
+Scaler statistics from labelled training nodes only. Model selection on
+validation PR-AUC. Decision threshold selected on validation and frozen before
+the test split is scored. Twenty seeds per arm, 140 runs in total. The no-DGI
+ablation is trained from scratch with the fused slot zeroed from the first
+epoch, not ablated at inference.
+
+**Results (test split, mean over 20 seeds).**
+
+| Model | DGI regime | F1 | SD | Precision | Recall | PR-AUC | ROC-AUC | MCC |
+|---|---|---|---|---|---|---|---|---|
+| **GraphSAGE** | n/a | **0.5467** | 0.0123 | 0.7686 | 0.4257 | 0.4985 | 0.8533 | 0.5569 |
+| Fusion | inductive | 0.5197 | 0.0303 | 0.7290 | 0.4064 | 0.4943 | 0.8505 | 0.5275 |
+| Fusion | transductive | 0.5186 | 0.0296 | 0.7168 | 0.4091 | 0.4917 | 0.8503 | 0.5243 |
+| GCN | n/a | 0.4997 | 0.0195 | 0.7549 | 0.3748 | 0.4839 | 0.8358 | 0.5165 |
+| GAT, zero DGI | transductive | 0.4711 | 0.0593 | 0.5812 | 0.4069 | 0.4568 | 0.8221 | 0.4610 |
+| GAT | n/a | 0.4620 | 0.0253 | 0.6015 | 0.3805 | 0.4517 | 0.8314 | 0.4564 |
+| GAT, zero DGI | inductive | 0.4568 | 0.0594 | 0.5486 | 0.4048 | 0.4473 | 0.8226 | 0.4438 |
+
+**Findings.**
+
+1. *The frozen self-supervised representation helps the architecture it is
+   fused into.* Fusion exceeds its own zero-DGI ablation by 0.049 to 0.063 F1
+   and halves the cross-seed standard deviation, 0.0303 against 0.0594. The
+   round-1 stability claim therefore survives the correction, restated against
+   the proper ablation.
+
+2. *The fused model is nevertheless not the best model.* GraphSAGE reaches
+   0.5467 with 29,570 parameters, against 131,588 for the fusion model, and
+   with the lowest variance of any arm. The round-1 claim that self-supervised
+   pre-training is the primary performance driver is withdrawn and replaced by
+   the narrower claim that it improves the GAT arm specifically.
+
+3. *The transductive regime does not account for the result.* Inductive and
+   transductive fusion differ by 0.0011 F1, well inside one standard deviation.
+   Restricting pre-training to the training-period subgraph costs essentially
+   nothing, which settles R1 comment 2: the reported gain is not an artefact of
+   letting the encoder observe later nodes.
+
+4. *Every graph model trails the tabular baseline.* The best GNN reaches
+   0.5467 against 0.6212 for a Random Forest on the same features. Conclusions
+   about model ordering are scoped to this benchmark and this evaluation window.
+
+**Timings not reported.** The per-model wall-clock and peak-memory figures in
+this run are contaminated by a duplicate process that shared the GPU for part
+of it, as recorded in the incident note. Computational cost is measured in E11.
