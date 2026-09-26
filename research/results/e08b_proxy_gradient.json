@@ -1,0 +1,75 @@
+{
+  "label_rule": "input_count >= 4 AND output_count >= 4",
+  "size_family_reconstruction": {
+    "size": {
+      "r2": 0.5949,
+      "coef_input": 163.62,
+      "coef_output": 36.32,
+      "intercept": 71.26
+    },
+    "vsize": {
+      "r2": 0.817,
+      "coef_input": 90.75,
+      "coef_output": 35.15,
+      "intercept": 20.51
+    },
+    "weight": {
+      "r2": 0.817,
+      "coef_input": 363.0,
+      "coef_output": 140.58,
+      "intercept": 80.42
+    },
+    "fee": {
+      "r2": 0.1039,
+      "coef_input": 0.0,
+      "coef_output": 0.0,
+      "intercept": 0.0
+    }
+  },
+  "aggregate": [
+    {
+      "regime": "A all columns",
+      "n_features": 31,
+      "f1": 0.9977,
+      "f1_std": 0.0002,
+      "precision": 1.0,
+      "recall": 0.9954,
+      "pr_auc": 1.0,
+      "roc_auc": 1.0,
+      "mcc": 0.9977
+    },
+    {
+      "regime": "B column-disjoint",
+      "n_features": 18,
+      "f1": 0.9122,
+      "f1_std": 0.0016,
+      "precision": 0.9145,
+      "recall": 0.9099,
+      "pr_auc": 0.9729,
+      "roc_auc": 0.9991,
+      "mcc": 0.9111
+    },
+    {
+      "regime": "C size-free",
+      "n_features": 14,
+      "f1": 0.9085,
+      "f1_std": 0.0021,
+      "precision": 0.9431,
+      "recall": 0.8764,
+      "pr_auc": 0.9702,
+      "roc_auc": 0.9994,
+      "mcc": 0.9081
+    },
+    {
+      "regime": "D value and temporal only",
+      "n_features": 12,
+      "f1": 0.8991,
+      "f1_std": 0.0014,
+      "precision": 0.8908,
+      "recall": 0.9075,
+      "pr_auc": 0.9684,
+      "roc_auc": 0.9994,
+      "mcc": 0.8979
+    }
+  ]
+}
