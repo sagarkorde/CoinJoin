@@ -1053,14 +1053,16 @@ throughout pre-training.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.75\linewidth]{fig02_dgi_loss.png}
-  \caption{DGI training loss over 300 pre-training epochs.
-    The binary cross-entropy loss defined in
-    Equation~\eqref{eq:dgi} converges from an initial
-    value of 1.459 at epoch 1 to stable low values by
-    epoch 300, confirming that the encoder successfully
-    learns to discriminate real node-summary pairs from
-    corrupted pairs across the full 203,769-node graph.}
+  \includegraphics[width=0.78\linewidth]{fig_dgi_loss.png}
+  \caption{Self-supervised pre-training loss over 200 epochs for
+    both regimes, computed on the 165 distributed features alone.
+    An earlier version of this figure was produced by the
+    superseded run that included the withdrawn features and is
+    replaced here. The transductive encoder, which observes the
+    whole graph, reaches a lower objective value than the
+    inductive encoder restricted to the training-period subgraph,
+    yet Table~\ref{tab:model_comparison} shows the two yield
+    indistinguishable downstream performance.}
   \label{fig:dgi_loss}
 \end{figure}
 
@@ -1692,15 +1694,17 @@ overfitting under early stopping.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.85\linewidth]{fig07_training_curves.png}
-  \caption{\textbf{Single representative run (seed 42).} Supervised GAT training curves showing training
-    F1-score, validation F1-score, and learning rate
-    schedule across supervised training epochs. Both metrics follow
-    a consistent upward trajectory, training reaching 0.9550
-    by epoch 220 and validation reaching a best macro F1 of
-    0.8864 at epoch 235, with the learning rate reduction
-    triggered by ReduceLROnPlateau visible as step decreases
-    at plateau epochs.}
+  \includegraphics[width=0.86\linewidth]{fig_training_curves.png}
+  \caption{Supervised training of the fused model for the primary
+    seed, under the corrected protocol. The dotted line marks the
+    epoch at which validation PR-AUC peaks and the model is
+    selected. Training and validation F1-score separate as
+    training proceeds, which is expected under this class
+    imbalance; selecting on validation PR-AUC rather than on
+    training loss is what prevents that gap from being exploited.
+    This is a single-run diagnostic, and the headline comparison
+    remains the twenty-seed aggregate of
+    Table~\ref{tab:model_comparison}.}
   \label{fig:training_curves}
 \end{figure}
 
@@ -1715,16 +1719,22 @@ supervised training.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.80\linewidth]{fig08_tsne_embeddings.png}
-  \caption{Two-dimensional t-SNE projection of the
-    128-dimensional DGI pre-trained node embeddings,
-    coloured by class label (red: illicit, blue: licit,
-    grey: unknown). Illicit nodes occupy geometrically
-    distinct cluster regions in the learned embedding space,
-    confirming that self-supervised DGI pre-training on the
-    full 203,769-node graph captures latent structural
-    patterns predictive of illicit activity before any
-    supervised labels are used.}
+  \includegraphics[width=0.72\linewidth]{fig_embedding_tsne.png}
+  \caption{Two-dimensional t-SNE projection of the frozen
+    self-supervised representation for 6{,}000 labelled nodes,
+    computed on the 165 distributed features alone. An earlier
+    version of this figure described illicit nodes as occupying
+    geometrically distinct cluster regions. That reading is not
+    supported: illicit nodes form local concentrations but remain
+    interspersed throughout the projection. Because a projection
+    cannot settle the question either way, separability is
+    quantified with a linear probe on the representation instead.
+    Fitted on the training period and scored on the test period
+    the probe reaches ROC-AUC 0.756, against 0.939 under a random
+    split that mixes periods. The self-supervised representation
+    does therefore encode label-relevant structure without ever
+    observing a label, but the in-distribution figure overstates
+    how much of that structure survives into a later period.}
   \label{fig:tsne}
 \end{figure}
 
@@ -1985,30 +1995,19 @@ reported in Table~\ref{tab:chamfer}.
   \label{fig:chamfer}
 \end{figure}
 
-Figure~\ref{fig:comparison} presents a comparative
-performance bar chart, from the single representative run
-introduced in Section~\ref{sec:class_results}, across all evaluated approaches for
-both the illicit-detection task and the Taproot clustering
-task; Tables~\ref{tab:classification} and~\ref{tab:stats}
-report the corresponding five-seed aggregate and significance
-tests.
+An earlier version of the present study closed this section with
+a bar chart consolidating results across all three modules,
+drawn from a single representative run. That figure is removed.
+It placed the illicit-detection and screening tasks on one axis
+although the two are measured against different targets on
+different corpora, and the values it displayed were produced
+under the superseded protocol. The corresponding evidence is
+reported instead by Table~\ref{tab:model_comparison} and
+Figure~\ref{fig:model_comparison} for detection, aggregated over
+twenty seeds with variance shown, and by
+Table~\ref{tab:leakage_gradient} for screening, where a gradient
+across feature regimes replaces any single score.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.90\linewidth]{fig11_method_comparison.png}
-  \caption{\textbf{Single representative run (seed 42); see
-    Table~\ref{tab:classification} for the five-seed mean
-    $\pm$ standard deviation.} Unified comparative performance summary across
-    all evaluated methods and tasks: F1-score comparisons for
-    illicit transaction detection in this run (MixTrace: 0.734, Random
-    Forest: 0.628, KNN: 0.483, K-Means: 0.088, original
-    single-run GAT-without-DGI ablation: 0.204), Taproot
-    clustering precision comparison, and
-    Chamfer distance linking F1 comparison, consolidating the
-    improvements achieved by the MixTrace framework across
-    all three research gaps.}
-  \label{fig:comparison}
-\end{figure}
 
 \subsection{Statistical Validation of Classification Results}
 \label{sec:stats}
@@ -2685,6 +2684,20 @@ such a route survives and falls to 0.2678 at the point where the
 last one closes. The corpus therefore cannot support a
 non-circular screening benchmark, and the module is reported as a
 characterisation study against a stated heuristic target.
+
+The consequence deserves stating without hedging, because it
+bounds what the CoinJoin half of the present study can mean. The
+corpus contains no transaction independently confirmed as a
+CoinJoin output, whether by coordinator attribution, by a known
+mixing-service address set, or by any source outside the
+heuristic itself. No result reported here therefore establishes
+that a screened transaction is a CoinJoin transaction. The
+screening module identifies transactions of a particular shape,
+many inputs and many outputs, and that is the whole of its
+demonstrated capability. Obtaining externally confirmed CoinJoin
+transactions is the single most valuable extension to this work,
+and until that exists no figure in this study should be read as
+CoinJoin detection accuracy.
 
 Classification performance on the Elliptic Data Set was found to
 be bimodal rather than gradually degrading. Mean illicit-class
