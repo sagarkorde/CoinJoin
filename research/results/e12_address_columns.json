@@ -1,0 +1,65 @@
+{
+  "n_transactions": 5884387,
+  "declared_columns": {
+    "input_address_count_unique_values": [
+      0,
+      1
+    ],
+    "output_address_count_max": 1,
+    "total_addresses_modal_value": 2,
+    "fraction_output_count_equal_1": 0.999839,
+    "interpretation": "The address-count columns count elements of a one-element array holding a semicolon-joined address string, not distinct addresses, so they are pinned at 1, 1 and 2."
+  },
+  "parsed_columns": {
+    "output_addresses_mean": 2.3874,
+    "output_addresses_max": 3199,
+    "input_addresses_mean": 1.8893,
+    "input_addresses_max": 1794,
+    "agreement_with_declared_pct": 54.34
+  },
+  "mixing_index_declared": {
+    "mean": 0.4998,
+    "sd": 0.0111,
+    "median": 0.5,
+    "p99": 0.5,
+    "p999": 0.5,
+    "max": 0.5,
+    "skew": -44.827
+  },
+  "mixing_index_parsed": {
+    "mean": 0.6778,
+    "sd": 1.4024,
+    "median": 0.5,
+    "p99": 1.7895,
+    "p999": 9.4104,
+    "max": 250.5,
+    "skew": 69.206
+  },
+  "tail_handling": {
+    "winsorise_at_p999": {
+      "threshold": 9.4104,
+      "mean": 0.6576,
+      "sd": 0.4337,
+      "median": 0.5,
+      "p99": 1.7895,
+      "p999": 9.4096,
+      "max": 9.4104,
+      "skew": 12.835
+    },
+    "log1p": {
+      "mean": 0.4913,
+      "sd": 0.1598,
+      "median": 0.4055,
+      "p99": 1.0259,
+      "p999": 2.3428,
+      "max": 5.5274,
+      "skew": 7.886
+    },
+    "n_above_p999": 5885
+  },
+  "label_correlation": {
+    "mi_declared": 0.0031,
+    "mi_parsed": 0.2738,
+    "mi_parsed_log1p": 0.5409
+  }
+}
