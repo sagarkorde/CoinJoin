@@ -1,0 +1,52 @@
+{
+  "n_sampled": 120,
+  "n_verified": 120,
+  "rules_source": "Dumplings (github.com/nopara73/Dumplings)",
+  "explorer": "blockstream.info",
+  "corpus_candidates": {
+    "whirlpool_shaped": 4137,
+    "wasabi2_shaped": 1522,
+    "labelled_positive": 110352
+  },
+  "by_group": {
+    "label_negative_random": {
+      "n": 20,
+      "confirmed_coinjoin": 0,
+      "confirmed_rate": 0.0,
+      "whirlpool": 0,
+      "wasabi2": 0,
+      "generic_equal_output": 0
+    },
+    "label_positive_random": {
+      "n": 40,
+      "confirmed_coinjoin": 0,
+      "confirmed_rate": 0.0,
+      "whirlpool": 0,
+      "wasabi2": 0,
+      "generic_equal_output": 3
+    },
+    "wasabi2_candidate": {
+      "n": 20,
+      "confirmed_coinjoin": 7,
+      "confirmed_rate": 0.35,
+      "whirlpool": 0,
+      "wasabi2": 7,
+      "generic_equal_output": 6
+    },
+    "whirlpool_candidate": {
+      "n": 40,
+      "confirmed_coinjoin": 39,
+      "confirmed_rate": 0.975,
+      "whirlpool": 39,
+      "wasabi2": 0,
+      "generic_equal_output": 0
+    }
+  },
+  "screening_label_precision": {
+    "n": 40,
+    "confirmed_coinjoin": 0,
+    "precision_strict": 0.0,
+    "generic_equal_output_rate": 0.075,
+    "note": "Random sample of transactions the corpus labels is_coinjoin_like, excluding protocol-shaped candidates, verified against real per-output values."
+  }
+}

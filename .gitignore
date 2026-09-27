@@ -111,3 +111,4 @@ Paper/*.fdb_latexmk
 Paper/*.synctex.gz
 Paper/main_v2.log
 Paper/main_v2.pdf
+research/results/e14_verified/
