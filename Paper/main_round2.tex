@@ -171,9 +171,10 @@ transactions, together with 1{,}168 that carry CoinJoin shape but
 fail verification, support the first detection result in the
 study whose labels do not originate in the heuristic being
 evaluated: within Whirlpool candidates, a model given only fee,
-size and timing attains an F1-score of 0.996 and a Matthews
-correlation of 0.956, against 0.966 and 0.582 for the strongest
-single rule the corpus columns express. The margin lies in
+size and timing attains a Matthews correlation of 0.956, with a
+bootstrap interval of 0.923 to 0.983, against 0.582 for the
+strongest single rule the corpus columns express, a paired
+difference of 0.374 whose interval excludes zero. The margin lies in
 rejecting look-alikes that match a pool denomination exactly yet
 fail other protocol conditions.
 
@@ -2132,16 +2133,66 @@ the difference because the positive class dominates, which is
 itself a reminder that a threshold metric on an imbalanced
 problem can conceal a large difference in discrimination.
 
+\paragraph{Uncertainty.}
+The Whirlpool task is 92.8 percent positive, so the chronological
+test split holds 1{,}035 transactions of which only 102 are
+negative, and every discrimination statistic rests on those. A
+point estimate alone would therefore overstate what has been
+measured. Table~\ref{tab:detection_ci} attaches percentile
+intervals from 5{,}000 bootstrap resamples of the test
+transactions. None of the 5{,}000 draws lost a class entirely,
+which was checked rather than assumed.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Bootstrap intervals on the strict-regime detection
+result, 5{,}000 resamples of the test transactions. The paired
+column compares each model against the rule on the same
+resampled transactions.}
+\label{tab:detection_ci}
+\begin{tabular}{lcccc}
+\toprule
+Detector & MCC & 95\,\% CI & $\Delta$MCC vs rule & 95\,\% CI \\
+\midrule
+Rule baseline          & 0.5823 & [0.4994, 0.6572] & reference & n/a \\
+Hist.\ Grad.\ Boosting & \textbf{0.9559} & [0.9232, 0.9830] & $+0.3736$ & $[+0.2969, +0.4567]$ \\
+Random Forest          & 0.8595 & [0.8020, 0.9094] & $+0.2629$ & $[+0.1740, +0.3570]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The advantage over the rule is robust to resampling: the interval
+on the difference excludes zero by a wide margin, and its lower
+bound of $+0.2969$ still represents a large improvement in
+discrimination. Both bootstrap $p$-values fall below $0.0001$.
+
+Two further observations follow from the table. Seed variance is
+negligible beside test variance here, since the gradient boosting
+model is deterministic under a fixed seed and the random forest
+varies by 0.0129, against interval widths of 0.060 and 0.107.
+That is the reverse of the position on the Elliptic benchmark in
+Section~\ref{sec:stats}, and it follows directly from the small
+negative class. And the same comparison expressed in F1 terms is
+$+0.0294$, which reads as a rounding difference, against
+$+0.3736$ in Matthews correlation. At this imbalance the
+F1-score is dominated by the majority class and conceals the
+effect being reported, which is why the discussion above is
+conducted in Matthews correlation throughout.
+
 \paragraph{Scope.}
-Two qualifications belong with the result. Its achievability
+Three qualifications belong with the result. Its achievability
 reflects how rigidly these two protocols constrain transaction
 structure, since a Whirlpool round is a near-identical template
-and recognising a template is not a demanding inference. And
-nothing here extends to CoinJoin implementations outside the two
-verified protocols, whose structures are unknown by construction
-and which the verification cannot label. The WabiSabi task, where
-recall halts at 0.7377 while precision reaches 1.000, is the more
+and recognising a template is not a demanding inference. Nothing
+here extends to CoinJoin implementations outside the two verified
+protocols, whose structures are unknown by construction and which
+the verification cannot label; the WabiSabi task, where recall
+halts at 0.7377 while precision reaches 1.000, is the more
 representative picture of a population that is not a template.
+And the interval belongs with the figure wherever it is quoted,
+because 102 negative transactions is a narrow base on which to
+rest a claim, however wide the margin over the alternative.
 
 \subsubsection{Operating-Point Behaviour}
 
@@ -2964,9 +3015,11 @@ The same confirmations support a detection result the study could
 not previously attempt. Within the Whirlpool population, and with
 every value and count column withheld so that no arithmetic route
 to the label remains, a model given only fee, size and timing
-attains an F1-score of 0.9957 and a Matthews correlation of
-0.9559, against 0.9663 and 0.5823 for the strongest single rule
-the corpus columns express. The margin lies where a rule cannot
+attains a Matthews correlation of 0.9559, with a bootstrap
+interval of 0.9232 to 0.9830 over 5{,}000 resamples of the test
+transactions, against 0.5823 for the strongest single rule the
+corpus columns express. The paired difference is 0.3736 with an
+interval from 0.2969 to 0.4567. The margin lies where a rule cannot
 reach: rejecting transactions that match a pool denomination
 exactly yet fail other protocol conditions. Two qualifications
 travel with the figure. It reflects the rigidity of a protocol
