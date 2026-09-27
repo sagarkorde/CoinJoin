@@ -1,59 +1,80 @@
 {
-  "n_candidates_total": 40,
-  "n_verified": 40,
+  "n_candidates_total": 6209,
+  "n_verified": 6209,
   "rules_source": "Dumplings (github.com/nopara73/Dumplings)",
   "explorers": [
     "https://mempool.space/api/tx/{}",
     "https://blockstream.info/api/tx/{}"
   ],
   "explorer_stats": {
-    "cache_hits": 40,
-    "fetched": 0,
+    "cache_hits": 601,
+    "fetched": 5608,
     "not_found": 0,
     "failed": 0,
-    "throttled": 0
+    "throttled": 27
   },
   "by_group": {
+    "label_negative_random": {
+      "n": 150,
+      "confirmed_coinjoin": 0,
+      "confirmed_rate": 0.0,
+      "whirlpool": 0,
+      "wasabi2": 0
+    },
+    "label_positive_random": {
+      "n": 400,
+      "confirmed_coinjoin": 0,
+      "confirmed_rate": 0.0,
+      "whirlpool": 0,
+      "wasabi2": 0
+    },
+    "wasabi2_candidate": {
+      "n": 1522,
+      "confirmed_coinjoin": 652,
+      "confirmed_rate": 0.4284,
+      "whirlpool": 0,
+      "wasabi2": 652
+    },
     "whirlpool_candidate": {
-      "n": 40,
-      "confirmed_coinjoin": 27,
-      "confirmed_rate": 0.675,
-      "whirlpool": 27,
+      "n": 4137,
+      "confirmed_coinjoin": 3839,
+      "confirmed_rate": 0.928,
+      "whirlpool": 3839,
       "wasabi2": 0
     }
   },
   "confirmed_whirlpool_pools_btc": {
-    "0.001": 11,
-    "0.01": 7,
-    "0.05": 8,
-    "0.5": 1
+    "0.001": 1753,
+    "0.01": 1103,
+    "0.05": 780,
+    "0.5": 203
   },
-  "n_confirmed_whirlpool": 27,
+  "n_confirmed_whirlpool": 3839,
   "screening_label_precision": {
     "n_label_positive": 110352,
     "strata": {
       "whirlpool_shaped": {
         "n": 4137,
-        "confirmed_rate": 0.675,
-        "n_verified": 40
+        "confirmed_rate": 0.928,
+        "n_verified": 4137
       },
       "wasabi2_shaped": {
         "n": 1522,
-        "confirmed_rate": 0.0,
-        "n_verified": 0
+        "confirmed_rate": 0.4284,
+        "n_verified": 1522
       },
       "remainder": {
         "n": 104693,
         "confirmed_rate": 0.0,
-        "n_verified": 0,
+        "n_verified": 400,
         "wilson_95ci": [
           0.0,
-          1.0
+          0.00951
         ]
       }
     },
-    "estimated_confirmed": 2792,
-    "estimated_precision": 0.02531,
-    "upper_bound_precision_95": 0.97402
+    "estimated_confirmed": 4491,
+    "estimated_precision": 0.0407,
+    "upper_bound_precision_95": 0.04972
   }
 }
