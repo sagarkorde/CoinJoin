@@ -39,6 +39,8 @@ train = steps 1–34, validation = 35–41, test = 42–49.
 | E11 | Computational cost on an idle device | Elliptic graph | Single process, refuses to run if another CUDA process is present | **The cheapest model is also the most accurate.** GraphSAGE: 8.1 s training, 947 MB peak, 29,570 params, 20.1 ms full-graph inference. Fusion: 73.1 s, 6,296 MB, 131,588 params, 78.7 ms. Attention dominates memory at ~6.3 GB against under 1 GB for the other encoders. | `654f1c5` |
 | E12 | Address-count columns and the Mixing Index | Author corpus, 5,884,387 tx | Parse address strings; compare against declared counts | **Third broken column family.** `input_address_count`, `output_address_count`, `total_addresses` sit at 1, 1, 2 for almost every row and agree with parsed addresses for only 54.34 %. MI from them is identically 0.5, label correlation 0.0031. Recomputed: mean 0.678, sd 1.402, max 250.5, skew 69.2; log1p cuts skew to 7.9 and raises label correlation to **0.541**. The reported 8.79 / 689.27 matches neither computation. | `da0c952` |
 | E13 | Training diagnostics regenerated, leakage-free | Elliptic, 165 features | DGI loss both regimes; supervised curves; t-SNE + linear probe | **Earlier embedding claim narrowed.** Illicit nodes form local concentrations, not distinct regions. Linear probe on the frozen representation: ROC-AUC **0.756 chronological** vs 0.939 random-split. Self-supervision does encode label-relevant structure without labels, but the in-distribution figure overstates transfer. | `da0c952` |
+| E14 | External CoinJoin ground truth, pilot | Author corpus + blockstream.info | Dumplings rules, 120 verified | **Route established.** 39/40 Whirlpool candidates confirmed, 7/20 Wasabi2, 0/40 random label-positive. | `d14bf42` |
+| E14b | Verify every protocol-shaped candidate | Author corpus + mempool.space / blockstream.info | 6,209 transactions, Dumplings rules on real per-output values | **4,491 confirmed CoinJoins.** Whirlpool 3,839/4,137 (92.8 %), Wasabi2 652/1,522 (42.8 %), random label-positive 0/400. Screening label precision against confirmed CoinJoins: **4.07 %** (95 % upper bound 4.97 %) at near-total recall. | `d14bf42` |
 
 ---
 
@@ -656,3 +658,79 @@ does encode label-relevant structure without ever observing a label, since
 not show distinct regions, only local concentration, and the in-distribution
 figure overstates transfer by 0.18 ROC-AUC. Only the chronological value is
 comparable with the rest of the study.
+
+---
+
+## E14 / E14b — External CoinJoin ground truth
+
+**Question.** Every earlier experiment measured the screening heuristic against
+a label produced by the same heuristic family. What does it achieve against
+transactions confirmed as CoinJoin outputs from blockchain data?
+
+**Rules.** Taken from Dumplings (github.com/nopara73/Dumplings), the reference
+tool used in the CoinJoin measurement literature, not invented here.
+
+* *Whirlpool*: native SegWit only; 5 to 10 inputs and outputs with equal
+  counts; every output exactly equal; that value one of
+  {0.001, 0.01, 0.05, 0.5} BTC; at least one input exactly pool-sized; every
+  other input within 0.0011 BTC above the pool size.
+* *Wasabi 2.x*: inputs exclusively P2WPKH or Taproot; at least 50 inputs; input
+  and output values sorted descending; over 80 % of outputs drawn from the
+  WabiSabi denomination set.
+
+**Method.** The corpus records no per-output values, so nothing can be
+confirmed locally. Candidates were selected by the necessary conditions the
+corpus columns express, then every candidate was fetched from a public
+explorer and tested against the full rule using real per-output values.
+Confirmation comes from the blockchain, not from the corpus. All 6,209
+transactions were verified: 5,608 fetched, 601 from cache, no failures.
+
+**Results.**
+
+| Group | n | Confirmed | Rate |
+|---|---|---|---|
+| Whirlpool-shaped | 4,137 | **3,839** | 92.8 % |
+| Wasabi2-shaped | 1,522 | **652** | 42.8 % |
+| `is_coinjoin_like`, random | 400 | 0 | 0.0 % |
+| Label-negative, random | 150 | 0 | 0.0 % |
+
+Confirmed Whirlpool transactions by pool: 1,753 at 0.001 BTC, 1,103 at 0.01,
+780 at 0.05, 203 at 0.5. The ordering matches reported Whirlpool usage, where
+the smallest pool is the busiest.
+
+**The headline.** Stratified over the whole label-positive population, the
+corpus label flags 110,352 transactions of which an estimated 4,491 are
+confirmed CoinJoin outputs.
+
+| Stratum | n | Confirmed rate |
+|---|---|---|
+| Whirlpool-shaped | 4,137 | 0.928 |
+| Wasabi2-shaped | 1,522 | 0.428 |
+| Remainder | 104,693 | 0.000 (95 % CI 0 to 0.0095) |
+
+**Precision 4.07 %**, upper bound 4.97 %. Recall is near total, because every
+confirmed transaction satisfies the label rule by construction: Whirlpool is
+5-in/5-out and Wasabi2 has at least 50 of each, both of which clear the
+threshold of four.
+
+**Interpretation.** `is_coinjoin_like` is a permissive shape filter, not a
+CoinJoin detector. It admits roughly twenty-four transactions for every real
+CoinJoin it contains. That is a usable first-stage screen in a pipeline whose
+second stage does the discriminating work, and it is not a basis for any
+attribution. The figure is now measured against blockchain truth rather than
+argued from the label's own definition.
+
+**What this changes.** The study is no longer limited to characterisation. A
+confirmed positive set of 4,491 transactions exists, together with 298
+Whirlpool-shaped and 870 Wasabi2-shaped transactions that failed verification.
+Those failures are the valuable negatives: transactions carrying CoinJoin
+shape that are not CoinJoins, which is precisely what a forensic tool must
+reject. E15 uses them.
+
+**Fetching conduct.** A first pass used ten workers against one explorer, was
+rate-limited with HTTP 429, and then made almost no progress while still
+issuing requests. It was stopped. `research/src/explorer.py` replaced it:
+requests spread across several explorers, a per-endpoint cooldown that rests
+one returning 429 or 5xx while others continue, and a shared token bucket
+holding the aggregate near 2.5 requests per second. The completed run recorded
+27 throttle events, all absorbed without a single failed transaction.
