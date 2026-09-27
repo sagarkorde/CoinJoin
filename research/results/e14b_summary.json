@@ -1,31 +1,41 @@
 {
-  "n_candidates_total": 60,
-  "n_verified": 60,
+  "n_candidates_total": 40,
+  "n_verified": 40,
   "rules_source": "Dumplings (github.com/nopara73/Dumplings)",
-  "explorer": "blockstream.info",
+  "explorers": [
+    "https://mempool.space/api/tx/{}",
+    "https://blockstream.info/api/tx/{}"
+  ],
+  "explorer_stats": {
+    "cache_hits": 40,
+    "fetched": 0,
+    "not_found": 0,
+    "failed": 0,
+    "throttled": 0
+  },
   "by_group": {
     "whirlpool_candidate": {
-      "n": 60,
-      "confirmed_coinjoin": 46,
-      "confirmed_rate": 0.7667,
-      "whirlpool": 46,
+      "n": 40,
+      "confirmed_coinjoin": 27,
+      "confirmed_rate": 0.675,
+      "whirlpool": 27,
       "wasabi2": 0
     }
   },
   "confirmed_whirlpool_pools_btc": {
-    "0.001": 21,
-    "0.01": 11,
-    "0.05": 11,
-    "0.5": 3
+    "0.001": 11,
+    "0.01": 7,
+    "0.05": 8,
+    "0.5": 1
   },
-  "n_confirmed_whirlpool": 46,
+  "n_confirmed_whirlpool": 27,
   "screening_label_precision": {
     "n_label_positive": 110352,
     "strata": {
       "whirlpool_shaped": {
         "n": 4137,
-        "confirmed_rate": 0.7667,
-        "n_verified": 60
+        "confirmed_rate": 0.675,
+        "n_verified": 40
       },
       "wasabi2_shaped": {
         "n": 1522,
@@ -42,8 +52,8 @@
         ]
       }
     },
-    "estimated_confirmed": 3172,
-    "estimated_precision": 0.02874,
-    "upper_bound_precision_95": 0.97746
+    "estimated_confirmed": 2792,
+    "estimated_precision": 0.02531,
+    "upper_bound_precision_95": 0.97402
   }
 }

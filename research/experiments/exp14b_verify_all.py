@@ -49,22 +49,23 @@ _spec.loader.exec_module(_e14)
 CACHE = _e14.CACHE
 classify = _e14.classify
 
-WORKERS = 8
-PACE = 0.12          # seconds a worker waits after a network fetch
+# Fetching goes through ExplorerPool, which spreads requests across several
+# public explorers, rests an endpoint that returns 429 or 5xx while the others
+# continue, and paces the aggregate against a global rate ceiling. An earlier
+# pass used ten workers against a single explorer, was rate-limited, and then
+# made almost no progress while still issuing requests.
+from explorer import ExplorerPool
+
+WORKERS = 4
 _print_lock = threading.Lock()
+POOL = ExplorerPool(CACHE, target_rps=2.5)
 
 
 def fetch_one(txid: str) -> tuple[str, dict | None, bool]:
     """Return (txid, record, came_from_cache)."""
-    path = CACHE / f"{txid}.json"
-    if path.exists():
-        try:
-            return txid, json.loads(path.read_text(encoding="utf-8")), True
-        except json.JSONDecodeError:
-            path.unlink()
-    rec = _e14.fetch(txid)          # handles retries, writes the cache
-    time.sleep(PACE)
-    return txid, rec, False
+    before = POOL.stats["cache_hits"]
+    rec = POOL.get(txid)
+    return txid, rec, POOL.stats["cache_hits"] > before
 
 
 def main() -> None:
@@ -172,7 +173,8 @@ def main() -> None:
         "n_candidates_total": int(len(res)),
         "n_verified": int(len(ok)),
         "rules_source": "Dumplings (github.com/nopara73/Dumplings)",
-        "explorer": "blockstream.info",
+        "explorers": POOL.endpoints,
+        "explorer_stats": POOL.summary(),
     }
     by_group = {}
     for g, sub in ok.groupby("group"):
