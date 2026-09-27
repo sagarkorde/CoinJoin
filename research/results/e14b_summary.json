@@ -1,0 +1,49 @@
+{
+  "n_candidates_total": 60,
+  "n_verified": 60,
+  "rules_source": "Dumplings (github.com/nopara73/Dumplings)",
+  "explorer": "blockstream.info",
+  "by_group": {
+    "whirlpool_candidate": {
+      "n": 60,
+      "confirmed_coinjoin": 46,
+      "confirmed_rate": 0.7667,
+      "whirlpool": 46,
+      "wasabi2": 0
+    }
+  },
+  "confirmed_whirlpool_pools_btc": {
+    "0.001": 21,
+    "0.01": 11,
+    "0.05": 11,
+    "0.5": 3
+  },
+  "n_confirmed_whirlpool": 46,
+  "screening_label_precision": {
+    "n_label_positive": 110352,
+    "strata": {
+      "whirlpool_shaped": {
+        "n": 4137,
+        "confirmed_rate": 0.7667,
+        "n_verified": 60
+      },
+      "wasabi2_shaped": {
+        "n": 1522,
+        "confirmed_rate": 0.0,
+        "n_verified": 0
+      },
+      "remainder": {
+        "n": 104693,
+        "confirmed_rate": 0.0,
+        "n_verified": 0,
+        "wilson_95ci": [
+          0.0,
+          1.0
+        ]
+      }
+    },
+    "estimated_confirmed": 3172,
+    "estimated_precision": 0.02874,
+    "upper_bound_precision_95": 0.97746
+  }
+}
