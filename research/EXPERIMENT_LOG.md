@@ -37,6 +37,8 @@ train = steps 1–34, validation = 35–41, test = 42–49.
 | E09 | Attribution and failure analysis | Elliptic, leakage-free features | Permutation importance (10 repeats) and integrated gradients (32 steps), primary seed | **Failure is a regime change, not diffuse decay.** Detected illicit transactions sit at mean time step 42.10, missed ones at 45.52, with missed cases scored 0.1882 against a 0.8292 threshold. False positives skew to hubs (mean degree 6.28 against 3.28). Tabular top-15 features are 15/15 local; graph top-15 is 9 local and 6 aggregated. | `654f1c5` |
 | E10 | Uncertainty quantification | E05 outputs, Elliptic test split | 20-seed paired t-tests (df = 19) and 2,000-resample test-set bootstrap | **Two analyses, stated separately.** Seed level: GraphSAGE beats fusion (p = 0.0012); fusion beats every attention variant (p < 0.005); regimes indistinguishable (p = 0.8148). Bootstrap on the primary seed puts fusion ahead of GraphSAGE by 0.0430; intervals are ~0.09 wide, so sub-0.05 differences are not resolvable. The disagreement is reported and explained. | `654f1c5` |
 | E11 | Computational cost on an idle device | Elliptic graph | Single process, refuses to run if another CUDA process is present | **The cheapest model is also the most accurate.** GraphSAGE: 8.1 s training, 947 MB peak, 29,570 params, 20.1 ms full-graph inference. Fusion: 73.1 s, 6,296 MB, 131,588 params, 78.7 ms. Attention dominates memory at ~6.3 GB against under 1 GB for the other encoders. | `654f1c5` |
+| E12 | Address-count columns and the Mixing Index | Author corpus, 5,884,387 tx | Parse address strings; compare against declared counts | **Third broken column family.** `input_address_count`, `output_address_count`, `total_addresses` sit at 1, 1, 2 for almost every row and agree with parsed addresses for only 54.34 %. MI from them is identically 0.5, label correlation 0.0031. Recomputed: mean 0.678, sd 1.402, max 250.5, skew 69.2; log1p cuts skew to 7.9 and raises label correlation to **0.541**. The reported 8.79 / 689.27 matches neither computation. | `da0c952` |
+| E13 | Training diagnostics regenerated, leakage-free | Elliptic, 165 features | DGI loss both regimes; supervised curves; t-SNE + linear probe | **Earlier embedding claim narrowed.** Illicit nodes form local concentrations, not distinct regions. Linear probe on the frozen representation: ROC-AUC **0.756 chronological** vs 0.939 random-split. Self-supervision does encode label-relevant structure without labels, but the in-distribution figure overstates transfer. | `da0c952` |
 
 ---
 
@@ -595,3 +597,62 @@ leaves little headroom and a larger graph would require neighbourhood sampling.
 And the cheapest model is also the most accurate: GraphSAGE trains in 8.12 s
 and answers a full-graph query in 20.13 ms, against 73.13 s and 78.67 ms for a
 fused model that scores lower.
+
+---
+
+## E12 — Address-count columns and the Mixing Index
+
+**Question.** Reviewer 3 asked how the outliers implied by a Mixing Index of
+mean 8.79 and standard deviation 689.27 were handled.
+
+**Finding.** The premise was wrong in a way that matters more than the
+question. The columns naming the input and output address sets count elements
+of a one-element array holding a semicolon-joined string, not distinct
+addresses, so they sit at 1, 1 and 2 for almost every transaction and agree
+with the parsed address lists for only 54.34 % of rows.
+
+| Quantity | Declared columns | Parsed addresses |
+|---|---|---|
+| Mean output addresses | 1.00 | 2.39 |
+| Max output addresses | 1 | 3,199 |
+| Mixing Index mean | 0.4998 | 0.678 |
+| Mixing Index sd | 0.0111 | 1.402 |
+| Mixing Index max | 0.5 | 250.5 |
+| Correlation with label | 0.0031 | 0.274 |
+| Correlation, log1p | 0.0031 | **0.541** |
+
+**Decision.** The statistic is used under a log(1+x) transform, which reduces
+skewness from 69.2 to 7.9 and raises label correlation to 0.541. Winsorising
+at the 99.9th percentile is reported but not used, since it discards the
+high-multiplicity transactions of forensic interest. The previously reported
+figures match neither computation and are withdrawn.
+
+This is the third column family in this corpus found to misreport its own
+contents, after the six script-type booleans of E07 and the degenerate
+`value_concentration_ratio` of E06.
+
+---
+
+## E13 — Training diagnostics regenerated
+
+**Question.** Three figures came from the superseded run. One carried a
+substantive claim: that illicit nodes occupy geometrically distinct regions of
+the self-supervised embedding before any label is used. With a
+label-re-encoding feature in the input, that separation could have been an
+artefact.
+
+**Method.** All three regenerated on the 165 distributed features alone.
+Because a projection cannot settle a separability question, a linear probe is
+fitted on the frozen representation, under two splits.
+
+| Probe | ROC-AUC | What it measures |
+|---|---|---|
+| Random five-fold | 0.939 | In-distribution separability, mixes periods |
+| Chronological | **0.756** | Transfer from training period to test period |
+
+**Interpretation.** The claim survives in narrowed form. The representation
+does encode label-relevant structure without ever observing a label, since
+0.756 is well above chance on a strictly later period. But the projection does
+not show distinct regions, only local concentration, and the in-distribution
+figure overstates transfer by 0.18 ROC-AUC. Only the chronological value is
+comparable with the rest of the study.
