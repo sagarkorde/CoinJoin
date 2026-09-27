@@ -42,6 +42,7 @@ train = steps 1–34, validation = 35–41, test = 42–49.
 | E14 | External CoinJoin ground truth, pilot | Author corpus + blockstream.info | Dumplings rules, 120 verified | **Route established.** 39/40 Whirlpool candidates confirmed, 7/20 Wasabi2, 0/40 random label-positive. | `d14bf42` |
 | E14b | Verify every protocol-shaped candidate | Author corpus + mempool.space / blockstream.info | 6,209 transactions, Dumplings rules on real per-output values | **4,491 confirmed CoinJoins.** Whirlpool 3,839/4,137 (92.8 %), Wasabi2 652/1,522 (42.8 %), random label-positive 0/400. Screening label precision against confirmed CoinJoins: **4.07 %** (95 % upper bound 4.97 %) at near-total recall. | `d14bf42` |
 | E15 | CoinJoin detection against externally confirmed labels | E14b labels + author corpus | Chronological split, 5 seeds, 3 learners, 4 feature regimes, rule baseline | **First validated detection result in the study.** Within Whirlpool candidates, a model on fee, size and timing alone reaches F1 0.9957 and MCC 0.9559, against F1 0.9663 and MCC 0.5823 for the strongest single rule. Within Wasabi2 candidates, F1 0.8491 at precision 1.000. Separation survives with every value and count column withheld, so it is not definitional. | `f81d86f` |
+| E16 | Uncertainty on the confirmed-label detection result | E14b labels + author corpus | 5,000-resample bootstrap, 5 seeds, paired against the rule baseline | **Headline survives.** Strict-regime MCC 0.9559, 95 % CI [0.9232, 0.9830]; rule baseline 0.5823 [0.4994, 0.6572]. Paired difference +0.3736 [+0.2969, +0.4567], p < 0.0001. Test split holds 1,035 transactions, only 102 of them negative; no resample was degenerate. | `5097fe1` |
 
 ---
 
@@ -802,3 +803,57 @@ a demanding inference. And the finding does not extend to CoinJoins outside
 the two protocols verified here, whose structures are unknown by construction.
 The Wasabi2 task, where recall stalls at 0.7377 with precision at 1.000, is the
 more representative picture of a harder population.
+
+---
+
+## E16 — Uncertainty on the detection result
+
+**Why.** E15 reported a Matthews correlation of 0.9559 against the rule
+baseline's 0.5823 with no interval attached. That is the omission this study
+criticises elsewhere, and it matters more than usual here: the Whirlpool task
+is 92.8 percent positive, so the chronological test split holds 1,035
+transactions of which only **102 are negative**, and every discrimination
+statistic rests on those.
+
+**Method.** Percentile bootstrap over test transactions, 5,000 resamples, with
+seed variance reported separately as in E10. A paired bootstrap compares model
+against rule on the same resampled transactions, so the comparison is not
+confounded by which transactions a resample happens to contain. Resamples in
+which one class vanishes were counted rather than silently dropped; with 102
+negatives that is a real possibility, and **none of the 5,000 draws was
+degenerate**.
+
+**Results (test split, strict regime: fee, size and timing only).**
+
+| Detector | MCC | 95 % CI | CI width | F1 | 95 % CI |
+|---|---|---|---|---|---|
+| Rule baseline | 0.5823 | [0.4994, 0.6572] | 0.158 | 0.9663 | [0.9581, 0.9739] |
+| **Hist. Grad. Boosting** | **0.9559** | **[0.9232, 0.9830]** | 0.060 | 0.9957 | [0.9925, 0.9984] |
+| Random Forest | 0.8595 | [0.8020, 0.9094] | 0.107 | 0.9864 | [0.9809, 0.9914] |
+
+Seed variance is negligible beside test variance: HistGradientBoosting is
+deterministic under a fixed seed (sd 0.0000) and Random Forest varies by
+sd 0.0129, against bootstrap interval widths of 0.06 and 0.11. The dominant
+uncertainty is which transactions the test period contained, not which
+initialisation the model drew, which is the opposite of the situation on
+Elliptic in E10 and follows from the small negative class.
+
+**Paired comparison against the rule, same resamples.**
+
+| Model | Δ MCC | 95 % CI | p | Δ F1 | 95 % CI |
+|---|---|---|---|---|---|
+| Hist. Grad. Boosting | +0.3736 | [+0.2969, +0.4567] | < 0.0001 | +0.0294 | [+0.0220, +0.0374] |
+| Random Forest | +0.2629 | [+0.1740, +0.3570] | < 0.0001 | +0.0187 | [+0.0108, +0.0272] |
+
+**Interpretation.** The advantage over the rule is robust to test-set
+resampling: the interval on the difference excludes zero by a wide margin and
+its lower bound, +0.2969, still represents a large improvement in
+discrimination. The F1 column shows again why the metric choice matters. The
+same comparison in F1 terms is +0.0294, which reads as a rounding difference,
+while in MCC terms it is +0.3736. At 92.8 percent positives, F1 is dominated
+by the majority class and conceals the difference the study is reporting.
+
+The interval should nevertheless be quoted with the result. A 95 percent
+interval of [0.9232, 0.9830] is tight enough to support the claim and wide
+enough that the point estimate alone would overstate the precision of the
+measurement.

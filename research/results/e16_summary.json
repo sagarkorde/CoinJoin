@@ -1,0 +1,90 @@
+{
+  "task": "Whirlpool candidates, strict regime (fee, size, timing only)",
+  "n_test": 1035,
+  "n_test_negatives": 102,
+  "n_bootstrap": 5000,
+  "rule_baseline": {
+    "n_test": 1035,
+    "n_negatives": 102,
+    "n_positives": 933,
+    "degenerate_resamples": 0,
+    "n_boot": 5000,
+    "mcc": 0.5823,
+    "mcc_lo": 0.4994,
+    "mcc_hi": 0.6572,
+    "f1": 0.9663,
+    "f1_lo": 0.9581,
+    "f1_hi": 0.9739,
+    "precision": 0.9349,
+    "precision_lo": 0.9196,
+    "precision_hi": 0.9492,
+    "recall": 1.0,
+    "recall_lo": 1.0,
+    "recall_hi": 1.0,
+    "seed": -1
+  },
+  "per_model": [
+    {
+      "model": "HistGradientBoosting",
+      "mcc_mean": 0.9559,
+      "mcc_sd": 0.0,
+      "mcc_lo": 0.9232,
+      "mcc_hi": 0.983,
+      "f1_mean": 0.9957,
+      "f1_lo": 0.9925,
+      "f1_hi": 0.9984
+    },
+    {
+      "model": "RandomForest",
+      "mcc_mean": 0.8595,
+      "mcc_sd": 0.0129,
+      "mcc_lo": 0.802,
+      "mcc_hi": 0.9094,
+      "f1_mean": 0.9864,
+      "f1_lo": 0.9809,
+      "f1_hi": 0.9914
+    }
+  ],
+  "paired_vs_rule": [
+    {
+      "metric": "mcc",
+      "difference": 0.3736,
+      "ci_lo": 0.2969,
+      "ci_hi": 0.4567,
+      "p_bootstrap": 0.0,
+      "degenerate_resamples": 0,
+      "model": "HistGradientBoosting",
+      "comparator": "RuleBaseline"
+    },
+    {
+      "metric": "f1",
+      "difference": 0.0294,
+      "ci_lo": 0.022,
+      "ci_hi": 0.0374,
+      "p_bootstrap": 0.0,
+      "degenerate_resamples": 0,
+      "model": "HistGradientBoosting",
+      "comparator": "RuleBaseline"
+    },
+    {
+      "metric": "mcc",
+      "difference": 0.2629,
+      "ci_lo": 0.174,
+      "ci_hi": 0.357,
+      "p_bootstrap": 0.0,
+      "degenerate_resamples": 0,
+      "model": "RandomForest",
+      "comparator": "RuleBaseline"
+    },
+    {
+      "metric": "f1",
+      "difference": 0.0187,
+      "ci_lo": 0.0108,
+      "ci_hi": 0.0272,
+      "p_bootstrap": 0.0,
+      "degenerate_resamples": 0,
+      "model": "RandomForest",
+      "comparator": "RuleBaseline"
+    }
+  ]
+}
