@@ -41,6 +41,7 @@ train = steps 1–34, validation = 35–41, test = 42–49.
 | E13 | Training diagnostics regenerated, leakage-free | Elliptic, 165 features | DGI loss both regimes; supervised curves; t-SNE + linear probe | **Earlier embedding claim narrowed.** Illicit nodes form local concentrations, not distinct regions. Linear probe on the frozen representation: ROC-AUC **0.756 chronological** vs 0.939 random-split. Self-supervision does encode label-relevant structure without labels, but the in-distribution figure overstates transfer. | `da0c952` |
 | E14 | External CoinJoin ground truth, pilot | Author corpus + blockstream.info | Dumplings rules, 120 verified | **Route established.** 39/40 Whirlpool candidates confirmed, 7/20 Wasabi2, 0/40 random label-positive. | `d14bf42` |
 | E14b | Verify every protocol-shaped candidate | Author corpus + mempool.space / blockstream.info | 6,209 transactions, Dumplings rules on real per-output values | **4,491 confirmed CoinJoins.** Whirlpool 3,839/4,137 (92.8 %), Wasabi2 652/1,522 (42.8 %), random label-positive 0/400. Screening label precision against confirmed CoinJoins: **4.07 %** (95 % upper bound 4.97 %) at near-total recall. | `d14bf42` |
+| E15 | CoinJoin detection against externally confirmed labels | E14b labels + author corpus | Chronological split, 5 seeds, 3 learners, 4 feature regimes, rule baseline | **First validated detection result in the study.** Within Whirlpool candidates, a model on fee, size and timing alone reaches F1 0.9957 and MCC 0.9559, against F1 0.9663 and MCC 0.5823 for the strongest single rule. Within Wasabi2 candidates, F1 0.8491 at precision 1.000. Separation survives with every value and count column withheld, so it is not definitional. | `f81d86f` |
 
 ---
 
@@ -734,3 +735,70 @@ requests spread across several explorers, a per-endpoint cooldown that rests
 one returning 429 or 5xx while others continue, and a shared token bucket
 holding the aggregate near 2.5 requests per second. The completed run recorded
 27 throttle events, all absorbed without a single failed transaction.
+
+---
+
+## E15 — Detection against confirmed labels
+
+**Question.** With 4,491 confirmed CoinJoin transactions and 1,168 shaped
+transactions that failed verification, can the corpus features distinguish
+them? This is the first detection question in the study whose labels do not
+come from the heuristic being evaluated.
+
+**Design.** Four regimes, because a single number would repeat the mistake the
+study set out to document.
+
+| Task | Classes | Features | Purpose |
+|---|---|---|---|
+| A | confirmed vs random corpus | all 26 | trivial; shape separates the sampling frame |
+| B | confirmed vs look-alike, pooled | 23, shape withheld | contaminated by group membership |
+| C | confirmed vs look-alike, within group | 23 | removes the group shortcut |
+| C-strict | same | 13: fee, size, timing only | removes every arithmetic route to the label |
+
+Task B pools Whirlpool-shaped candidates, 92.8 % positive, with Wasabi2-shaped
+candidates, 42.8 % positive. Those groups differ by input count, which size,
+virtual size and weight encode even when the count columns are withheld, so a
+model can score well by recognising the group and predicting its base rate.
+Task C runs inside each group, where that shortcut does not exist.
+
+C-strict withholds every value and count column. Each offers a route back to
+the per-output value that defines the label: `avg_output_value` *is* the common
+output value of a confirmed Whirlpool transaction, and `total_output_value`
+divided by `output_count` recovers it. What remains appears in no detection
+rule.
+
+**Results (test split, chronological, mean over 5 seeds).**
+
+| Task | Model | F1 | Precision | Recall | PR-AUC | MCC |
+|---|---|---|---|---|---|---|
+| C, Whirlpool | HistGradientBoosting | 0.9973 | 0.9947 | 1.0000 | 1.0000 | 0.9726 |
+| C, Whirlpool | RandomForest | 0.9773 | 0.9765 | 0.9781 | 0.9948 | 0.7722 |
+| **C-strict, Whirlpool** | **HistGradientBoosting** | **0.9957** | 0.9915 | 1.0000 | 1.0000 | **0.9559** |
+| C-strict, Whirlpool | RandomForest | 0.9800 | 0.9880 | 0.9721 | 0.9977 | 0.8136 |
+| C-strict, Whirlpool | **RuleBaseline** | 0.9663 | 0.9349 | 1.0000 | 0.9349 | **0.5823** |
+| C-strict, Wasabi2 | RandomForest | 0.8491 | 1.0000 | 0.7377 | 0.9214 | 0.8103 |
+| C-strict, Wasabi2 | HistGradientBoosting | 0.8451 | 0.9890 | 0.7377 | 0.9623 | 0.8030 |
+
+**The rule baseline matters.** A confirmed Whirlpool transaction has every
+output equal to a pool denomination, so its mean output value sits exactly on
+one, to within float32 noise: the maximum relative distance among confirmed
+transactions is 4.75e-08. The rule "distance below 1e-7" is therefore the
+strongest single condition the corpus columns express, and it is stable from
+1e-7 through 1e-4. It reaches recall 1.000 but precision only 0.9349, because
+roughly half the unconfirmed candidates also sit on a denomination and fail on
+conditions the corpus cannot see, such as input values outside the pool
+tolerance or a non-SegWit script.
+
+That is exactly where the trained model earns its place. On MCC, the
+appropriate metric at 92.8 % positives, it reaches 0.9559 against the rule's
+0.5823. F1 hides the difference because the positive class dominates.
+
+**Interpretation.** Detection of protocol CoinJoins from corpus features is
+achievable and the result is externally grounded, which no earlier experiment
+in this study could claim. Two qualifications belong with it. Achievability
+reflects how rigidly these protocols constrain transaction structure: a
+Whirlpool round is a near-identical template, and recognising a template is not
+a demanding inference. And the finding does not extend to CoinJoins outside
+the two protocols verified here, whose structures are unknown by construction.
+The Wasabi2 task, where recall stalls at 0.7377 with precision at 1.000, is the
+more representative picture of a harder population.
