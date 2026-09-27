@@ -1,0 +1,6 @@
+{
+  "n_sampled": 6000,
+  "linear_probe_roc_auc_random_cv": 0.9394,
+  "linear_probe_roc_auc_chronological": 0.7576,
+  "note": "Two linear probes on the frozen representation. The random five-fold value mixes time periods and measures in-distribution separability. The chronological value fits on the training period and scores the test period, and is the figure comparable with the rest of the study."
+}

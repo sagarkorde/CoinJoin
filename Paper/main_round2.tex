@@ -157,6 +157,15 @@ of screening candidates involve a Taproot script. The proxy is
 therefore unnecessary, and script-aware analysis is performed
 directly on post-Taproot data.
 
+One limitation is stated here rather than deferred, because it
+bounds what the screening results can mean. The corpus contains
+no independently confirmed CoinJoin transaction, so no result
+reported here establishes that a screened transaction is a
+CoinJoin output. Screening is therefore reported as
+characterisation against a disclosed heuristic target, with a
+residual F1-score of 0.268 once every identified route back to
+the label is closed, and not as validated detection.
+
 Corrected protocols are supplied for every module, together with
 leakage-free baselines, inductive and transductive
 self-supervised regimes, twenty-seed repetition, test-set
@@ -555,8 +564,56 @@ where $\mathcal{A}$ and $\mathcal{B}$ are disjoint singletons,
 $\text{MI} = 1/2$; for a 10-input, 10-output CoinJoin
 transaction with fully disjoint address sets,
 $\text{MI} = 100/20 = 5$, growing proportionally with
-combinatorial ambiguity. In the author dataset, MI has a
-mean of 8.79 and standard deviation of 689.27.
+combinatorial ambiguity.
+
+\paragraph{A defect in the address-count columns.}
+A statistic for this quantity was previously reported with a mean
+of 8.79 and a standard deviation of 689.27, and the implied
+outliers were queried during review. Investigating that query
+uncovered a defect rather than a heavy tail.
+
+The corpus supplies columns named
+\texttt{input\_address\_count}, \texttt{output\_address\_count}
+and \texttt{total\_addresses}. Those columns do not hold the
+quantities those names describe. Each counts the elements of a
+one-element array containing a semicolon-joined address string
+rather than the distinct addresses inside it, and so sits at 1, 1
+and 2 for almost every transaction, agreeing with the parsed
+address lists for only 54.34 percent of rows. Computed from them,
+the Mixing Index is identically 0.5 and its correlation with the
+screening label is 0.0031. As distributed, the statistic carries
+no information at all.
+
+Parsing the address strings directly gives a mean of 1.89 input
+and 2.39 output addresses, with maxima of 1{,}794 and 3{,}199.
+Recomputed on those values the Mixing Index has a mean of 0.678,
+a standard deviation of 1.402, a median of 0.5 and a maximum of
+250.5, with a skewness of 69.2. Neither the corrected nor the
+distributed computation reproduces the previously reported
+figures, which appear to derive from a third procedure the
+present study was unable to reconstruct; those figures are
+therefore withdrawn.
+
+\paragraph{Handling the tail.}
+The corrected statistic is genuinely heavy-tailed, with 5{,}885
+transactions above the 99.9th percentile of 9.41, so it is used
+under a $\log(1+x)$ transform throughout. The transform reduces
+skewness from 69.2 to 7.9 and, more importantly, makes the
+quantity useful: correlation with the screening label rises from
+0.0031 for the distributed column to 0.274 for the corrected
+statistic and 0.541 under the transform. Winsorising at the
+99.9th percentile is reported for comparison in the released
+results but is not used, since it discards precisely the
+high-multiplicity transactions of forensic interest.
+
+This is the third column family in this corpus found to
+misreport its own contents, after the six script-type indicators
+of Section~\ref{sec:screening_results} and the degenerate
+\texttt{value\_concentration\_ratio}. The pattern is noted in
+Section~\ref{sec:threats}: a derived column whose name describes
+a quantity it does not hold is not detectable by inspecting the
+schema, and is best caught by checking each derived column
+against a recomputation from the raw field it summarises.
 
 \paragraph{Temporal Irregularity.}
 Mixing coordination services schedule transactions at
@@ -1156,7 +1213,7 @@ specification.
      \mathbf{Z}^*_\text{test}])\bigr)$
 \State $\theta^* \leftarrow \arg\max_\theta
   F_1(\hat{p} \geq \theta,\;\mathbf{Y}_\text{val})$
-  \Comment{$\theta^*\!=\!0.9397$}
+  \Comment{selected on validation, then frozen}
 \State $\hat{\mathbf{y}} \leftarrow
   \mathbf{1}[\hat{p} \geq \theta^*]$
 \State \Return $\hat{\mathbf{y}}$
@@ -1618,7 +1675,15 @@ improved to 0.8844 and validation F1 to 0.5847. Convergence
 stabilised between epochs 220 and 265, where training F1
 exceeded 0.9550 and the best validation macro F1 of 0.8864
 was recorded at epoch 235. The optimal decision threshold
-was $\theta^* = 0.9397$.
+was $\theta^* = 0.9397$. Both that threshold and the
+convergence figures above belong to the superseded run described
+in Section~\ref{sec:feature_withdrawal}, which included the
+withdrawn features, and neither is comparable with the corrected
+results. Both are retained here only to document what the earlier
+protocol produced. Under the corrected protocol the threshold is
+selected independently for each run and frozen, and for the
+primary seed of the fused model it is 0.8292, as reported in
+Table~\ref{tab:error_profile}.
 
 Figure~\ref{fig:training_curves} traces the training and
 validation F1-score curves across supervised training epochs: both
@@ -2364,84 +2429,109 @@ rather than omitted. The present study therefore claims no novel
 feature contribution on the Elliptic Data Set.
 
 
-\subsection{Policy Implications for Blockchain Forensics}
+\subsection{Implications for Forensic Practice}
+\label{sec:policy}
 
-The findings carry direct implications for financial
-intelligence policy, exchange compliance practice, and
-the legal frameworks governing digital-asset transactions.
+An earlier version of this subsection argued from figures that
+Sections~\ref{sec:detection_results} and~\ref{sec:screening_results}
+withdraw, including a recall of 0.934 and a false-positive
+reduction of 79.8 percent. Those figures were obtained with the
+leaked feature present or under the uncorrected screening
+protocol. Reasoning from them while correcting them elsewhere
+would be incoherent, so the discussion is rebuilt on the measured
+results. The conclusions it supports are considerably more
+cautious than those it replaces.
 
-\textbf{Regulatory alignment.}
-FATF Recommendation 16 and the 2021 ``Updated Guidance for
-a Risk-Based Approach to Virtual Assets and Virtual Asset
-Service Providers'' require virtual asset service providers
-(VASPs) to implement risk-based transaction monitoring
-capable of identifying mixing services and suspicious
-spending patterns~\citep{lo2023}. MixTrace's mean
-illicit-class recall of 0.934, against 0.470 for the best
-conventional baseline (Random Forest), translates directly
-into fewer
-unmonitored fund flows with potential FATF-compliance
-consequences. The federated training architecture evaluated
-by~\citet{baabdullah2024} and~\citet{ahmed2024fed} offers a
-deployment pathway in which multiple exchange compliance
-systems jointly refine the MixTrace encoder while retaining
-transaction data on-premises.
+\paragraph{Recall is the binding constraint, not precision.}
+The strongest configurations recover well under half of the
+illicit transactions in the evaluation window: recall is 0.4681
+for the tabular reference and 0.4257 for the best graph model, at
+precisions of 0.9231 and 0.7686 respectively. A monitoring system
+built on either would miss most of what it is intended to find.
+Under regimes such as FATF Recommendation 16 and the 2021
+risk-based guidance for virtual asset service
+providers~\citep{lo2023}, that makes these methods usable as
+prioritisation aids that rank a queue for human analysts, and not
+as coverage mechanisms that can be represented as having
+monitored a transaction stream. The distinction matters for how
+compliance is evidenced, and the earlier framing obscured it.
 
-\textbf{False-positive costs and legal consequences.}
-Each false positive may trigger a Suspicious Activity Report
-(SAR), an account restriction, or misdirected analyst
-resources. Structural DBSCAN reduces false-positive
-attributions from 6,623 to 1,337 per 200,000 analysed
-transactions (79.8 percent relative), which at VASP scale
-translates into measurable reductions in analyst workload
-and filing overhead. Its 70.0 percent false-negative rate
-means regulators should treat the DBSCAN output as a
-high-confidence subset for priority investigation rather
-than exhaustive coverage; the naive CIOH operating point,
-with zero false negatives, provides the complementary
-high-sensitivity sweep.
+\paragraph{Performance is not stationary, and deployment must
+assume that.}
+Section~\ref{sec:temporal_drift} shows performance collapsing at
+a single time step, with recall falling from 0.789 to zero and
+not recovering, following a marketplace closure. Ranking quality
+degrades far more gently than the calibrated operating point,
+with ROC-AUC remaining between 0.57 and 0.86 while the F1-score
+reaches zero. Two operational consequences follow. A deployed
+threshold has a shelf life measured against market structure
+rather than against elapsed time, so recalibration against recent
+confirmed cases should be routine rather than exceptional. And a
+monitoring dashboard reporting a pooled accuracy figure over a
+period spanning such an event reports a number describing no part
+of that period. Per-period reporting is the minimum safeguard.
 
-\textbf{Privacy rights and proportionality.}
-Algorithmic transaction attribution raises proportionality
-concerns under data protection and financial privacy law:
-high false-positive rates impose disproportionate
-investigative burdens on innocent users, and the precision
-improvement from 0.770 to 0.833 achieved by structural
-DBSCAN over naive CIOH directly reduces this burden. Where
-MixTrace output triggers automated account restrictions
-without human review, it additionally falls within
-Article~22 of the GDPR (Regulation (EU) 2016/679), which
-grants data subjects the right not to be subject to solely
-automated decisions with significant legal effects, and
-under Section~1798.185 of the CCPA for United
-States-based exchange operators; the 70.0 percent
-false-negative rate at the high-precision DBSCAN operating
-point makes human-oversight checkpoints necessary at any
-consequential decision stage. These frameworks reinforce
-that MixTrace output should function as a
-risk-prioritisation tool rather than an autonomous
-enforcement mechanism, consistent with proportionality
-principles in anti-money laundering
-regulation~\citep{coinjoin2024tdsc}.
+\paragraph{False positives concentrate on well-connected
+transactions.}
+Section~\ref{sec:xai} shows false positives carrying a mean
+degree of 6.28 against 3.28 for correctly rejected transactions.
+Highly connected nodes in a transaction graph are
+disproportionately services rather than individuals, including
+exchange deposit addresses and payment processors. A flag on such
+a node therefore carries a higher expected cost, since
+restricting a service account affects many uninvolved parties,
+and it is also more likely to be wrong. Escalation policy should
+weight structural position, not only model score.
 
-\textbf{Admissibility and forensic standards.}
-Blockchain attribution introduced in criminal proceedings
-must satisfy evidentiary standards governing
-reproducibility, interpretability, and error-rate
-disclosure. Under the Daubert standard applicable in United
-States federal courts (\textit{Daubert v.\ Merrell Dow
-Pharmaceuticals, Inc.}, 509 U.S.\ 579, 1993), expert
-evidence must be testable, peer-reviewed, and accompanied
-by a known error rate; the open-source MixTrace pipeline at
-\url{https://github.com/sagarkorde/CoinJoin}, the public
-Elliptic benchmark, the five-seed statistical validation of
-Table~\ref{tab:stats}, and the explicit disclosure of
-false-negative alongside false-positive rates jointly
-satisfy this requirement. Under the Frye ``general
-acceptance'' standard, the adoption of Graph Attention
-Networks and DBSCAN clustering by the broader blockchain
-forensics community~\citep{motie2024,futureinternet2025}
-supports general acceptance.
+\paragraph{The screening module cannot support attribution
+claims.}
+Section~\ref{sec:screening} establishes that the screening target
+is a threshold on input and output counts, recoverable by
+arithmetic from most other columns, and that once every
+identified route is closed the residual performance is an
+F1-score of 0.2678. Nothing in the present study establishes that
+a transaction flagged by structural screening is a CoinJoin
+output, because the corpus contains no independently confirmed
+CoinJoin transaction against which such a claim could be tested.
+Screening output is therefore a structural filter over
+transaction shape and is described as such. It should not inform
+an attribution asserted about a person, and no proportionality
+argument in this subsection rests on it.
+
+\paragraph{Privacy and proportionality.}
+Automated transaction attribution engages data protection and
+financial privacy law. Article~22 of the General Data Protection
+Regulation grants data subjects a right not to be subject to
+decisions based solely on automated processing where those
+decisions carry legal or similarly significant effects. At the
+recall levels measured here, and given a failure mode that
+switches regime without warning, automated restriction without
+human review is not defensible on the present evidence. The
+appropriate posture is a human-reviewed prioritisation queue with
+a documented error rate attached to each period rather than to
+the system as a whole.
+
+\paragraph{Evidentiary standards.}
+Evidence introduced in criminal proceedings is expected to be
+testable, with a known error rate and a disclosed method. Under
+the \textit{Daubert} criteria applied in United States federal
+courts, the relevant question is not whether a pipeline is
+accurate in general but whether its error rate is known for the
+conditions of the case. The present study supplies three things
+that bear on this: released code and per-experiment commit
+hashes, an error rate reported per time step rather than pooled,
+and the observation that a pooled rate can be wrong by an order
+of magnitude when a regime change falls inside the window. It
+also supplies a caution. A feature constructed from labelled
+nodes can reproduce the target and yield a near-perfect internal
+validation figure, as Section~\ref{sec:feature_withdrawal}
+demonstrates, and a pipeline validated in that way would present
+an error rate that is not merely optimistic but meaningless.
+Expert evidence derived from graph machine learning should
+therefore be accompanied by the feature-construction procedure in
+enough detail for leakage to be excluded, which is a stronger
+disclosure requirement than accuracy reporting alone.
+
 
 \subsection{Threats to Validity in Graph-Based Forensic Evaluation}
 \label{sec:threats}
