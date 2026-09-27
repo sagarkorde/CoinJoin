@@ -157,14 +157,25 @@ of screening candidates involve a Taproot script. The proxy is
 therefore unnecessary, and script-aware analysis is performed
 directly on post-Taproot data.
 
-One limitation is stated here rather than deferred, because it
-bounds what the screening results can mean. The corpus contains
-no independently confirmed CoinJoin transaction, so no result
-reported here establishes that a screened transaction is a
-CoinJoin output. Screening is therefore reported as
-characterisation against a disclosed heuristic target, with a
-residual F1-score of 0.268 once every identified route back to
-the label is closed, and not as validated detection.
+The screening target is then validated externally. Detection
+rules published with the reference tool used in the CoinJoin
+measurement literature are applied to per-output values retrieved
+from public block explorers, confirming 4{,}491 transactions in
+the corpus as CoinJoin outputs: 3{,}839 Whirlpool rounds across
+the four standard pools and 652 WabiSabi rounds. Measured against
+those confirmations, the screening label attains a precision of
+4.07 percent at near-total recall, admitting roughly twenty-four
+transactions for every CoinJoin it contains, so it is a
+permissive shape filter rather than a detector. The confirmed
+transactions, together with 1{,}168 that carry CoinJoin shape but
+fail verification, support the first detection result in the
+study whose labels do not originate in the heuristic being
+evaluated: within Whirlpool candidates, a model given only fee,
+size and timing attains an F1-score of 0.996 and a Matthews
+correlation of 0.956, against 0.966 and 0.582 for the strongest
+single rule the corpus columns express. The margin lies in
+rejecting look-alikes that match a pool denomination exactly yet
+fail other protocol conditions.
 
 Corrected protocols are supplied for every module, together with
 leakage-free baselines, inductive and transductive
@@ -923,6 +934,54 @@ metric that stays flat while features are withdrawn and then
 falls sharply localises the dependence to the columns removed at
 the discontinuity, which is more informative than any single
 ablation.
+
+\subsubsection{External Verification of CoinJoin Status}
+\label{sec:external_verification}
+
+The preceding subsections establish that the screening target is
+a threshold on two counts and that the corpus reconstructs those
+counts from almost any feature subset. Neither observation can be
+resolved from inside the corpus, because the corpus holds no
+statement of CoinJoin status independent of the heuristic. That
+independent statement is obtained here from the blockchain.
+
+\paragraph{Rules.}
+CoinJoin status is decided by the conditions implemented in
+Dumplings, the reference tool used to extract Wasabi, Whirlpool
+and JoinMarket transactions from mainnet in the measurement
+literature. The conditions are reproduced rather than devised, so
+that the verification does not become a second heuristic of the
+present study's own making.
+
+A transaction is a Whirlpool round when every input and output
+uses native SegWit, the input and output counts are equal and lie
+between five and ten, every output carries exactly the same
+value, that value is one of the four pools
+$\{0.001, 0.01, 0.05, 0.5\}$ BTC, at least one input is exactly
+pool-sized, and every remaining input lies within 0.0011 BTC
+above the pool size. A transaction is a WabiSabi round when every
+input is P2WPKH or Taproot, at least fifty inputs are present,
+input and output values are each sorted descending, and more than
+eighty percent of outputs are drawn from the WabiSabi
+denomination set.
+
+\paragraph{Procedure.}
+The corpus records aggregate and mean output values but not
+individual output amounts, and every rule above turns on the
+individual amounts. No transaction can therefore be confirmed
+from the corpus alone. Candidates are instead selected by the
+necessary conditions the corpus columns can express, and each
+candidate is then retrieved from a public block explorer and
+tested against the complete rule using the per-output values the
+blockchain records. Confirmation is a property of the chain, not
+of the corpus.
+
+Retrieval is spread across several explorers, with a per-endpoint
+cooldown when one returns a refusal and an aggregate rate
+ceiling, and every response is cached by transaction identifier
+so that the procedure is reproducible without repeating the
+requests. All 6{,}209 candidates were retrieved, 5{,}608 by
+request and the remainder from cache, with no failures.
 
 \subsubsection{Clustering Protocol}
 
@@ -1908,6 +1967,166 @@ supervised reference at 0.9140, and
 Table~\ref{tab:leakage_gradient} shows that this residual is
 itself a proxy effect that disappears once the value averages are
 withdrawn.
+
+\subsubsection{Confirmed CoinJoin Transactions}
+\label{sec:confirmed_results}
+
+Table~\ref{tab:confirmed} reports the verification described in
+Section~\ref{sec:external_verification}.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Verification of every protocol-shaped candidate against
+per-output values retrieved from public block explorers. Random
+samples of labelled and unlabelled transactions estimate the
+remaining population.}
+\label{tab:confirmed}
+\begin{tabular}{lrrr}
+\toprule
+Candidate group & Verified & Confirmed & Rate \\
+\midrule
+Whirlpool-shaped                 & 4{,}137 & \textbf{3{,}839} & 92.8\,\% \\
+WabiSabi-shaped                  & 1{,}522 & \textbf{652}     & 42.8\,\% \\
+Labelled positive, random sample &    400  &   0              &  0.0\,\% \\
+Labelled negative, random sample &    150  &   0              &  0.0\,\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 3{,}839 confirmed Whirlpool rounds distribute across the four
+pools as 1{,}753 at 0.001 BTC, 1{,}103 at 0.01, 780 at 0.05 and
+203 at 0.5. The ordering matches reported Whirlpool usage, in
+which the smallest pool is the busiest, which is a consistency
+check the verification was not designed to pass.
+
+\paragraph{Precision of the screening label.}
+Every confirmed transaction satisfies the screening rule by
+construction, since a Whirlpool round has five inputs and five
+outputs and a WabiSabi round has at least fifty of each, and both
+exceed the threshold of four. Recall is therefore near total and
+the informative quantity is precision. Stratifying over the whole
+labelled population gives Table~\ref{tab:label_precision}.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Precision of the screening label against confirmed
+CoinJoin transactions, estimated stratum by stratum over all
+110{,}352 labelled transactions. The interval on the remainder is
+a Wilson interval on 400 verified transactions.}
+\label{tab:label_precision}
+\begin{tabular}{lrrr}
+\toprule
+Stratum & Population & Confirmed rate & Estimated confirmed \\
+\midrule
+Whirlpool-shaped  &   4{,}137 & 0.928 & 3{,}839 \\
+WabiSabi-shaped   &   1{,}522 & 0.428 &    652 \\
+Remainder         & 104{,}693 & 0.000 (95\,\% CI 0 to 0.0095) &      0 \\
+\midrule
+\textbf{Total}    & \textbf{110{,}352} & & \textbf{4{,}491} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The screening label therefore attains a precision of 4.07
+percent, with a 95 percent upper bound of 4.97 percent. It admits
+roughly twenty-four transactions for every CoinJoin it contains.
+That is a defensible first stage in a pipeline whose second stage
+discriminates, and it is not a detector, and it is not a basis
+for any statement about a particular transaction. The figure
+supersedes every screening number reported before it, because it
+is the only one measured against a target the heuristic did not
+produce.
+
+\subsubsection{Detection Against Confirmed Labels}
+\label{sec:confirmed_detection}
+
+The verification yields 4{,}491 confirmed transactions and
+1{,}168 that carry CoinJoin shape yet fail the rule. The failures
+are the more valuable of the two, because rejecting a look-alike
+is the task a forensic tool actually faces. Taken together, the
+two sets support the first detection experiment in the present
+study whose labels do not originate in the heuristic under
+evaluation.
+
+\paragraph{Guarding the experiment.}
+A single accuracy figure here would repeat the error the study
+documents elsewhere, so four regimes are reported. Pooling the
+two candidate groups is unsafe: Whirlpool-shaped candidates are
+92.8 percent positive and WabiSabi-shaped candidates 42.8
+percent, the groups differ by input count, and size, virtual size
+and weight encode input count even when the count columns are
+withheld, so a model can score well by identifying the group and
+predicting its base rate. Evaluation therefore runs inside each
+group. A stricter regime additionally withholds every value and
+count column, because each offers an arithmetic route to the
+per-output value that defines the label: the mean output value
+\emph{is} the common output value of a confirmed Whirlpool round,
+and the total divided by the count recovers it. What remains is
+fee, size and timing, none of which appears in any detection
+rule.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Detection within candidate groups, chronological split,
+mean over five seeds. The strict regime withholds every value and
+count column. The rule baseline is the strongest single condition
+the corpus columns express.}
+\label{tab:confirmed_detection}
+\begin{tabular}{llcccc}
+\toprule
+Group and regime & Model & F1 & Precision & Recall & MCC \\
+\midrule
+\multirow{3}{*}{Whirlpool, all features}
+ & Hist.\ Grad.\ Boosting & 0.9973 & 0.9947 & 1.0000 & 0.9726 \\
+ & Random Forest          & 0.9773 & 0.9765 & 0.9781 & 0.7722 \\
+ & Logistic Regression    & 0.9627 & 0.9434 & 0.9829 & 0.5530 \\
+\midrule
+\multirow{3}{*}{Whirlpool, strict}
+ & Hist.\ Grad.\ Boosting & \textbf{0.9957} & 0.9915 & 1.0000 & \textbf{0.9559} \\
+ & Random Forest          & 0.9800 & 0.9880 & 0.9721 & 0.8136 \\
+ & \textit{Rule baseline} & 0.9663 & 0.9349 & 1.0000 & \textit{0.5823} \\
+\midrule
+\multirow{2}{*}{WabiSabi, strict}
+ & Random Forest          & 0.8491 & 1.0000 & 0.7377 & 0.8103 \\
+ & Hist.\ Grad.\ Boosting & 0.8451 & 0.9890 & 0.7377 & 0.8030 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{What the rule baseline shows.}
+A confirmed Whirlpool round has every output equal to a pool
+denomination, so its mean output value sits exactly on one. The
+corpus stores values in single precision, and the largest
+relative deviation among confirmed transactions is
+$4.75 \times 10^{-8}$, which is that precision rather than any
+real spread. The rule requiring a deviation below $10^{-7}$ is
+therefore the strongest single condition available, and its
+verdict is unchanged from $10^{-7}$ through $10^{-4}$. It attains
+perfect recall and a precision of 0.9349, because roughly half
+the unconfirmed candidates also sit on a denomination and fail on
+conditions the corpus cannot observe, such as an input outside
+the pool tolerance or a non-SegWit script.
+
+That is where the trained model earns its place. On Matthews
+correlation, the appropriate statistic at 92.8 percent positives,
+it reaches 0.9559 against the rule's 0.5823. The F1-score hides
+the difference because the positive class dominates, which is
+itself a reminder that a threshold metric on an imbalanced
+problem can conceal a large difference in discrimination.
+
+\paragraph{Scope.}
+Two qualifications belong with the result. Its achievability
+reflects how rigidly these two protocols constrain transaction
+structure, since a Whirlpool round is a near-identical template
+and recognising a template is not a demanding inference. And
+nothing here extends to CoinJoin implementations outside the two
+verified protocols, whose structures are unknown by construction
+and which the verification cannot label. The WabiSabi task, where
+recall halts at 0.7377 while precision reaches 1.000, is the more
+representative picture of a population that is not a template.
 
 \subsubsection{Operating-Point Behaviour}
 
