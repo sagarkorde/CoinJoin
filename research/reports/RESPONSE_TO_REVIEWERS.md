@@ -52,13 +52,10 @@ four times `vsize`). More decisively, `avg_input_value` is
 rule reconstructed from those quotients agrees with the distributed label for
 **100.0000 %** of sampled transactions.
 
-The consequence is stated plainly in the revised manuscript: this corpus
-cannot support a non-circular benchmark for a structural CoinJoin screening
-heuristic, because the label is a deterministic function of two counts that
-almost every other column encodes. The screening module is therefore reported
-as a characterisation study with a stated heuristic target, not as a detection
-benchmark, and a leakage gradient across progressively stricter feature
-regimes is reported so the reader can see how the dependence persists.
+Because no rearrangement of the corpus columns can settle whether the
+heuristic detects anything, we took the question outside the corpus entirely.
+This is described under item 3 of Reviewer 1 and item 2 of Reviewer 3, and it
+is the largest addition to the revision.
 
 **4. The Taproot limitation does not exist.** All three reviewers asked us to
 moderate the Taproot claims because the corpus reportedly contained no
@@ -124,12 +121,40 @@ questions. See E05.
 
 **3. The status of the CoinJoin labels requires clarification.**
 
-Accepted, and the exact rule is now stated in the manuscript:
+Accepted, and now resolved rather than merely clarified.
+
+The exact rule is stated in the manuscript:
 `is_coinjoin_like == (input_count >= 4) AND (output_count >= 4)`, verified
 against all 5,884,387 rows. The reviewer's concern that the same variables feed
-both the target and the detector is correct. We no longer describe the label as
-ground truth; it is a structural screening heuristic and is named as such
-throughout. See E06.
+both the target and the detector is correct, and we no longer describe the
+label as ground truth.
+
+The reviewer also asked for independent validation against known mixing
+services, and we have now done this. Detection rules published with Dumplings,
+the reference tool used to extract Wasabi, Whirlpool and JoinMarket
+transactions from mainnet in the measurement literature, were applied to
+per-output values retrieved from public block explorers. The corpus records
+aggregate and mean output values but not individual amounts, and every rule
+turns on the individual amounts, so nothing can be confirmed from the corpus
+alone; candidates were selected by the necessary conditions the columns
+express and each was then tested against the full rule using blockchain data.
+All 6,209 candidates were retrieved, with no failures.
+
+| Candidate group | Verified | Confirmed | Rate |
+|---|---|---|---|
+| Whirlpool-shaped | 4,137 | 3,839 | 92.8 % |
+| WabiSabi-shaped | 1,522 | 652 | 42.8 % |
+| Labelled positive, random | 400 | 0 | 0.0 % |
+| Labelled negative, random | 150 | 0 | 0.0 % |
+
+The 3,839 confirmed Whirlpool rounds distribute across the four pools as
+1,753 / 1,103 / 780 / 203, matching reported usage where the smallest pool is
+busiest, which is a consistency check the procedure was not designed to pass.
+
+Stratified over all 110,352 labelled transactions, the screening label
+attains a **precision of 4.07 %** (95 % upper bound 4.97 %) at near-total
+recall. It admits roughly twenty-four transactions for every CoinJoin it
+contains. See E14, E14b.
 
 **4. Possible contamination in DBSCAN cluster-to-class assignment.**
 
@@ -288,9 +313,36 @@ recoverable by arithmetic from the remaining columns: from the size family via
 the Bitcoin serialisation constants, and exactly from the value columns, since
 `total_input_value / avg_input_value` returns `input_count` for 99.97 % of
 rows and reproduces the label for 100.0000 % of sampled transactions. We
-therefore report a gradient across progressively stricter feature regimes
-rather than claiming any single regime is clean, and the module is reframed as
-a characterisation study. See E06, E08, E08b.
+report a gradient across progressively stricter feature regimes rather than
+claiming any single regime is clean.
+
+The reviewer asked us to justify or independently validate the labels against
+known mixing-service clusters. We have done so, and it resolves the
+circularity rather than describing it. Using published protocol rules and
+per-output values from the blockchain, 4,491 transactions in the corpus are
+confirmed as CoinJoin outputs (details under Reviewer 1, item 3). Against
+those confirmations the label attains 4.07 % precision.
+
+The confirmations also support a detection experiment whose labels do not
+originate in the heuristic under evaluation, which is the first such
+experiment in the study. It is deliberately guarded: evaluation runs inside
+each candidate group, because pooling groups with positive rates of 92.8 % and
+42.8 % would let a model score well by recognising the group and predicting its
+base rate; and a strict regime withholds every value and count column, because
+the mean output value *is* the common output value of a confirmed Whirlpool
+round. With only fee, size and timing remaining, the result holds:
+
+| Detector, Whirlpool population | F1 | MCC |
+|---|---|---|
+| Strongest single rule | 0.9663 | 0.5823 |
+| Trained model | 0.9957 | 0.9559 |
+
+The margin lies in rejecting look-alikes that match a pool denomination
+exactly yet fail other protocol conditions. Two qualifications are stated in
+the manuscript: the result reflects the rigidity of a protocol that produces
+near-identical transactions, and it does not extend to implementations the
+verification cannot label, for which the weaker WabiSabi figures (recall
+0.7377 at precision 1.000) are the better guide. See E14b, E15.
 
 **3. Pre-Taproot limitation.** The limitation was an artefact of broken
 columns; the corpus is post-Taproot throughout and is 24.10 % P2TR by output.
