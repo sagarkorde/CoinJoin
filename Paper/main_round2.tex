@@ -84,8 +84,8 @@
 %  Author and Affiliation block
 % ─────────────────────────────────────────────────────────────
 \title{\textbf{Leakage-Free Evaluation of Graph-Based Bitcoin
-       Forensics: CoinJoin Screening and Illicit Transaction
-       Detection Across Two Datasets}}
+       Forensics: Externally Validated CoinJoin Screening and
+       Illicit Transaction Detection Across Two Datasets}}
 
 \author[1,2]{Sagar D. Korde\thanks{Corresponding author.
   ORCID: \url{https://orcid.org/0000-0002-6289-6741}.
@@ -304,9 +304,24 @@ a stated limitation rather than a result: the corpus had been
 reported to contain no confirmed Pay-to-Taproot transactions, but
 the indicator columns supporting that statement are uniformly
 false, and the corpus is in fact 24.10 percent Taproot by output.
-The corrected protocols, the leakage-free baselines and the
-diagnostics that expose each defect are the substance of the
-present study.
+A fifth result is not a correction but an addition. The question
+each of the earlier findings raises, whether the screening
+heuristic detects anything at all, cannot be settled inside a
+corpus whose only statement of CoinJoin status is the heuristic
+itself. It is therefore settled outside. Published protocol rules
+applied to per-output values retrieved from the blockchain
+confirm 4{,}491 transactions in the corpus as CoinJoin outputs.
+Against those confirmations the screening label attains a
+precision of 4.07 percent at near-total recall, and the confirmed
+transactions together with 1{,}168 verified look-alikes support a
+detection result whose labels do not originate in the heuristic
+under evaluation, reaching a Matthews correlation of 0.956 within
+the Whirlpool population where the strongest single rule reaches
+0.582.
+
+The corrected protocols, the leakage-free baselines, the
+diagnostics that expose each defect and the externally validated
+screening evaluation are the substance of the present study.
 
 The manuscript proceeds as follows: Section~\ref{sec:related}
 reviews the literature; Section~\ref{sec:method} presents
@@ -2701,20 +2716,33 @@ restricting a service account affects many uninvolved parties,
 and it is also more likely to be wrong. Escalation policy should
 weight structural position, not only model score.
 
-\paragraph{The screening module cannot support attribution
-claims.}
-Section~\ref{sec:screening} establishes that the screening target
-is a threshold on input and output counts, recoverable by
-arithmetic from most other columns, and that once every
-identified route is closed the residual performance is an
-F1-score of 0.2678. Nothing in the present study establishes that
-a transaction flagged by structural screening is a CoinJoin
-output, because the corpus contains no independently confirmed
-CoinJoin transaction against which such a claim could be tested.
-Screening output is therefore a structural filter over
-transaction shape and is described as such. It should not inform
-an attribution asserted about a person, and no proportionality
-argument in this subsection rests on it.
+\paragraph{What screening output can and cannot support.}
+The screening label is not a detector. Measured against
+transactions confirmed from blockchain data it attains a
+precision of 4.07 percent
+(Table~\ref{tab:label_precision}), admitting roughly
+twenty-four transactions for every CoinJoin it contains. Treating
+a flag as an indication about a particular transaction is
+therefore unsupportable, and nothing in this subsection rests on
+it.
+
+Verification does change what can be claimed, within limits worth
+stating precisely. Membership of a Whirlpool or WabiSabi round is
+decidable from the blockchain, and
+Section~\ref{sec:confirmed_detection} shows it is recoverable
+from transaction attributes at a Matthews correlation of 0.956
+within the Whirlpool population. For those two protocols a
+defensible statement is available, and it is a statement about
+participation in a specific mixing protocol, not about intent,
+ownership, or wrongdoing. Participation in a CoinJoin is lawful
+in the jurisdictions considered here and is, on the evidence of
+this corpus, overwhelmingly ordinary. Two further limits apply:
+the verified protocols are two among several, and a transaction
+belonging to an unverified implementation cannot be labelled by
+this procedure at all; and the confirmation applies to the
+transaction, never to a person, since neither the corpus nor the
+blockchain supplies the link between an output and an
+identity.
 
 \paragraph{Privacy and proportionality.}
 Automated transaction attribution engages data protection and
@@ -2811,18 +2839,34 @@ deployment should attempt.
 
 \subsection{Limitations}
 
-\paragraph{Screening evaluation is bounded by label provenance.}
-The author-curated corpus cannot support a non-circular benchmark
-for structural CoinJoin screening, for the reasons given in
-Section~\ref{sec:screening}. The screening results are reported
-as a characterisation of the corpus against a stated heuristic
-target, and the residual figure once every identified route to
-the label is closed is an illicit-class F1-score of 0.2678.
-Establishing genuine screening performance requires transactions
-confirmed as CoinJoin outputs by an independent source, such as
-coordinator-attributed transactions from a known mixing service.
-Such attribution was not available for the present corpus and is
-the single most valuable extension to this work.
+\paragraph{Verification covers two protocols, not the population.}
+An earlier version of this study reported that no independent
+confirmation of CoinJoin status was available and treated that as
+its principal limitation. Section~\ref{sec:external_verification}
+removes the limitation for two protocols and replaces it with a
+narrower one.
+
+Whirlpool and WabiSabi are decidable from the blockchain because
+each imposes a rigid structure. Other implementations do not.
+JoinMarket rounds vary in participant count and denomination,
+bespoke and manually constructed CoinJoins follow no published
+template, and an implementation designed to resist structural
+identification would by intention leave no signature to match.
+The 4{,}491 confirmed transactions are therefore a lower bound on
+the CoinJoin content of the corpus, and the unconfirmed remainder
+contains an unknown mixture of non-CoinJoin transactions and
+CoinJoins the procedure cannot recognise. No estimate of that
+mixture is offered, because none is available: the verification
+that establishes the positives is silent about what it fails to
+match.
+
+This matters for the detection result as well. Performance within
+Whirlpool candidates reflects the rigidity of a template, and the
+weaker WabiSabi figures, where recall halts at 0.7377, are the
+better guide to a population that is not one. Extending
+verification to further implementations, particularly through
+coordinator attribution rather than structure, remains the most
+valuable extension to this work.
 
 \paragraph{No equal-value output test is possible.}
 The defining structural property of a CoinJoin is a set of
@@ -2900,23 +2944,37 @@ serialised size through the protocol constants and exactly from
 the ratio of a total value to its corresponding average. Across
 six feature regimes the metric remains at or above 0.90 wherever
 such a route survives and falls to 0.2678 at the point where the
-last one closes. The corpus therefore cannot support a
-non-circular screening benchmark, and the module is reported as a
-characterisation study against a stated heuristic target.
+last one closes. Nothing internal to the corpus can settle
+whether the heuristic detects anything, because the corpus states
+CoinJoin status only through the heuristic itself.
 
-The consequence deserves stating without hedging, because it
-bounds what the CoinJoin half of the present study can mean. The
-corpus contains no transaction independently confirmed as a
-CoinJoin output, whether by coordinator attribution, by a known
-mixing-service address set, or by any source outside the
-heuristic itself. No result reported here therefore establishes
-that a screened transaction is a CoinJoin transaction. The
-screening module identifies transactions of a particular shape,
-many inputs and many outputs, and that is the whole of its
-demonstrated capability. Obtaining externally confirmed CoinJoin
-transactions is the single most valuable extension to this work,
-and until that exists no figure in this study should be read as
-CoinJoin detection accuracy.
+That question was therefore taken outside the corpus. Applying
+published protocol rules to per-output values retrieved from the
+blockchain confirms 4{,}491 transactions as CoinJoin outputs,
+3{,}839 Whirlpool rounds distributed across the four standard
+pools in the proportions reported usage predicts, and 652
+WabiSabi rounds. Measured against those confirmations the
+screening label attains a precision of 4.07 percent at near-total
+recall. It admits roughly twenty-four transactions for every
+CoinJoin it contains, which makes it a permissive first-stage
+filter and not a detector, and that judgement now rests on a
+target the heuristic did not produce.
+
+The same confirmations support a detection result the study could
+not previously attempt. Within the Whirlpool population, and with
+every value and count column withheld so that no arithmetic route
+to the label remains, a model given only fee, size and timing
+attains an F1-score of 0.9957 and a Matthews correlation of
+0.9559, against 0.9663 and 0.5823 for the strongest single rule
+the corpus columns express. The margin lies where a rule cannot
+reach: rejecting transactions that match a pool denomination
+exactly yet fail other protocol conditions. Two qualifications
+travel with the figure. It reflects the rigidity of a protocol
+that produces near-identical transactions, and recognising a
+template is not a demanding inference. And it does not extend to
+implementations the verification cannot label, for which the
+weaker WabiSabi result, recall halting at 0.7377 while precision
+reaches 1.000, is the better guide.
 
 Classification performance on the Elliptic Data Set was found to
 be bimodal rather than gradually degrading. Mean illicit-class
