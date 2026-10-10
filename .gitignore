@@ -112,3 +112,9 @@ Paper/*.synctex.gz
 Paper/main_round2.log
 Paper/main_round2.pdf
 research/results/e14_verified/
+
+# Submission package binaries (regenerable from build_submission.py)
+MDPI Submission/Revised MDPI Submit/SUBMISSION/*.docx
+MDPI Submission/Revised MDPI Submit/SUBMISSION/*.pdf
+MDPI Submission/Revised MDPI Submit/SUBMISSION/Figures/
+MDPI Submission/Revised MDPI Submit/SUBMISSION/Supplementary/*.docx
