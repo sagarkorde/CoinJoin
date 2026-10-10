@@ -133,7 +133,20 @@ $PY research/experiments/exp05_gnn_main.py               # GPU, ~2-3 h for 20 se
 $PY research/experiments/exp06_coinjoin_label_recovery.py
 $PY research/experiments/exp07_script_types.py
 $PY research/experiments/exp08_coinjoin_detection.py     # needs E06 context
+$PY research/experiments/exp08b_label_proxy_gradient.py
+$PY research/experiments/exp09_explainability.py         # GPU
+$PY research/experiments/exp10_statistical_analysis.py   # needs E05
+$PY research/experiments/exp11_compute_cost.py           # idle GPU required
+$PY research/experiments/exp12_address_columns.py
+$PY research/experiments/exp13_training_diagnostics.py   # GPU
+$PY research/experiments/exp14_external_ground_truth.py  # network; see below
+$PY research/experiments/exp14b_verify_all.py            # network; see below
+$PY research/experiments/exp15_confirmed_detection.py    # needs E14b
+$PY research/experiments/exp16_detection_uncertainty.py  # needs E14b
 ```
+
+`exp11_compute_cost.py` refuses to start if another process holds the GPU,
+since contention invalidates its timings.
 
 `exp05_gnn_main.py --seeds 42` runs a single-seed smoke test in a few minutes.
 
@@ -142,3 +155,35 @@ $PY research/experiments/exp08_coinjoin_detection.py     # needs E06 context
 `EXPERIMENT_LOG.md` links every experiment ID to its modification, data
 version, configuration, headline result and Git commit hash. No prior version
 is overwritten; superseded results remain reachable through Git history.
+
+## Network experiments, and how to avoid repeating them
+
+E14 and E14b retrieve per-output values from public block explorers. Running
+them from scratch issues roughly six thousand requests; doing so the first
+time triggered rate limiting, which is why `src/explorer.py` spreads requests
+across endpoints, rests one that refuses, and caps the aggregate rate.
+
+**Do not re-run them unless the retrieval itself is what you are checking.**
+The responses are deposited:
+
+- Verification records, version DOI <https://doi.org/10.5281/zenodo.23275812>
+- All versions, concept DOI <https://doi.org/10.5281/zenodo.23275811>
+
+Download `d1_raw_api_responses_part*.jsonl.gz`, expand them into
+`research/results/e14_verified/` as one JSON file per transaction id, and both
+experiments will read from cache and issue no requests. `classify()` in
+`exp14_external_ground_truth.py` reproduces the verdicts from those responses
+alone.
+
+## Data sources and identifiers
+
+| Source | Identifier | Notes |
+|---|---|---|
+| Author-curated corpus, 5,884,387 transactions | <https://doi.org/10.21227/bxmt-mn56> | IEEE DataPort, Academic Use licence |
+| Verification records, 6,269 responses | <https://doi.org/10.5281/zenodo.23275812> | CC BY 4.0 |
+| Elliptic Data Set | [Kaggle](https://www.kaggle.com/datasets/ellipticco/elliptic-data-set) | Distributed under its own terms |
+| Analysis code | <https://github.com/sagarkorde/CoinJoin> | MIT |
+
+Neither the corpus nor the Elliptic data is redistributed in the deposit. The
+corpus already carries its own DOI, and re-hosting it would split citations;
+Elliptic is not ours to license.
