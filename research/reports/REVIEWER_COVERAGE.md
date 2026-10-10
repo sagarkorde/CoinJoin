@@ -1,7 +1,7 @@
 # Reviewer concern coverage
 
 Verified against `Manuscript_Revised_Clean.docx`, the master copy.
-Manuscript length: 18,289 words.
+Manuscript length: 18,306 words.
 
 | Reviewer | # | Concern | Status |
 |---|---|---|---|
