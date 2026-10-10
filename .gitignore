@@ -118,3 +118,4 @@ submission/package/*.docx
 submission/package/*.pdf
 submission/package/Figures/
 submission/package/Supplementary/*.docx
+zenodo_bundle/
