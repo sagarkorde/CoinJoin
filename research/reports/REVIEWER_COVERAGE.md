@@ -1,7 +1,7 @@
 # Reviewer concern coverage
 
 Verified against `Manuscript_Revised_Clean.docx`, the master copy.
-Manuscript length: 18,168 words.
+Manuscript length: 18,289 words.
 
 | Reviewer | # | Concern | Status |
 |---|---|---|---|
@@ -41,25 +41,3 @@ Manuscript length: 18,168 words.
 | R3 | 10 | Positive contributions addressed | Addressed |
 
 **34 of 34 verified.**
-
-## Note on the two citations Reviewer 2 suggested
-
-Reviewer 2 suggested two additional references: a paper on capacity- and
-spectrum-aware communication for wireless sensor networks in smart grids, and
-a second at doi 10.1002/eng2.12963 as a source of ideas for explainability.
-
-Neither is included, for two reasons that point the same way.
-
-Neither appears in the project reference corpus, and the standing rule for this
-manuscript is that citations are drawn only from that corpus, so including
-either would require sourcing bibliographic metadata from elsewhere.
-
-On substance, neither connects to the subject matter. Capacity and spectrum
-allocation in wireless sensor networks shares no method, dataset or threat
-model with Bitcoin transaction forensics, and the explainability work was not
-used: the attribution reported here is permutation importance and integrated
-gradients, both standard and both cited to their own sources.
-
-The response letter declines the first explicitly and gives this reasoning. If
-the editor presses the point, the cost of adding a sentence is small, but the
-decision should be made deliberately rather than by default.
