@@ -71,62 +71,24 @@ DESCRIPTION = (
 
 REASONS = [
     "This request is made during peer review, before acceptance and before "
-    "publication. The manuscript is currently under major revision following "
-    "three reviewer reports. No Correction notice is therefore required, and "
-    "the request falls within the period in which the journal's policy states "
-    "that authorship changes should be made.",
+    "publication, so no Correction is required.",
 
-    "The reviewer reports prompted a revision considerably larger than the "
-    "editorial pass the authors had anticipated. Two of the methodological "
-    "concerns raised were investigated and confirmed, and the affected results "
-    "were withdrawn rather than defended. The study was then re-executed from "
-    "the raw data under corrected protocols. The revision also required work "
-    "that did not exist in the original submission, most substantially an "
-    "external validation of CoinJoin status in which 6,269 Bitcoin "
-    "transactions were retrieved from public block explorers and tested "
-    "against published protocol detection rules, confirming 4,491 as CoinJoin "
-    "outputs and establishing a measurement against labels that did not "
-    "originate in the heuristic being evaluated. The revised manuscript rests "
-    "on eighteen experiments, each released with its source code and a "
-    "version-control commit hash, and grew from approximately 10,200 to "
-    "approximately 19,100 words.",
+    "The reviewer reports required a substantially larger revision than "
+    "anticipated. Affected results were withdrawn and the study re-executed "
+    "from the raw data, and new work was added, including an external "
+    "validation of CoinJoin status against blockchain records. That scope "
+    "required expertise beyond that of the two original authors.",
 
-    "Work of this scope required expertise beyond that of the two original "
-    "authors. Ashwini Dalvi contributed domain expertise in blockchain "
-    "forensics and transaction-graph analysis, advised on the design of the "
-    "external validation procedure, and critically reviewed the methodology "
-    "and the revised manuscript. Anuprita Korde contributed to the "
-    "construction and curation of the transaction corpus and to the "
-    "verification of the derived features on which the screening analysis "
-    "depends, including the data-quality checks that identified several "
-    "misreported columns. Abhijeet Pasi contributed to the implementation and "
-    "execution of the experimental pipeline, to the reproducibility procedures "
-    "by which each result is recorded against released code, and to the "
-    "preparation of the results and figures. Irfan Siddavatam contributed to "
-    "the conception and framing of the revised study and advised on the "
-    "evaluation protocol and the interpretation of the statistical results. "
-    "These contributions were made during the revision, in response to the "
-    "scope of additional work the reviewer reports required.",
+    "Ashwini Dalvi advised on the design of the validation procedure and "
+    "reviewed the methodology. Anuprita Korde contributed to corpus curation "
+    "and to verification of the derived features. Abhijeet Pasi contributed to "
+    "the experimental pipeline and to the results and figures. Irfan "
+    "Siddavatam contributed to the framing of the revised study and to the "
+    "evaluation protocol. These contributions were made during the revision.",
 
-    "Each author being added satisfies the ICMJE criteria the journal applies. "
-    "Each made a substantial contribution to the conception, execution or "
-    "analysis of the work reported; each participated in drafting or "
-    "critically revising the manuscript for important intellectual content; "
-    "each has approved the version now submitted; and each agrees to be "
-    "accountable for the aspects of the work to which they contributed.",
-
-    "All six authors, including both authors named on the original submission, "
-    "have reviewed this request and consent to the revised author list. No "
-    "author objects and no author is being removed. Signatures are provided "
-    "below.",
-
-    "Supporting material. A dataset deposit published on 10 October 2026 "
-    "(DOI 10.5281/zenodo.23275812) records the four authors being added as "
-    "members of the research group; this record predates the present request "
-    "and is independently timestamped. The analysis repository at "
-    "https://github.com/sagarkorde/CoinJoin carries a dated commit for each of "
-    "the eighteen experiments, with the mapping given in the accompanying "
-    "experiment log.",
+    "All four meet the authorship criteria the journal applies. All six "
+    "authors have reviewed this request and consent to the revised author "
+    "list. No author is being removed.",
 ]
 
 
