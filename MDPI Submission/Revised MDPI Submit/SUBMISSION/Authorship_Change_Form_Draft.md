@@ -12,8 +12,7 @@ brackets is factual and can be used as written.
 **Manuscript Title:**
 
 ```
-Leakage-Free Evaluation of Graph-Based Bitcoin Forensics: Externally Validated
-CoinJoin Screening and Illicit Transaction Detection Across Two Datasets
+MixTrace: Externally Validated CoinJoin Screening and Leakage-Free Illicit Transaction Detection in Bitcoin
 ```
 
 **Nature of the change:** Addition of four authors. No author is being removed,
