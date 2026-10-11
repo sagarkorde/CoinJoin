@@ -23,9 +23,9 @@ NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 SUB = Path(r"C:\Users\sagar\Desktop\CoinJoin\MDPI Submission\Revised MDPI Submit"
            r"\SUBMISSION")
 
-OLD_FRAGMENT = "Leakage-Free Evaluation of Graph-Based Bitcoin Forensics"
-NEW_TITLE = ("MixTrace: Externally Validated CoinJoin Screening and "
-             "Leakage-Free Illicit Transaction Detection in Bitcoin")
+OLD_FRAGMENT = "Externally Validated CoinJoin Screening"
+NEW_TITLE = ("MixTrace: Auditing Graph-Based Bitcoin Forensics Through "
+             "Leakage-Free Evaluation and External CoinJoin Validation")
 
 
 def set_paragraph_text(p, text: str) -> None:

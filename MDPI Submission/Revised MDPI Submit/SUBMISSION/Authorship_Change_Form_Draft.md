@@ -12,7 +12,7 @@ brackets is factual and can be used as written.
 **Manuscript Title:**
 
 ```
-MixTrace: Externally Validated CoinJoin Screening and Leakage-Free Illicit Transaction Detection in Bitcoin
+MixTrace: Auditing Graph-Based Bitcoin Forensics Through Leakage-Free Evaluation and External CoinJoin Validation
 ```
 
 **Nature of the change:** Addition of four authors. No author is being removed,
