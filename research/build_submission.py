@@ -165,7 +165,8 @@ def main() -> None:
     pdf = PAPER / "main_round2.pdf"
     if pdf.exists():
         shutil.copy(pdf, OUT / "Manuscript_Revised_Clean.pdf")
-    shutil.copy(PAPER / "main_round2.tex", OUT / "Supplementary" / "main_round2.tex")
+    # The LaTeX source is deliberately not shipped. This work is Word only by
+    # standing instruction, and the Word manuscript is the master copy.
 
     print("\n  package written to", OUT)
 
