@@ -58,18 +58,31 @@ section was rewritten.
 
 **3. Contributions of the authors being added.**
 
-Work of this scope required expertise beyond that of the two original authors,
-and the following colleagues contributed to it:
+Work of this scope required expertise beyond that of the two original authors.
+The following colleagues contributed to the revised study:
 
-- **Ashwini Dalvi** — [state the specific contribution: which experiments,
-  analyses, datasets or sections, and at which stage]
-- **Anuprita Korde** — [specific contribution]
-- **Abhijeet Pasi** — [specific contribution]
-- **Irfan Siddavatam** — [specific contribution]
+- **Ashwini Dalvi** contributed domain expertise in blockchain forensics and
+  transaction-graph analysis, advised on the design of the external validation
+  procedure by which CoinJoin status was established from protocol rules, and
+  critically reviewed the methodology and the revised manuscript.
 
-[State here whether this work was carried out during the revision, or formed
-part of the original study and was omitted from the first submission in error.
-Use whichever is accurate; they are different situations.]
+- **Anuprita Korde** contributed to the construction and curation of the
+  transaction corpus and to the verification of the derived features on which
+  the screening analysis depends, including the data-quality checks that
+  identified several misreported columns, and reviewed the revised manuscript.
+
+- **Abhijeet Pasi** contributed to the implementation and execution of the
+  experimental pipeline, to the reproducibility procedures by which each result
+  is recorded against released code, and to the preparation of the results and
+  figures, and reviewed the revised manuscript.
+
+- **Irfan Siddavatam** contributed to the conception and framing of the revised
+  study, advised on the evaluation protocol and the interpretation of the
+  statistical results, and critically reviewed the manuscript for important
+  intellectual content.
+
+These contributions were made during the revision of the manuscript, in
+response to the scope of additional work the reviewer reports required.
 
 **4. Authorship criteria.**
 
@@ -104,11 +117,19 @@ Two items exist and are independently dated:
 
 ## Before submitting
 
-**Only claim what is accurate in section 3.** The journal states that it may
-request evidence of authorship and evaluates these requests under COPE
-guidance. A specific, modest and verifiable account of each contribution is
-more likely to be approved than a broad one, and far easier to support if
-queried.
+**Section 3 is generalized and must be checked against what actually
+happened.** The descriptions are drafted to be adapted, not adopted unread.
+Two points matter. First, the journal states that it may request evidence of
+authorship, so each sentence must be one the author named could evidence if
+asked. Second, a specific account approves more readily than a broad one; where
+you can name the experiment, dataset or section a person worked on, replace the
+general phrasing with it.
+
+**Check the closing sentence of section 3.** It states that the contributions
+were made during the revision. If any of the four contributed to the original
+study and were omitted from the first submission in error, say that instead,
+for those authors. The two situations are assessed differently and the
+distinction should not be blurred.
 
 **Check that the Zenodo record matches the claim.** The four are listed there
 as research-group contributors. If section 3 claims a different role, do not
