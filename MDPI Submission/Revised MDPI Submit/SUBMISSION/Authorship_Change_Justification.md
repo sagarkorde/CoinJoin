@@ -44,7 +44,7 @@ corrected protocols.
 
 The revision also required work that did not exist in the original submission.
 The most substantial addition was an external validation of CoinJoin status:
-6,269 Bitcoin transactions were retrieved from public block explorers and
+6,209 candidate transactions were retrieved from public block explorers and
 tested against published protocol detection rules, confirming 4,491 as CoinJoin
 outputs and establishing, for the first time in this study, a measurement
 against labels that did not originate in the heuristic being evaluated. A
@@ -53,7 +53,7 @@ uncertainty on its headline result quantified by bootstrap.
 
 In total the revised manuscript rests on eighteen experiments, each released
 with its source code and a version-control commit hash. The manuscript grew
-from approximately 10,200 to approximately 19,100 words, and every results
+from approximately 12,400 to approximately 20,300 words, and every results
 section was rewritten.
 
 **3. Contributions of the authors being added.**

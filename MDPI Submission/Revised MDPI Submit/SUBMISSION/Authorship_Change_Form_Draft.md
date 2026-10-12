@@ -43,7 +43,7 @@ The reviewers' reports required a revision substantially larger than an
 editorial pass. Two methodological defects were confirmed and the affected
 results withdrawn; the study was re-executed from the raw data; and new work
 was added that did not exist in the original submission, including an external
-validation in which 6,269 Bitcoin transactions were retrieved from public block
+validation in which 6,209 candidate transactions were retrieved from public block
 explorers and tested against published protocol rules, confirming 4,491 as
 CoinJoin outputs. Eighteen experiments were conducted in total, each released
 with its code and a version-control commit hash.

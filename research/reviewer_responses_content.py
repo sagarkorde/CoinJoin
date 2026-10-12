@@ -597,8 +597,8 @@ R1_ENGLISH = (
         "The larger part of the problem was not style. Several passages "
         "claimed more than the evidence supported, and the clarity improves "
         "chiefly because those claims are now stated at the strength the "
-        "results allow. The revised manuscript is approximately 18,500 words "
-        "against approximately 11,000 in round one, and the added material "
+        "results allow. The revised manuscript is approximately 20,300 words "
+        "against approximately 12,400 in round one, and the added material "
         "was written to the same standard and read back for concision.",
     ],
 )
@@ -1565,7 +1565,7 @@ R3_ENGLISH = (
         "claimed more than the evidence supported, as item 4 notes, and the "
         "clarity improves chiefly because those claims are now stated at the "
         "strength the results allow. The revised manuscript is approximately "
-        "18,500 words against approximately 11,000 in round one, and the "
+        "20,300 words against approximately 12,400 in round one, and the "
         "added material was written to the same standard and read back for "
         "concision.",
     ],
