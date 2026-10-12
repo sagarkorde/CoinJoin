@@ -271,7 +271,9 @@ R1_POINTS = [
             "90.75 n_in + 35.15 n_out, R-squared 0.817; weight is exactly "
             "four times vsize). More decisively, avg_input_value is "
             "total_input_value divided by input_count, so the quotient "
-            "recovers input_count exactly for 99.97 percent of rows, and the "
+            "recovers input_count exactly for 99.96 percent of rows and "
+            "output_count for 99.98 percent across 500,000 sampled "
+            "transactions, and the "
             "rule reconstructed from those quotients agrees with the "
             "distributed label for 100.0000 percent of sampled transactions. "
             "The manuscript therefore reports a gradient across progressively "
@@ -884,7 +886,7 @@ R2_POINTS = [
             "columns along two routes: transaction size is an affine function "
             "of the counts, and avg_input_value is total_input_value divided "
             "by input_count, so the quotient recovers input_count exactly for "
-            "99.97 percent of rows and reproduces the label for 100.0000 "
+            "99.96 percent of rows and reproduces the label for 100.0000 "
             "percent of sampled transactions. The manuscript therefore "
             "reports a gradient across progressively stricter feature "
             "regimes, in Table 2, rather than a single score.",
@@ -939,10 +941,21 @@ R2_POINTS = [
         "Figure 11 should clearly indicate the validation-selected threshold "
         "and the corresponding independent test performance.",
         [
-            "Agree, and done. The validation-selected threshold is now marked "
-            "on the curve, with the corresponding independent test "
-            "performance annotated at that point, so that the operating point "
-            "and the sweep can be read together.",
+            "Agree with the requirement, and it is met, though not on that "
+            "figure. The round-one Figure 11 does not survive the revision: "
+            "every figure was regenerated after Reviewer 1 found that several "
+            "came from a superseded ablation protocol, and the threshold "
+            "sweep for the Elliptic classifier is no longer among them.",
+
+            "Both quantities the comment asks for are now reported "
+            "explicitly, and together. The threshold is validation-selected "
+            "and frozen for every run; for the primary seed of the fused "
+            "model it is 0.8292, and Table 6 profiles the independent test "
+            "split at exactly that operating point, giving the count, mean "
+            "time step, mean degree and mean score of each of the four "
+            "outcome groups. Threshold-free metrics, PR-AUC and ROC-AUC, are "
+            "reported alongside every thresholded figure in the manuscript, "
+            "so that no claim rests on the choice of operating point alone.",
 
             "The underlying protocol was also made consistent, since Reviewer "
             "1 found that the manuscript described two different threshold "
@@ -950,6 +963,10 @@ R2_POINTS = [
             "validation F1, is selected independently for each run, and is "
             "frozen before the test split is scored; research/src/metrics.py "
             "is the only code path that produces one.",
+
+            "If the reviewer would prefer the operating point marked "
+            "graphically as well, we will add it to the precision-recall and "
+            "ROC figure.",
         ],
     ),
     (
@@ -968,14 +985,16 @@ R2_POINTS = [
             "GB RAM, Windows 11, Python 3.10.10, PyTorch 2.7.1 with CUDA "
             "12.8, PyTorch Geometric 2.7.0.",
 
-            "Training time and peak memory: DGI pre-training 25.4 s and 1,688 "
-            "MB transductive, 15.1 s and 1,312 MB inductive; fusion 73.1 s "
-            "and 6,296 MB; GAT with the DGI slot zeroed 15.5 s and 6,298 MB; "
-            "GAT 38.4 s and 6,298 MB; GCN 10.0 s and 962 MB; GraphSAGE 8.1 s "
-            "and 947 MB. Inference over a full-graph forward pass of all "
-            "203,769 nodes: 78.7 ms for fusion, 75.8 ms for GAT, 20.1 ms for "
-            "GraphSAGE and 14.1 ms for GCN. Per-layer complexity is stated in "
-            "the manuscript.",
+            "Training time and peak memory, as Table 5 reports them: DGI "
+            "pre-training 25.36 s and 1,688.5 MB transductive, 15.05 s and "
+            "1,312.3 MB inductive; fusion 73.13 s and 6,296.4 MB; GAT with "
+            "the DGI slot zeroed 15.46 s and 6,298.0 MB; GAT 38.41 s and "
+            "6,298.3 MB; GCN 9.99 s and 962.2 MB; GraphSAGE 8.12 s and "
+            "946.8 MB. Inference is a full-graph forward pass over all "
+            "203,769 nodes, averaged over twenty repetitions after warm-up: "
+            "78.67 ms for fusion, 75.80 ms for GAT, 20.13 ms for GraphSAGE "
+            "and 14.14 ms for GCN. Per-layer complexity is stated in the "
+            "manuscript.",
 
             "Two points are worth drawing out for deployment. Attention "
             "dominates memory, roughly 6.3 GB against under 1 GB for the "
@@ -1241,7 +1260,7 @@ R3_POINTS = [
             "the Bitcoin serialisation constants directly (vsize "
             "approximately 20.5 + 90.75 n_in + 35.15 n_out, R-squared 0.817); "
             "and avg_input_value is total_input_value divided by input_count, "
-            "so the quotient recovers input_count exactly for 99.97 percent "
+            "so the quotient recovers input_count exactly for 99.96 percent "
             "of rows and the reconstructed rule agrees with the distributed "
             "label for 100.0000 percent of sampled transactions. The "
             "manuscript therefore reports a gradient across progressively "
@@ -1361,18 +1380,56 @@ R3_POINTS = [
         "transformed, or bounded. Please address this or clarify how outliers "
         "affect downstream clustering.",
         [
-            "Agree. Heavy-tailed quantities, the Mixing Index among them, are "
-            "now log- or rank-transformed before clustering, and the "
-            "transformation is stated in the manuscript alongside the "
-            "untransformed statistics, under “Handling the tail”.",
+            "Thank you. The reviewer was right that the statistic could not "
+            "be what it was reported to be, and investigating the query "
+            "uncovered a defect rather than a heavy tail.",
 
-            "Checking the rest of the feature set on the strength of this "
-            "comment surfaced a related defect the report did not reach: "
-            "value_concentration_ratio, one of the clustering features, is "
-            "degenerate. Its 25th, 50th and 75th percentiles are all exactly "
-            "1.0, so it carries no information for the method that consumed "
-            "it. It is removed, and the check that found it now runs over "
-            "every derived column.",
+            "What was wrong. The corpus supplies columns named "
+            "input_address_count, output_address_count and total_addresses. "
+            "They do not hold the quantities those names describe. Each "
+            "counts the elements of a one-element array containing a "
+            "semicolon-joined address string rather than the distinct "
+            "addresses inside it, so they sit at 1, 1 and 2 for almost every "
+            "transaction and agree with the parsed address lists for only "
+            "54.34 percent of rows. Computed from them the Mixing Index is "
+            "identically 0.5 and its correlation with the screening label is "
+            "0.0031. As distributed, the statistic carries no information at "
+            "all.",
+
+            "The corrected statistic. Parsing the address strings directly "
+            "gives a mean of 1.89 input and 2.39 output addresses, with "
+            "maxima of 1,794 and 3,199. Recomputed on those values the Mixing "
+            "Index has a mean of 0.678, a standard deviation of 1.402, a "
+            "median of 0.5 and a maximum of 250.5, with a skewness of 69.2. "
+            "Neither the corrected nor the distributed computation reproduces "
+            "the figures the reviewer quotes, which appear to derive from a "
+            "third procedure the present study was unable to reconstruct; "
+            "the mean of 8.79 and the standard deviation of 689.27 are "
+            "therefore withdrawn rather than explained.",
+
+            "How the outliers are handled, which is the second half of the "
+            "comment. The corrected statistic is genuinely heavy-tailed, with "
+            "5,885 transactions above the 99.9th percentile of 9.41, so it is "
+            "used under a transform throughout, stated in the manuscript "
+            "under “Handling the tail”. The transform reduces "
+            "skewness from 69.2 to 7.9 and, more to the point, makes the "
+            "quantity useful for the clustering that consumes it: correlation "
+            "with the screening label rises from 0.0031 for the distributed "
+            "column to 0.274 for the corrected statistic and 0.541 under the "
+            "transform. Winsorising at the 99.9th percentile is reported for "
+            "comparison in the released results but is not used, since it "
+            "discards precisely the high-multiplicity transactions that are "
+            "of forensic interest.",
+
+            "This is the third column family in this corpus found to "
+            "misreport its own contents, after the six script-type indicators "
+            "discussed in Response 3 and the degenerate "
+            "value_concentration_ratio. The pattern, a derived column whose "
+            "name describes a quantity it does not hold, is not detectable "
+            "from the schema or from summary statistics, and is now raised as "
+            "a threat to validity in its own right, with the remedy the study "
+            "adopted: check each derived column against a recomputation from "
+            "the raw field it summarises.",
         ],
     ),
     (
