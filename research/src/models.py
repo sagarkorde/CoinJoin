@@ -107,17 +107,24 @@ class FrozenDGIGATFusion(nn.Module):
 
     def __init__(self, in_dim: int, dgi_dim: int, hid_dim: int = 64,
                  heads: int = 8, dropout: float = 0.3, n_classes: int = 2,
-                 zero_dgi: bool = False):
+                 zero_dgi: bool = False, head_dim: int | None = None):
         super().__init__()
         self.zero_dgi = zero_dgi
         self.dropout = dropout
         self.gat = GAT(in_dim, hid_dim, heads, dropout, n_classes)
         fused = hid_dim + (0 if zero_dgi else dgi_dim)
+        # head_dim widens the classifier without supplying a frozen
+        # representation. It is how the parameter-matched control in E18 is
+        # built , so that the fused model can
+        # be compared against an arm of equal capacity rather than only
+        # against a smaller one. Defaulting to hid_dim leaves every model
+        # trained before E18 bit-identical.
+        head = hid_dim if head_dim is None else head_dim
         self.classifier = nn.Sequential(
-            nn.Linear(fused, hid_dim),
+            nn.Linear(fused, head),
             nn.ELU(),
             nn.Dropout(dropout),
-            nn.Linear(hid_dim, n_classes),
+            nn.Linear(head, n_classes),
         )
 
     def forward(self, x, edge_index, dgi_emb):

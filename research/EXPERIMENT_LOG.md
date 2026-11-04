@@ -857,3 +857,219 @@ The interval should nevertheless be quoted with the result. A 95 percent
 interval of [0.9232, 0.9830] is tight enough to support the claim and wide
 enough that the point estimate alone would overstate the precision of the
 measurement.
+
+## E17 — Does the strict regime survive without the size family?
+
+**Raised by.** The audit: predictors that directly or
+indirectly reproduce the verification criteria must be controlled, so that the
+models can be shown to learn forensic characteristics rather than to reproduce
+rule-based labels.
+
+**Script.** `experiments/exp17_strict_regime_audit.py`
+**Input.** `results/e14b_all_verified.csv` joined to the author corpus.
+**Config.** E15's protocol exactly: chronological 60/15/25 split by timestamp,
+scaler fitted on training rows, threshold selected on validation and frozen,
+`build_model` copied verbatim from E15, 20 seeds.
+**Output.** `results/e17_strict_regime_audit.csv`,
+`results/e17_strict_regime_aggregate.csv`
+
+The strict regime is decomposed into four feature regimes per candidate group.
+`strict` is the published regime and is included for replication;
+`size_only` keeps `size`, `vsize`, `weight`; `strict_no_size` withholds them;
+`fee_timing` keeps fee and calendar fields alone.
+
+**Replication.** `whirlpool_strict` under HistGradientBoosting returns
+F1 0.9957, precision 0.9915, recall 1.0000, MCC 0.9559, identical to Table 12
+and to the abstract. The decomposition therefore measures the published result.
+
+**Whirlpool group, MCC.**
+
+| Regime | Features | Hist. Grad. Boosting | Random Forest | Logistic Regression |
+|---|---|---|---|---|
+| strict | 13 | 0.9559 | 0.8608 | 0.6532 |
+| size_only | 3 | 0.9726 | 0.8312 | 0.8083 |
+| strict_no_size | 10 | 0.2669 | 0.5291 | 0.2040 |
+| fee_timing | 5 | 0.0378 | 0.0022 | 0.0514 |
+
+**WabiSabi group, MCC.**
+
+| Regime | Features | Hist. Grad. Boosting | Random Forest | Logistic Regression |
+|---|---|---|---|---|
+| strict | 13 | 0.8030 | 0.8071 | 0.9577 |
+| size_only | 3 | 0.7524 | 0.7331 | 0.6057 |
+| strict_no_size | 10 | 0.9348 | 0.9281 | 0.9638 |
+| fee_timing | 5 | 0.5554 | 0.5202 | 0.2586 |
+
+**Fingerprint probe.** Within a fixed input/output shape, virtual size is
+near-deterministic for confirmed Whirlpool transactions and variable for
+look-alikes at the same shape.
+
+| Shape | Confirmed | Look-alikes | Confirmed vsize | Look-alike vsize | Look-alikes inside the confirmed 5 to 95 percent band |
+|---|---|---|---|---|---|
+| 5x5 | 2,435 | 137 | 505.2 +/- 0.4 | 520.2 +/- 23.6 | 1.5 % |
+| 6x6 | 397 | 51 | 604.1 +/- 0.3 | 618.2 +/- 18.6 | 3.9 % |
+| 7x7 | 254 | 37 | 703.0 +/- 0.4 | 744.8 +/- 92.2 | 0.0 % |
+| 8x8 | 753 | 71 | 801.9 +/- 0.4 | 814.0 +/- 1.5 | 0.0 % |
+
+Across 3,839 confirmed Whirlpool transactions virtual size takes 12 distinct
+values; across 298 look-alikes it takes 56.
+
+**Interpretation.** For Whirlpool the published result is carried entirely by
+the size family. Three size columns alone exceed the full strict regime,
+0.9726 against 0.9559, and withholding them reduces MCC to 0.2669. The
+fingerprint probe explains why: Whirlpool constructs byte-identical
+transactions by design, so virtual size is a twelve-entry lookup for pool
+membership rather than a behavioural attribute. The paper's statement
+that what remains in the strict regime does not appear in any detection rule,
+so that separation surviving there is not definitional, does not hold, because
+Section 3.4.2 of the same paper establishes that virtual size is an
+affine function of the input and output counts and the Whirlpool rule requires
+a fixed shape.
+
+For WabiSabi the direction reverses. Withholding the size family improves
+detection, from 0.8030 to 0.9348 under HistGradientBoosting and from 0.9577 to
+0.9638 under Logistic Regression. WabiSabi admits variable denominations and
+participant counts, so no size template exists, and the surviving signal comes
+from address reuse, locktime, version, replace-by-fee signalling, OP_RETURN
+presence and timing. This is the regime that answers item 4 affirmatively.
+
+**Secondary finding.** With E15's hyperparameters copied verbatim, the Random
+Forest rows still differ from Table 12 (WabiSabi strict 0.8461 here against
+0.8491 in the paper, Whirlpool strict 0.8608 against 0.8136). Table 12's
+Random Forest rows are therefore carried over from a superseded run, which
+confirms the discrepancy recorded against `e15_aggregate.csv`.
+
+## E18 — Does the frozen representation contribute structure, or capacity?
+
+**Raised by.** The audit: the fused model has more parameters
+than the arm it is compared against, and no control separates learned
+structural information from added capacity or from the regularising effect of a
+fixed extra input. A parameter-matched comparison including a randomly
+initialised frozen representation is requested.
+
+**Script.** `experiments/exp18_representation_controls.py`
+**Input.** Elliptic Data Set, 203,769 nodes, 165 base features.
+**Config.** Inductive regime, E05's training protocol, early stopping on
+validation PR-AUC, threshold selected on validation and frozen, 20 seeds.
+`MATCHED_HEAD_DIM = 186` so that the widened head lands within 18 parameters
+of the fused arm.
+**Output.** `results/e18_representation_controls.csv`,
+`..._aggregate.csv`, `..._tests.csv`, `..._summary.json`
+
+| Arm | Trainable params | F1 | sd | MCC | PR-AUC | Paired difference vs fusion | p |
+|---|---|---|---|---|---|---|---|
+| fusion | 131,588 | 0.5282 | 0.0188 | 0.5361 | 0.5013 | - | - |
+| fusion_random | 131,588 | 0.5232 | 0.0316 | 0.5299 | 0.4999 | -0.0050 | 0.51 |
+| fusion_shuffled | 131,588 | 0.4626 | 0.0717 | 0.4563 | 0.4387 | -0.0656 | 5.6e-4 |
+| fusion_noise | 131,588 | 0.4417 | 0.0440 | 0.4277 | 0.4204 | -0.0864 | 1.6e-8 |
+| gat_zero_dgi | 123,396 | 0.4562 | 0.0586 | 0.4448 | 0.4454 | -0.0720 | 3.8e-5 |
+| gat_matched | 131,570 | 0.4467 | 0.0655 | 0.4384 | 0.4275 | -0.0815 | 6.0e-5 |
+
+**Interpretation.** Four of the five controls lose and one does not, which
+decomposes the gain precisely.
+
+The frozen branch is not added capacity: `gat_matched` carries 131,570
+trainable parameters against the fused arm's 131,588 and still loses 0.0815 F1
+at p = 6.0e-5. It is not a generic regularising input either, since a frozen
+Gaussian matrix matched to the embedding's first two moments loses 0.0864. The
+representation must also correspond to the node it is attached to, because
+permuting its rows, which preserves the marginal distribution exactly, loses
+0.0656. Item 6's three alternative explanations are therefore excluded.
+
+The self-supervised objective, however, contributes nothing measurable. An
+encoder that is randomly initialised and never trained performs identically,
+0.5232 against 0.5282 with p = 0.51, and its MCC and PR-AUC fall inside the
+same interval. An untrained two-layer graph convolution is still a random
+projection of each node's own neighbourhood, so it supplies structure without
+learning. The defensible claim is that a frozen structural view of the graph
+improves a supervised attention model and does not need to be trained in order
+to do so; the stronger claim that Deep Graph Infomax pre-training is the better
+modelling strategy is not supported by this architecture.
+
+## E19 — Rolling-origin evaluation and the drift remedy
+
+**Raised by.** The audit. Item 5 asks for a strictly
+prospective evaluation in which future graph nodes, edges and neighbourhood
+statistics cannot influence earlier predictions, through incremental graph
+construction. Item 8 observes that threshold recalibration is proposed as a
+remedy for the collapse after time step 42, on the grounds that ROC-AUC falls
+less sharply than F1, but is never tested.
+
+**Script.** `experiments/exp19_rolling_origin.py`
+**Config.** Origins 42 to 49. At each origin the graph is rebuilt from time
+steps up to and including the origin, so no later node, edge, scaler statistic
+or pre-training sample exists. The encoder is fitted on the subgraph up to
+t-1, the classifier trains on labelled nodes up to t-2 and selects on t-1, and
+step t is scored once. 5 seeds.
+**Output.** `results/e19_rolling_origin.csv`, `..._per_step.csv`,
+`..._overall.csv`, `..._summary.json`
+
+**Step 42, the last pre-shutdown step.**
+
+| Arm | F1 | MCC | ROC-AUC |
+|---|---|---|---|
+| frozen | 0.7825 | 0.7642 | 0.9451 |
+| recalibrated | 0.7881 | 0.7695 | 0.9451 |
+| retrained | 0.7921 | 0.7696 | 0.9568 |
+
+**Steps 43 to 49, paired over 35 (seed, step) observations.**
+
+| Arm | F1 | MCC |
+|---|---|---|
+| frozen | 0.0755 | 0.0772 |
+| recalibrated | 0.0857 | 0.0618 |
+| retrained | 0.1611 | 0.1493 |
+
+| Comparison | d F1 | p | Wilcoxon p | d MCC | p | Wilcoxon p |
+|---|---|---|---|---|---|---|
+| recalibrated minus frozen | +0.0102 | 0.69 | 0.50 | -0.0154 | 0.46 | 0.76 |
+| retrained minus frozen | +0.0856 | 0.032 | 0.025 | +0.0721 | 0.064 | 0.033 |
+| retrained minus recalibrated | +0.0754 | 0.0056 | 0.0041 | +0.0874 | 0.021 | 0.038 |
+
+**Frozen arm, per time step, with the labelled positive count.**
+
+| Step | ROC-AUC | F1 | Illicit nodes | Labelled nodes |
+|---|---|---|---|---|
+| 42 | 0.9451 | 0.7825 | 239 | 2,154 |
+| 43 | 0.8193 | 0.0000 | 24 | 1,370 |
+| 44 | 0.5810 | 0.0497 | 24 | 1,591 |
+| 45 | 0.8275 | 0.0000 | 5 | 1,221 |
+| 46 | 0.9397 | 0.3310 | 2 | 712 |
+| 47 | 0.7521 | 0.0000 | 22 | 846 |
+| 48 | 0.8823 | 0.1356 | 36 | 471 |
+| 49 | 0.5036 | 0.0120 | 56 | 476 |
+
+**Interpretation, item 5.** Strict prospectivity costs nothing. At step 42 the
+incrementally constructed arm matches the paper's protocol, 0.7921 against
+0.7825, and across the post-shutdown steps it is better rather than worse.
+There is therefore no evidence that the reported figures were inflated by
+lookahead through graph construction. This is the expected outcome, because the
+Elliptic graph contains no cross-timestep edges and standardisation already
+used training rows only, but it had not previously been demonstrated.
+
+**Interpretation, item 8.** The paper's proposed remedy does not work.
+Reselecting the threshold on the most recent labelled step leaves F1 unchanged
+within noise, +0.0102 at p = 0.69, and moves MCC in the wrong direction,
+-0.0154 at p = 0.46. It buys recall at the cost of precision, 0.167 to 0.361
+overall, with no net gain in either balanced metric. Periodic retraining does
+help, +0.0856 F1 at p = 0.032, and beats recalibration more cleanly than it
+beats the frozen baseline. The operational recommendation is therefore a
+retraining schedule, not rethresholding, and the paper's current
+suggestion needs correcting.
+
+The inference that produced that suggestion is also invalid. ROC-AUC does not
+fall as sharply as F1, but a high ROC-AUC does not imply that a threshold
+exists which recovers usable precision: step 45 returns ROC-AUC 0.8275 with F1
+exactly zero under every arm, and step 46 returns 0.9397. ROC-AUC is nearly
+insensitive to the number of positives and F1 is not.
+
+**Power limitation, to be stated in the paper.** The post-shutdown window
+contains 169 labelled illicit nodes across seven time steps, between 2 and 56
+per step. Step 46's ROC-AUC of 0.9397 rests on two positives. Neither F1 nor
+MCC can be estimated with useful precision on steps of that size, so the
+comparison above establishes a direction rather than an effect size, and the
+retraining advantage should be quoted with that caveat. A further caveat
+applies to its attribution: the retrained arm trains on labelled nodes up to
+t-2 and so also has more recent data than the frozen arm, which trains up to
+step 34, so the gain is attributable to training-data recency and cannot be
+separated from prospectivity in this design.

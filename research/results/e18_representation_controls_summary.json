@@ -1,0 +1,142 @@
+{
+ "arms": [
+  "fusion",
+  "fusion_random",
+  "fusion_noise",
+  "fusion_shuffled",
+  "gat_zero_dgi",
+  "gat_matched"
+ ],
+ "seeds": [
+  42,
+  43,
+  44,
+  45,
+  46,
+  47,
+  48,
+  49,
+  50,
+  51,
+  52,
+  53,
+  54,
+  55,
+  56,
+  57,
+  58,
+  59,
+  60,
+  61
+ ],
+ "matched_head_dim": 186,
+ "aggregate": [
+  {
+   "arm": "fusion",
+   "n_params": 131588,
+   "f1": 0.5282,
+   "f1_sd": 0.0188,
+   "mcc": 0.5361,
+   "mcc_sd": 0.0234,
+   "pr_auc": 0.5013,
+   "seconds": 64.228
+  },
+  {
+   "arm": "fusion_noise",
+   "n_params": 131588,
+   "f1": 0.4417,
+   "f1_sd": 0.044,
+   "mcc": 0.4277,
+   "mcc_sd": 0.056,
+   "pr_auc": 0.4204,
+   "seconds": 44.0338
+  },
+  {
+   "arm": "fusion_random",
+   "n_params": 131588,
+   "f1": 0.5232,
+   "f1_sd": 0.0316,
+   "mcc": 0.5299,
+   "mcc_sd": 0.0377,
+   "pr_auc": 0.4999,
+   "seconds": 60.693
+  },
+  {
+   "arm": "fusion_shuffled",
+   "n_params": 131588,
+   "f1": 0.4626,
+   "f1_sd": 0.0717,
+   "mcc": 0.4563,
+   "mcc_sd": 0.0914,
+   "pr_auc": 0.4387,
+   "seconds": 44.2102
+  },
+  {
+   "arm": "gat_matched",
+   "n_params": 131570,
+   "f1": 0.4467,
+   "f1_sd": 0.0655,
+   "mcc": 0.4384,
+   "mcc_sd": 0.0812,
+   "pr_auc": 0.4275,
+   "seconds": 32.4899
+  },
+  {
+   "arm": "gat_zero_dgi",
+   "n_params": 123396,
+   "f1": 0.4562,
+   "f1_sd": 0.0586,
+   "mcc": 0.4448,
+   "mcc_sd": 0.0744,
+   "pr_auc": 0.4454,
+   "seconds": 38.6996
+  }
+ ],
+ "paired_tests": [
+  {
+   "comparison": "fusion vs fusion_noise",
+   "n_seeds": 20,
+   "mean_fusion": 0.5282,
+   "mean_other": 0.4417,
+   "difference": 0.0864,
+   "t": 9.3304,
+   "p_value": 1.588153408178571e-08
+  },
+  {
+   "comparison": "fusion vs fusion_random",
+   "n_seeds": 20,
+   "mean_fusion": 0.5282,
+   "mean_other": 0.5232,
+   "difference": 0.005,
+   "t": 0.6712,
+   "p_value": 0.5101493483132098
+  },
+  {
+   "comparison": "fusion vs fusion_shuffled",
+   "n_seeds": 20,
+   "mean_fusion": 0.5282,
+   "mean_other": 0.4626,
+   "difference": 0.0656,
+   "t": 4.1381,
+   "p_value": 0.0005589615690701373
+  },
+  {
+   "comparison": "fusion vs gat_matched",
+   "n_seeds": 20,
+   "mean_fusion": 0.5282,
+   "mean_other": 0.4467,
+   "difference": 0.0815,
+   "t": 5.1244,
+   "p_value": 6.0258701552932966e-05
+  },
+  {
+   "comparison": "fusion vs gat_zero_dgi",
+   "n_seeds": 20,
+   "mean_fusion": 0.5282,
+   "mean_other": 0.4562,
+   "difference": 0.072,
+   "t": 5.3312,
+   "p_value": 3.814362391116422e-05
+  }
+ ]
+}
