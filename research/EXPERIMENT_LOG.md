@@ -1073,3 +1073,104 @@ applies to its attribution: the retrained arm trains on labelled nodes up to
 t-2 and so also has more recent data than the frozen arm, which trains up to
 step 34, so the gain is attributable to training-data recency and cannot be
 separated from prospectivity in this design.
+
+## E20 - Why Table 12's Random Forest rows could not be reproduced
+
+**Raised by.** Found while preparing E17. E16 and E17 agree with each other to
+four decimal places and both disagree with E15 on every Random Forest row,
+while matching it exactly on HistGradientBoosting, LogisticRegression and the
+rule baseline. Table 12 of the paper matches none of the three.
+
+**Script.** `experiments/exp20_table12_determinism.py`
+**Output.** `results/e20_hashseed_probe.json`, `results/e20_table12.csv`,
+`results/e20_table12_aggregate.csv`, `results/e20_regimes.csv`,
+`results/e20_regimes_aggregate.csv`, `results/e20_vsize_fingerprint.csv`,
+`results/e20_vsize_fingerprint.json`
+
+**Cause.** E15 collects group membership into Python `set` objects and builds
+its frame with `feats.loc[list(ids_pos)]`. Iteration order over a set of
+strings depends on the interpreter hash seed, which is randomised per process,
+so the row order preceding the chronological sort differs between runs. The
+sort on `timestamp` uses the pandas default, which is not stable, and 791 of
+the 4,137 Whirlpool candidates share a timestamp with at least one other
+candidate. Rows tied on the sort key therefore fall on different sides of the
+60/15/25 boundaries from one run to the next. Deterministic learners absorb
+this, which is why only the Random Forest rows disagreed.
+
+**Probe, E15's own construction under five hash seeds.**
+
+| PYTHONHASHSEED | Strict RF MCC | Strict RF F1 |
+|---|---|---|
+| 0 | 0.8629 | 0.9868 |
+| 1 | 0.8607 | 0.9864 |
+| 2 | 0.8704 | 0.9876 |
+| 3 | 0.8583 | 0.9860 |
+| 4 | 0.8701 | 0.9875 |
+
+Five seeds, five distinct results, spanning 0.0121 of MCC. The test split size
+and class balance are stable at 933 positives in 1,035, so the variation is in
+which transactions land in which split, not in how many. The paper's
+published 0.8136 falls outside this span and comes from an earlier run again.
+
+**Fix.** Identifiers are taken in sorted order and the chronological sort is
+stable (`kind="mergesort"`), so the split is a function of the data alone.
+Everything else is E15's protocol unchanged.
+
+| Group and regime | Model | F1 | Precision | Recall | MCC |
+|---|---|---|---|---|---|
+| Whirlpool, all features | Hist. Grad. Boosting | 0.9973 | 0.9947 | 1.0000 | 0.9726 |
+| | Random Forest | 0.9770 | 0.9773 | 0.9768 | 0.7687 |
+| | Logistic Regression | 0.9627 | 0.9434 | 0.9829 | 0.5530 |
+| Whirlpool, strict | Hist. Grad. Boosting | 0.9957 | 0.9915 | 1.0000 | 0.9559 |
+| | Random Forest | 0.9873 | 0.9840 | 0.9906 | 0.8685 |
+| | Logistic Regression | 0.9706 | 0.9497 | 0.9925 | 0.6532 |
+| | Rule baseline | 0.9663 | 0.9349 | 1.0000 | 0.5823 |
+| WabiSabi, all features | Hist. Grad. Boosting | 0.8098 | 1.0000 | 0.6803 | 0.7690 |
+| | Random Forest | 0.8425 | 1.0000 | 0.7279 | 0.8032 |
+| | Logistic Regression | 0.9878 | 0.9837 | 0.9918 | 0.9820 |
+| WabiSabi, strict | Hist. Grad. Boosting | 0.8451 | 0.9890 | 0.7377 | 0.8030 |
+| | Random Forest | 0.8480 | 1.0000 | 0.7361 | 0.8091 |
+| | Logistic Regression | 0.9712 | 0.9752 | 0.9672 | 0.9577 |
+
+Every HistGradientBoosting, LogisticRegression and rule-baseline figure
+reproduces the paper exactly, which confirms the defect was confined to
+the one learner sensitive to split membership and leaves the headline 0.9559
+untouched. The three LogisticRegression rows the published table omitted are
+restored, and the WabiSabi all-features block the surrounding text promises is
+added.
+
+**Regime decomposition under the deterministic construction**, repeating E17.
+MCC, mean over five seeds.
+
+| Group | Regime | Features | HGB | RF | LogReg |
+|---|---|---|---|---|---|
+| Whirlpool | strict | 13 | 0.9559 | 0.8685 | 0.6532 |
+| Whirlpool | size_only | 3 | 0.9726 | 0.8306 | 0.8083 |
+| Whirlpool | strict_no_size | 10 | 0.2669 | 0.5454 | 0.2040 |
+| Whirlpool | fee_timing | 5 | 0.0378 | 0.0065 | 0.0514 |
+| WabiSabi | strict | 13 | 0.8030 | 0.8091 | 0.9577 |
+| WabiSabi | size_only | 3 | 0.7524 | 0.7350 | 0.6057 |
+| WabiSabi | strict_no_size | 10 | 0.9348 | 0.9322 | 0.9638 |
+| WabiSabi | fee_timing | 5 | 0.5554 | 0.5202 | 0.2586 |
+
+E17's conclusions are unchanged in every respect.
+
+**Virtual-size fingerprint**, now committed to a script rather than computed
+ad hoc. Confirmed Whirlpool rounds take 12 distinct virtual sizes across 3,839
+transactions; 298 look-alikes take 56. Mean input count is 5.82 for confirmed
+rounds against 6.17 for look-alikes, so the signal is the serialisation
+template and not the count.
+
+| Shape | Confirmed | Look-alikes | Confirmed vsize | cv | Look-alike vsize | Inside band |
+|---|---|---|---|---|---|---|
+| 5x5 | 2,435 | 137 | 505.2 +/- 0.4 | 0.0008 | 520.2 +/- 23.6 | 1.5 % |
+| 6x6 | 397 | 51 | 604.1 +/- 0.3 | 0.0005 | 618.2 +/- 18.6 | 3.9 % |
+| 7x7 | 254 | 37 | 703.0 +/- 0.4 | 0.0006 | 744.8 +/- 92.2 | 0.0 % |
+| 8x8 | 753 | 71 | 801.9 +/- 0.4 | 0.0005 | 814.0 +/- 1.5 | 0.0 % |
+
+**Interpretation.** This is the same class of defect the article documents
+elsewhere, found in the article's own code: a protocol choice that makes a
+reported figure depend on something other than the data. It is disclosed in
+Section 4.12 rather than corrected silently, and the diagnostic generalises:
+any evaluation that derives a split from a sort on a column with ties should
+fix the pre-sort order and use a stable sort.
