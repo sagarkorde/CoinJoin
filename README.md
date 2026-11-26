@@ -59,7 +59,7 @@ No dataset is redistributed here.
 |---|---|
 | Elliptic Data Set | [Kaggle](https://www.kaggle.com/datasets/ellipticco/elliptic-data-set), under its own terms |
 | Author-curated corpus, 5,884,387 transactions | IEEE DataPort, <https://doi.org/10.21227/bxmt-mn56> |
-| CoinJoin verification records (raw explorer responses and verdicts) | Zenodo, <https://doi.org/10.5281/zenodo.23275811> (all versions) |
+| CoinJoin verification records and experiment outputs | Zenodo, <https://doi.org/10.5281/zenodo.24551653> |
 
 Place the data under `Paper/Datasets/` as described in
 [`research/README.md`](research/README.md).

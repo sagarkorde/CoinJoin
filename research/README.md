@@ -171,9 +171,8 @@ time triggered rate limiting, which is why `src/explorer.py` spreads requests
 across endpoints, rests one that refuses, and caps the aggregate rate.
 
 **Do not re-run them unless the retrieval itself is what you are checking.**
-The responses are deposited on Zenodo, concept DOI
-<https://doi.org/10.5281/zenodo.23275811>, which resolves to the latest
-version. Download `d1_raw_api_responses_part*.jsonl.gz`, expand them into
+The responses are deposited on Zenodo,
+<https://doi.org/10.5281/zenodo.24551653>. Download `d1_raw_api_responses_part*.jsonl.gz`, expand them into
 `research/results/e14_verified/` as one JSON file per transaction id, and both
 experiments will read from cache and issue no requests. `classify()` in
 `exp14_external_ground_truth.py` reproduces the verdicts from those responses
@@ -184,7 +183,7 @@ alone.
 | Source | Identifier | Notes |
 |---|---|---|
 | Author-curated corpus, 5,884,387 transactions | <https://doi.org/10.21227/bxmt-mn56> | IEEE DataPort, Academic Use licence |
-| Verification records, 6,269 responses | <https://doi.org/10.5281/zenodo.23275811> | CC BY 4.0, all versions |
+| Verification records, 6,269 responses | <https://doi.org/10.5281/zenodo.24551653> | CC BY 4.0 |
 | Elliptic Data Set | [Kaggle](https://www.kaggle.com/datasets/ellipticco/elliptic-data-set) | Distributed under its own terms |
 | Analysis code | <https://github.com/sagarkorde/CoinJoin> | MIT |
 

@@ -136,7 +136,7 @@ def main() -> None:
     manifest = {
         "title": ("Blockchain verification records for CoinJoin confirmation, "
                   "Bitcoin 2022-2024, with raw explorer responses"),
-        "version": "1.1.0",
+        "version": "1.0.0",
         "date": date.today().isoformat(),
         "license": "CC-BY-4.0",
         "authors": [
@@ -169,7 +169,7 @@ def main() -> None:
 Bitcoin transactions, July 2022 to September 2024, with the raw block-explorer
 responses used to confirm CoinJoin status.
 
-**Version 1.1.0 · CC BY 4.0 · {date.today().isoformat()}**
+**Version 1.0.0 · CC BY 4.0 · {date.today().isoformat()}**
 
 Sagar D. Korde, K. J. Somaiya School of Engineering, Somaiya Vidyavihar
 University, Mumbai, India
