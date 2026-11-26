@@ -1,7 +1,7 @@
 """
 E08 - Non-circular CoinJoin candidate detection.
 
-Initial clustered transactions on structural features and scored the clusters
+The initial design clustered transactions on structural features and scored the clusters
 against `is_coinjoin_like`, assigning each cluster a class by majority vote
 over the ground-truth labels of its own members. E06 showed the label is
 exactly `input_count >= 4 AND output_count >= 4`, and both counts are among the
@@ -12,9 +12,9 @@ transactions it was scored on.
 This experiment rebuilds it with three corrections.
 
   1. **Chronological split.** The corpus spans 2022-07 to 2025-07. Train on the
-     earliest period, select on the middle, test on the latest. Initial had no
-     temporal separation at all.
-  2. **Frozen cluster-to-class map** . Clusters are fitted on
+     earliest period, select on the middle, test on the latest. The initial
+     design had no temporal separation at all.
+  2. **Frozen cluster-to-class map.** Clusters are fitted on
      training transactions only; the majority-vote map is frozen; test
      transactions are assigned to clusters by nearest fitted centroid and
      scored without ever contributing to the map.
@@ -24,8 +24,8 @@ This experiment rebuilds it with three corrections.
      detectable without reading the label's own inputs.
 
 A supervised reference and an operating-point sweep are included, the latter
-answering the audit, which asked for the precision-recall trade-off to be
-shown across parameter settings rather than at a single point.
+showing the precision-recall trade-off across parameter settings rather than
+at a single point.
 
 Outputs
 -------
@@ -101,7 +101,7 @@ def dbscan_frozen(Xtr, ytr, Xva, Xte, eps: float, min_samples: int, seed: int):
     Fit DBSCAN on training data, freeze a cluster-to-score map, then assign
     validation and test points to the nearest fitted centroid.
 
-    Initial labelled each cluster by majority vote over its members. Under a
+    The initial design labelled each cluster by majority vote over its members. Under a
     2 % positive class majority vote makes almost every cluster negative, which
     is an artefact of the imbalance rather than a property of the clustering.
     Each cluster is therefore scored by its *training* positive rate, and the
@@ -167,7 +167,7 @@ def main() -> None:
 
     rows, sweep_rows = [], []
 
-    for regime, cols in (("all (reproduces initial)", ALL_COLS),
+    for regime, cols in (("all columns (initial design)", ALL_COLS),
                          ("disjoint from label", DISJOINT_COLS)):
         X = df[cols].to_numpy(dtype=np.float32)
         scaler = StandardScaler().fit(X[itr])
@@ -205,7 +205,7 @@ def main() -> None:
                   f"F1={m['f1_illicit']:.4f} P={m['precision']:.4f} "
                   f"R={m['recall']:.4f} PR-AUC={m['pr_auc']:.4f}")
 
-            # Operating-point sweep on the primary seed .
+            # Operating-point sweep on the primary seed.
             if seed == SEEDS[0]:
                 for q in np.linspace(0.50, 0.999, 40):
                     t = float(np.quantile(s_te, q))

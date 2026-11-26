@@ -2,7 +2,7 @@
   "aggregate": [
     {
       "method": "DBSCAN (frozen map)",
-      "regime": "all (reproduces initial)",
+      "regime": "all columns (initial design)",
       "f1": 0.4832,
       "f1_std": 0.0066,
       "precision": 0.3997,
@@ -28,7 +28,7 @@
     },
     {
       "method": "RandomForest (supervised)",
-      "regime": "all (reproduces initial)",
+      "regime": "all columns (initial design)",
       "f1": 0.9978,
       "f1_std": 0.0004,
       "precision": 1.0,

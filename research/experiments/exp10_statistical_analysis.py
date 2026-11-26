@@ -1,11 +1,10 @@
 """
 E10 - Uncertainty quantification for the main GNN comparison.
 
-The audit observed that repeated seeds measure training
-stochasticity on one fixed partition and do not constitute independent samples
-of generalisation performance, and suggested a bootstrap over test-set metric
-differences instead. The audit made the same point about the
-paired t-tests resting on df = 4.
+Repeated seeds measure training stochasticity on one fixed partition and do
+not constitute independent samples of generalisation performance; a bootstrap
+over test-set metric differences answers the complementary question. Paired
+t-tests over five seeds (df = 4) are too weak for population-level claims.
 
 This script reports the two sources of variation as distinct quantities.
 

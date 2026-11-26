@@ -1,9 +1,8 @@
 """
 E12 - Address-count columns and the Mixing Index.
 
-the audit questioned a derived statistic reported with a mean of 8.79 and a
-standard deviation of 689.27, asking how the implied outliers were handled.
-Investigating that question uncovered a defect rather than a heavy tail.
+An initial summary of the Mixing Index gave a mean of 8.79 and a standard
+deviation of 689.27, implying extreme outliers. Investigating them uncovered a defect rather than a heavy tail.
 
 The Mixing Index is defined as
 

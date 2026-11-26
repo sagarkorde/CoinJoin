@@ -1,8 +1,8 @@
 """
 E13 - Training diagnostics regenerated under the corrected protocol.
 
-Three figures in the paper were produced by the superseded run that
-included the withdrawn features: the self-supervised loss curve, the
+Three diagnostic figures were first produced by the initial run, which
+included the label-derived features: the self-supervised loss curve, the
 supervised training curves, and a t-SNE projection of the learned embedding.
 The last carried a substantive claim, that illicit nodes occupy distinct
 regions of the embedding space before any supervised label is used. With a
@@ -119,7 +119,7 @@ def main() -> None:
     cols = base_feature_columns(nodes)
     data = build_graph(nodes, edges, cols)
     print(f"  graph: {data.num_nodes:,} nodes, {data.num_node_features} features "
-          "(165 distributed only, no withdrawn features)")
+          "(165 distributed only, no label-derived features)")
 
     # -- self-supervised loss, both regimes --------------------------------
     curves, embs = {}, {}

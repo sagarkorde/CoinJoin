@@ -68,7 +68,7 @@ def base_feature_columns(nodes: pd.DataFrame) -> list[str]:
 
 
 def split_summary(nodes: pd.DataFrame) -> pd.DataFrame:
-    """Per-split node and class counts, for the paper's dataset table."""
+    """Per-split node and class counts, for the dataset table."""
     lm = labelled_masks(nodes)
     cm = chronological_masks(nodes)
     y = nodes["label"].to_numpy()

@@ -1,13 +1,12 @@
 """
 Regenerate the framework architecture figure.
 
-The previous figure was exported from a drawing tool and fell out of step with
-the paper in four places: it described the classifier as "DGI
-pre-training + GAT fine-tuning", which is not what the code does; it showed a
-shared 169-dimensional feature matrix, although two of those features were
-withdrawn; it described Phase 2 as fine-tuning; and it advertised five-seed
-confidence intervals, since superseded by twenty seeds and bootstrap
-intervals.
+A figure exported from a drawing tool falls out of step with the code: an
+earlier hand-drawn version described the classifier as "DGI pre-training +
+GAT fine-tuning", which is not what the code does, showed a 169-dimensional
+feature matrix that includes the two removed label-derived features, and
+advertised five-seed confidence intervals rather than twenty seeds and
+bootstrap intervals.
 
 Building it from a script rather than a drawing keeps it in step: the labels
 now come from the same constants the experiments use, so a figure that
@@ -70,7 +69,7 @@ def main() -> None:
             weight="bold", color=C_DATA)
     ax.text(87, 85.9, "Elliptic features", ha="center", fontsize=8.0,
             color=C_MUTED)
-    ax.text(87, 83.6, "two withdrawn (§3.2)", ha="center", fontsize=7.2,
+    ax.text(87, 83.6, "two removed (§3.2.2)", ha="center", fontsize=7.2,
             style="italic", color=C_MUTED)
 
     # ---- tier 2: the three modules ---------------------------------------

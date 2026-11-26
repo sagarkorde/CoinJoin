@@ -1,8 +1,8 @@
 """
 Graph construction and training loops for the GNN experiments.
 
-Two DGI regimes are supported, because The audit noted that
-pre-training on all 203,769 nodes is transductive and is inconsistent with a
+Two DGI regimes are supported, because pre-training on all 203,769 nodes is
+transductive and is inconsistent with a
 claim that the chronological protocol prevents temporal leakage:
 
   transductive : DGI sees the whole graph, including validation and test nodes.

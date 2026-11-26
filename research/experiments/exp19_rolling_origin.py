@@ -1,16 +1,15 @@
 """
 E19 - Rolling-origin evaluation: can recalibration recover what drift takes?
 
-Two of audit questions meet in one experiment.
+Two questions meet in one experiment.
 
-Item 5 asks for a strictly prospective evaluation in which future graph nodes,
+The first is a strictly prospective evaluation in which future graph nodes,
 edges and neighbourhood statistics cannot influence earlier predictions, ideally
 through an incremental graph-construction experiment that simulates realistic
-monitoring. Item 8 observes that the paper proposes threshold
-recalibration as a remedy for the collapse after time step 42, on the grounds
-that ROC-AUC falls less sharply than F1, but never tests it; a comparison of
-frozen thresholds, recalibrated decision rules and periodically retrained
-models is requested.
+monitoring. The second is whether threshold
+recalibration remedies the collapse after time step 42, as the gentler fall
+in ROC-AUC than in F1 suggests it might; frozen thresholds, recalibrated
+decision rules and periodically retrained models are compared.
 
 The design answers both. At each origin t the graph is rebuilt from the nodes
 of time steps up to and including t, so nothing later exists in any form: not
@@ -19,9 +18,9 @@ pre-training. Standardisation uses training rows only, the DGI encoder is
 fitted on the subgraph up to t-1, the classifier trains on labelled nodes up
 to t-2 and selects on t-1, and step t is scored once.
 
-  frozen         one model, trained once under the paper's protocol,
+  frozen         one model, trained once under the main protocol,
                  with the threshold selected on the validation block and held
-                 fixed for every later step. This is what the paper reports.
+                 fixed for every later step. This is the E05 setting.
   recalibrated   the same model and the same scores, with the threshold
                  reselected on the most recent labelled step before t. No
                  retraining, so the cost is an afternoon of labelling rather
@@ -32,8 +31,7 @@ to t-2 and selects on t-1, and step t is scored once.
 
 If recalibration recovers most of the loss, the operational recommendation is
 relabelling and rethresholding. If only retraining recovers it, the
-recommendation is a retraining schedule, and the paper's current
-suggestion needs correcting.
+recommendation is a retraining schedule instead.
 """
 from __future__ import annotations
 
@@ -57,7 +55,7 @@ from metrics import evaluate, select_threshold                  # noqa: E402
 
 from torch_geometric.data import Data                           # noqa: E402
 
-ORIGINS = list(range(VAL_END + 1, 50))   # 42 .. 49, the paper's test window
+ORIGINS = list(range(VAL_END + 1, 50))   # 42 .. 49, the main test window
 
 
 def build_graph_upto(nodes: pd.DataFrame, edges: pd.DataFrame,

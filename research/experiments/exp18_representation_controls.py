@@ -1,16 +1,16 @@
 """
 E18 - Does the frozen representation contribute structure, or capacity?
 
-the audit (audit, item 6) accepts that the frozen DGI representation
-improves the GAT arm but observes that this does not establish that
-self-supervised learning is the better modelling strategy: the fused model
+E05 shows that the frozen DGI representation improves the GAT arm, but that
+does not establish that self-supervised learning is the better modelling
+strategy: the fused model
 also has more parameters than the arm it is compared against, and no control
 separates learned structural information from added capacity or the
-regularising effect of a fixed extra input. A parameter-matched comparison
-including a randomly initialised frozen representation is requested.
+regularising effect of a fixed extra input. This experiment adds a parameter-matched
+comparison and a randomly initialised frozen representation.
 
-Five arms, all under the inductive regime, which is the reference arm of the
-paper. Every arm uses the same GAT trunk, the same optimiser, the same
+Five arms, all under the inductive regime, which is the reference arm of
+the study. Every arm uses the same GAT trunk, the same optimiser, the same
 early-stopping rule on validation PR-AUC and the same frozen threshold.
 
   fusion            frozen DGI representation, trained self-supervised
@@ -23,7 +23,7 @@ early-stopping rule on validation PR-AUC and the same frozen threshold.
   fusion_shuffled   the real DGI representation with its node rows permuted.
                     Marginal distribution preserved exactly, correspondence
                     between a node and its embedding destroyed.
-  gat_zero_dgi      no frozen representation, as reported in the paper
+  gat_zero_dgi      no frozen representation, as reported in E05
   gat_matched       no frozen representation, classifier head widened so the
                     trainable parameter count matches `fusion`
 

@@ -1,15 +1,15 @@
 """
 E02 - Quantifying the performance inflation caused by the leaked features.
 
-the audit requested exactly this ablation:
+Four-way ablation:
     (i)   the original 165 Elliptic features
     (ii)  + illicit_neighbor_ratio
     (iii) + shortest_path_to_illicit
     (iv)  + both
 
 E01 established that (ii)-(iv) are contaminated. This experiment measures how
-much apparent performance that contamination buys, which is the number the
-paper needs in order to withdraw the features honestly.
+much apparent performance that contamination buys, which is the number needed
+to justify removing the features.
 
 Protocol
 --------

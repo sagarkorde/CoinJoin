@@ -1,8 +1,8 @@
 """
 Publication figures.
 
-Initial mixed single-seed illustrative figures with multi-seed summary tables,
-which the audit found confusing and potentially inflating. Every figure
+Mixing single-seed illustrative figures with multi-seed summary tables is
+confusing and can inflate an impression. Every figure
 produced here is either seed-aggregated with an explicit variance band, or
 labelled in its own caption as a single-run diagnostic. Nothing is drawn from
 a superseded protocol.
@@ -215,7 +215,7 @@ def fig_operating_points(sweep_csv: Path, out: Path) -> Path:
     """FPR-FNR and precision-recall trade-off across parameter settings."""
     df = pd.read_csv(sweep_csv)
     # Print-friendly regime names.
-    short = {"all (reproduces initial)": "all columns",
+    short = {"all columns (initial design)": "all columns",
              "disjoint from label": "label-free columns"}
     df["regime"] = df["regime"].map(lambda r: short.get(r, r))
     fig, axes = plt.subplots(1, 2, figsize=(7.6, 3.2))

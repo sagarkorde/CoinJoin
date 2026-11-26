@@ -1,7 +1,7 @@
 """
-Graph models for the MixTrace revision.
+Graph models for the MixTrace audit.
 
-Naming note . The initial paper described the
+Naming note. The initial design described the
 architecture as "DGI pre-training followed by GAT fine-tuning". That is not
 what the code does. The DGI encoder is trained self-supervised, then frozen;
 the GAT is trained separately and supervised; the two representations are
@@ -101,7 +101,7 @@ class FrozenDGIGATFusion(nn.Module):
     The DGI embedding is supplied precomputed and detached; only the GAT and
     the classifier head carry gradients. `zero_dgi` replaces the frozen
     representation with zeros from the start of training, which is the correct
-    way to ablate the DGI contribution : the model is
+    way to ablate the DGI contribution: the model is
     genuinely trained without it rather than having it removed at inference.
     """
 
@@ -115,7 +115,7 @@ class FrozenDGIGATFusion(nn.Module):
         fused = hid_dim + (0 if zero_dgi else dgi_dim)
         # head_dim widens the classifier without supplying a frozen
         # representation. It is how the parameter-matched control in E18 is
-        # built , so that the fused model can
+        # built, so that the fused model can
         # be compared against an arm of equal capacity rather than only
         # against a smaller one. Defaulting to hid_dim leaves every model
         # trained before E18 bit-identical.

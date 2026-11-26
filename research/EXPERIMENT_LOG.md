@@ -1,4 +1,4 @@
-# MixTrace — Experiment Log 
+# MixTrace — Experiment Log
 
 Traceable record of every experimental milestone. Each row links an experiment
 ID to the modification, data version, configuration, headline result, and the
@@ -25,24 +25,28 @@ train = steps 1–34, validation = 35–41, test = 42–49.
 
 | ID | Modification | Data / version | Configuration | Main result | Commit |
 |---|---|---|---|---|---|
-| E01 | Leakage audit of initial engineered features (INR, SPTI) | Elliptic raw CSVs | Directed-reverse BFS, cap 6, reproducing initial semantics | **Leak confirmed.** SPTI == 0 for 4,545/4,545 illicit and 0/42,019 licit nodes (precision 1.000); r = −0.9182 reproduced bit-identically. Zero cross-time-step edges, so strict train-only-seed variant is constant on val/test (SPTI ≡ 6, INR ≡ 0). Both features are unusable. | `7415004` |
-| E02 | Four-way feature ablation  | Elliptic raw CSVs | RandomForest + HistGradientBoosting, 5 seeds, val-selected frozen threshold | **Leak quantified.** Base 165 features: F1 0.621 (RF) / 0.613 (HGB). Adding SPTI drives F1, PR-AUC and MCC to **1.0000** under both model families. INR adds +0.012 (RF) / +0.069 (HGB). Leakage-free tabular ceiling is F1 ~ 0.62. | `60dca79` |
-| E03 | Label-free topological features as a replacement for the withdrawn ones | Elliptic raw CSVs | 15 descriptors computed inside each node's own time-step subgraph; permutation verification; 5 seeds x 2 models | **Clean but uninformative (negative result).** All 15 features bit-identical under full label permutation; max \|r\| with label 0.1223 (vs 0.9182 for SPTI). Adding them to the 165 base features changes F1 by -0.004 (RF) / +0.001 (HGB). Topology alone: F1 0.03, ROC-AUC 0.38 - *below chance*, indicating the topology-label relation inverts between train and test periods. | `65b137a` |
-| E04 | Per-time-step evaluation and protocol comparison | Elliptic raw CSVs | RandomForest, 165 base features, 5 seeds, frozen threshold | **Baseline validated; collapse localised.** Literature protocol (train 1-25, test 35-49) gives F1 0.7634, consistent with published Elliptic RF results, so the leakage-free baseline is sound. Per step: mean F1 0.8582 on steps 35-42 vs 0.0283 on steps 43-49; recall falls 0.789 to 0.000 at step 43 (dark-market shutdown). The initial test window 42-49 lies almost entirely inside the collapsed regime. | `88365ed` |
-| E06 | Recover the undocumented `is_coinjoin_like` rule | Author corpus, 5,884,387 tx | Decision tree fitted to structural columns | **Rule recovered exactly.** Depth-3 tree reproduces the label with accuracy 1.00000000: `is_coinjoin_like == (input_count >= 4) AND (output_count >= 4)`. The label is a deterministic function of two columns that the initial DBSCAN detector also clusters on, confirming the circularity identified in the audit. | `d55d942` |
-| E07 | Reconstruct script types; test the Taproot premise | Author corpus, 5,884,387 tx | Parse `input/output_script_types` node descriptors | **Taproot premise overturned.** All six declared script flags are identically False for every row, so nothing could be confirmed through them. Parsing the descriptor columns shows P2TR is 24.10% of outputs; 2,494,168 tx (42.39%) touch Taproot, and 79,386 / 110,352 (71.94%) of label-positive CoinJoin-like candidates do. The corpus spans 2022-07 to 2025-07 and is post-Taproot throughout. | `d55d942` |
-| E08 | Non-circular CoinJoin screening: chronological split, frozen cluster map | Author corpus, 600k train / 300k test | DBSCAN eps 0.6 frozen positive-rate map; RandomForest reference; 5 seeds | **Circularity reproduced and measured past.** RF with the label's own input columns: F1 0.9978. RF column-disjoint: F1 0.9140. DBSCAN frozen, all columns: F1 0.4832 (close to the initial figure of 0.441). DBSCAN column-disjoint: F1 0.1649. | `1b04e03` |
-| E08b | Leakage gradient: how far the screening label survives feature removal | Author corpus, 600k train / 300k test | RandomForest, 6 regimes of increasing strictness, 5 seeds | **Circularity is arithmetic, not incidental.** `total_input_value / avg_input_value` recovers `input_count` for 99.96 % of rows and the reconstructed rule matches the distributed label for **100.0000 %** of sampled transactions. F1 stays at 0.90-1.00 for every regime that retains an arithmetic route, then collapses to **0.2678** once the average-value columns are removed, and to 0.1592 with temporal columns alone. | `868130c` |
-| E05 | Main GNN experiment, leakage-free features, both DGI regimes | Elliptic raw CSVs, 165 distributed features | 20 seeds x 7 model/regime arms (140 runs), val-selected frozen threshold, model selection on validation PR-AUC | **Fusion helps its own architecture but is not the best model.** GraphSAGE 0.5467 > fusion-inductive 0.5197 > fusion-transductive 0.5186 > GCN 0.4997 > GAT-zero-DGI 0.4711 > GAT 0.4620. Fusion beats its own zero-DGI ablation by +0.06 F1 and halves cross-seed SD (0.030 vs 0.059). Inductive and transductive are indistinguishable. All GNNs trail the tabular baseline (0.6212). | `0db03f6` |
-| E09 | Attribution and failure analysis | Elliptic, leakage-free features | Permutation importance (10 repeats) and integrated gradients (32 steps), primary seed | **Failure is a regime change, not diffuse decay.** Detected illicit transactions sit at mean time step 42.10, missed ones at 45.52, with missed cases scored 0.1882 against a 0.8292 threshold. False positives skew to hubs (mean degree 6.28 against 3.28). Tabular top-15 features are 15/15 local; graph top-15 is 9 local and 6 aggregated. | `654f1c5` |
-| E10 | Uncertainty quantification | E05 outputs, Elliptic test split | 20-seed paired t-tests (df = 19) and 2,000-resample test-set bootstrap | **Two analyses, stated separately.** Seed level: GraphSAGE beats fusion (p = 0.0012); fusion beats every attention variant (p < 0.005); regimes indistinguishable (p = 0.8148). Bootstrap on the primary seed puts fusion ahead of GraphSAGE by 0.0430; intervals are ~0.09 wide, so sub-0.05 differences are not resolvable. The disagreement is reported and explained. | `654f1c5` |
-| E11 | Computational cost on an idle device | Elliptic graph | Single process, refuses to run if another CUDA process is present | **The cheapest model is also the most accurate.** GraphSAGE: 8.1 s training, 947 MB peak, 29,570 params, 20.1 ms full-graph inference. Fusion: 73.1 s, 6,296 MB, 131,588 params, 78.7 ms. Attention dominates memory at ~6.3 GB against under 1 GB for the other encoders. | `654f1c5` |
-| E12 | Address-count columns and the Mixing Index | Author corpus, 5,884,387 tx | Parse address strings; compare against declared counts | **Third broken column family.** `input_address_count`, `output_address_count`, `total_addresses` sit at 1, 1, 2 for almost every row and agree with parsed addresses for only 54.34 %. MI from them is identically 0.5, label correlation 0.0031. Recomputed: mean 0.678, sd 1.402, max 250.5, skew 69.2; log1p cuts skew to 7.9 and raises label correlation to **0.541**. The reported 8.79 / 689.27 matches neither computation. | `da0c952` |
-| E13 | Training diagnostics regenerated, leakage-free | Elliptic, 165 features | DGI loss both regimes; supervised curves; t-SNE + linear probe | **Earlier embedding claim narrowed.** Illicit nodes form local concentrations, not distinct regions. Linear probe on the frozen representation: ROC-AUC **0.756 chronological** vs 0.939 random-split. Self-supervision does encode label-relevant structure without labels, but the in-distribution figure overstates transfer. | `da0c952` |
-| E14 | External CoinJoin ground truth, pilot | Author corpus + blockstream.info | Dumplings rules, 120 verified | **Route established.** 39/40 Whirlpool candidates confirmed, 7/20 Wasabi2, 0/40 random label-positive. | `d14bf42` |
-| E14b | Verify every protocol-shaped candidate | Author corpus + mempool.space / blockstream.info | 6,209 transactions, Dumplings rules on real per-output values | **4,491 confirmed CoinJoins.** Whirlpool 3,839/4,137 (92.8 %), Wasabi2 652/1,522 (42.8 %), random label-positive 0/400. Screening label precision against confirmed CoinJoins: **4.07 %** (95 % upper bound 4.97 %) at near-total recall. | `d14bf42` |
-| E15 | CoinJoin detection against externally confirmed labels | E14b labels + author corpus | Chronological split, 5 seeds, 3 learners, 4 feature regimes, rule baseline | **First validated detection result in the study.** Within Whirlpool candidates, a model on fee, size and timing alone reaches F1 0.9957 and MCC 0.9559, against F1 0.9663 and MCC 0.5823 for the strongest single rule. Within Wasabi2 candidates, F1 0.8491 at precision 1.000. Separation survives with every value and count column withheld, so it is not definitional. | `f81d86f` |
-| E16 | Uncertainty on the confirmed-label detection result | E14b labels + author corpus | 5,000-resample bootstrap, 5 seeds, paired against the rule baseline | **Headline survives.** Strict-regime MCC 0.9559, 95 % CI [0.9232, 0.9830]; rule baseline 0.5823 [0.4994, 0.6572]. Paired difference +0.3736 [+0.2969, +0.4567], p < 0.0001. Test split holds 1,035 transactions, only 102 of them negative; no resample was degenerate. | `5097fe1` |
+| E01 | Leakage audit of initial engineered features (INR, SPTI) | Elliptic raw CSVs | Directed-reverse BFS, cap 6, reproducing initial semantics | **Leak confirmed.** SPTI == 0 for 4,545/4,545 illicit and 0/42,019 licit nodes (precision 1.000); r = −0.9182 reproduced bit-identically. Zero cross-time-step edges, so strict train-only-seed variant is constant on val/test (SPTI ≡ 6, INR ≡ 0). Both features are unusable. | `93849b1` |
+| E02 | Four-way feature ablation | Elliptic raw CSVs | RandomForest + HistGradientBoosting, 5 seeds, val-selected frozen threshold | **Leak quantified.** Base 165 features: F1 0.621 (RF) / 0.613 (HGB). Adding SPTI drives F1, PR-AUC and MCC to **1.0000** under both model families. INR adds +0.012 (RF) / +0.069 (HGB). Leakage-free tabular ceiling is F1 ~ 0.62. | `c7d07fd` |
+| E03 | Label-free topological features as a replacement for the label-derived ones | Elliptic raw CSVs | 15 descriptors computed inside each node's own time-step subgraph; permutation verification; 5 seeds x 2 models | **Clean but uninformative (negative result).** All 15 features bit-identical under full label permutation; max \|r\| with label 0.1223 (vs 0.9182 for SPTI). Adding them to the 165 base features changes F1 by -0.004 (RF) / +0.001 (HGB). Topology alone: F1 0.03, ROC-AUC 0.38 - *below chance*, indicating the topology-label relation inverts between train and test periods. | `50c5a2e` |
+| E04 | Per-time-step evaluation and protocol comparison | Elliptic raw CSVs | RandomForest, 165 base features, 5 seeds, frozen threshold | **Baseline validated; collapse localised.** Literature protocol (train 1-25, test 35-49) gives F1 0.7634, consistent with published Elliptic RF results, so the leakage-free baseline is sound. Per step: mean F1 0.8582 on steps 35-42 vs 0.0283 on steps 43-49; recall falls 0.789 to 0.000 at step 43 (dark-market shutdown). The initial test window 42-49 lies almost entirely inside the collapsed regime. | `68a2cb2` |
+| E06 | Recover the undocumented `is_coinjoin_like` rule | Author corpus, 5,884,387 tx | Decision tree fitted to structural columns | **Rule recovered exactly.** Depth-3 tree reproduces the label with accuracy 1.00000000: `is_coinjoin_like == (input_count >= 4) AND (output_count >= 4)`. The label is a deterministic function of two columns that the initial DBSCAN detector also clusters on, confirming the circularity identified in the audit. | `8c88d51` |
+| E07 | Reconstruct script types; test the Taproot premise | Author corpus, 5,884,387 tx | Parse `input/output_script_types` node descriptors | **Taproot premise overturned.** All six declared script flags are identically False for every row, so nothing could be confirmed through them. Parsing the descriptor columns shows P2TR is 24.10% of outputs; 2,494,168 tx (42.39%) touch Taproot, and 79,386 / 110,352 (71.94%) of label-positive CoinJoin-like candidates do. The corpus spans 2022-07 to 2025-07 and is post-Taproot throughout. | `8c88d51` |
+| E08 | Non-circular CoinJoin screening: chronological split, frozen cluster map | Author corpus, 600k train / 300k test | DBSCAN eps 0.6 frozen positive-rate map; RandomForest reference; 5 seeds | **Circularity reproduced and measured past.** RF with the label's own input columns: F1 0.9978. RF column-disjoint: F1 0.9140. DBSCAN frozen, all columns: F1 0.4832 (close to the initial figure of 0.441). DBSCAN column-disjoint: F1 0.1649. | `e9924d4` |
+| E08b | Leakage gradient: how far the screening label survives feature removal | Author corpus, 600k train / 300k test | RandomForest, 6 regimes of increasing strictness, 5 seeds | **Circularity is arithmetic, not incidental.** `total_input_value / avg_input_value` recovers `input_count` for 99.96 % of rows and the reconstructed rule matches the distributed label for **100.0000 %** of sampled transactions. F1 stays at 0.90-1.00 for every regime that retains an arithmetic route, then collapses to **0.2678** once the average-value columns are removed, and to 0.1592 with temporal columns alone. | `4a30376` |
+| E05 | Main GNN experiment, leakage-free features, both DGI regimes | Elliptic raw CSVs, 165 distributed features | 20 seeds x 7 model/regime arms (140 runs), val-selected frozen threshold, model selection on validation PR-AUC | **Fusion helps its own architecture but is not the best model.** GraphSAGE 0.5467 > fusion-inductive 0.5197 > fusion-transductive 0.5186 > GCN 0.4997 > GAT-zero-DGI 0.4711 > GAT 0.4620. Fusion beats its own zero-DGI ablation by +0.06 F1 and halves cross-seed SD (0.030 vs 0.059). Inductive and transductive are indistinguishable. All GNNs trail the tabular baseline (0.6212). | `0638619` |
+| E09 | Attribution and failure analysis | Elliptic, leakage-free features | Permutation importance (10 repeats) and integrated gradients (32 steps), primary seed | **Failure is a regime change, not diffuse decay.** Detected illicit transactions sit at mean time step 42.10, missed ones at 45.52, with missed cases scored 0.1882 against a 0.8292 threshold. False positives skew to hubs (mean degree 6.28 against 3.28). Tabular top-15 features are 15/15 local; graph top-15 is 9 local and 6 aggregated. | `3f70e49` |
+| E10 | Uncertainty quantification | E05 outputs, Elliptic test split | 20-seed paired t-tests (df = 19) and 2,000-resample test-set bootstrap | **Two analyses, stated separately.** Seed level: GraphSAGE beats fusion (p = 0.0012); fusion beats every attention variant (p < 0.005); regimes indistinguishable (p = 0.8148). Bootstrap on the primary seed puts fusion ahead of GraphSAGE by 0.0430; intervals are ~0.09 wide, so sub-0.05 differences are not resolvable. The disagreement is reported and explained. | `3f70e49` |
+| E11 | Computational cost on an idle device | Elliptic graph | Single process, refuses to run if another CUDA process is present | **The cheapest model is also the most accurate.** GraphSAGE: 8.1 s training, 947 MB peak, 29,570 params, 20.1 ms full-graph inference. Fusion: 73.1 s, 6,296 MB, 131,588 params, 78.7 ms. Attention dominates memory at ~6.3 GB against under 1 GB for the other encoders. | `3116c90` |
+| E12 | Address-count columns and the Mixing Index | Author corpus, 5,884,387 tx | Parse address strings; compare against declared counts | **Third broken column family.** `input_address_count`, `output_address_count`, `total_addresses` sit at 1, 1, 2 for almost every row and agree with parsed addresses for only 54.34 %. MI from them is identically 0.5, label correlation 0.0031. Recomputed: mean 0.678, sd 1.402, max 250.5, skew 69.2; log1p cuts skew to 7.9 and raises label correlation to **0.541**. The reported 8.79 / 689.27 matches neither computation. | `499b4d5` |
+| E13 | Training diagnostics regenerated, leakage-free | Elliptic, 165 features | DGI loss both regimes; supervised curves; t-SNE + linear probe | **Earlier embedding claim narrowed.** Illicit nodes form local concentrations, not distinct regions. Linear probe on the frozen representation: ROC-AUC **0.756 chronological** vs 0.939 random-split. Self-supervision does encode label-relevant structure without labels, but the in-distribution figure overstates transfer. | `499b4d5` |
+| E14 | External CoinJoin ground truth, pilot | Author corpus + blockstream.info | Dumplings rules, 120 verified | **Route established.** 39/40 Whirlpool candidates confirmed, 7/20 Wasabi2, 0/40 random label-positive. | `5ebf686` |
+| E14b | Verify every protocol-shaped candidate | Author corpus + mempool.space / blockstream.info | 6,209 transactions, Dumplings rules on real per-output values | **4,491 confirmed CoinJoins.** Whirlpool 3,839/4,137 (92.8 %), Wasabi2 652/1,522 (42.8 %), random label-positive 0/400. Screening label precision against confirmed CoinJoins: **4.07 %** (95 % upper bound 4.97 %) at near-total recall. | `f145205` |
+| E15 | CoinJoin detection against externally confirmed labels | E14b labels + author corpus | Chronological split, 5 seeds, 3 learners, 4 feature regimes, rule baseline | **First validated detection result in the study.** Within Whirlpool candidates, a model on fee, size and timing alone reaches F1 0.9957 and MCC 0.9559, against F1 0.9663 and MCC 0.5823 for the strongest single rule. Within Wasabi2 candidates, F1 0.8491 at precision 1.000. Separation survives with every value and count column withheld, so it is not definitional. | `ed3fc76` |
+| E16 | Uncertainty on the confirmed-label detection result | E14b labels + author corpus | 5,000-resample bootstrap, 5 seeds, paired against the rule baseline | **Headline survives.** Strict-regime MCC 0.9559, 95 % CI [0.9232, 0.9830]; rule baseline 0.5823 [0.4994, 0.6572]. Paired difference +0.3736 [+0.2969, +0.4567], p < 0.0001. Test split holds 1,035 transactions, only 102 of them negative; no resample was degenerate. | `e11ac23` |
+| E17 | Strict-regime decomposition: does detection survive without the size family? | E14b labels + author corpus | E15 protocol; four nested feature regimes; 3 learners; 5 seeds | **Whirlpool is template recognition; WabiSabi is not.** Whirlpool: size columns alone MCC 0.9726; strict regime without size 0.2669. WabiSabi: withholding size raises MCC from 0.8030 to 0.9348 (HGB) and to 0.9638 (LR). | `19a0b95` |
+| E18 | Representation controls for the frozen branch | Elliptic, 165 features | Inductive regime; parameter-matched, Gaussian-noise, row-permuted and untrained-encoder arms; 20 seeds | **Gain is structural, not learned.** Fused 0.5282 F1; untrained encoder 0.5232 (p = 0.51); permuted 0.4626, noise 0.4417, matched capacity 0.4467 (all p < 0.001). | `19a0b95` |
+| E19 | Rolling-origin evaluation and the drift remedy | Elliptic, 165 features | Graph rebuilt at each origin 42-49; frozen vs recalibrated vs retrained; 5 seeds | **Retrain, do not rethreshold.** Post-shutdown F1: frozen 0.0755, recalibrated 0.0857 (p = 0.69), retrained 0.1611 (p = 0.032). Strict prospectivity costs nothing at step 42 (0.7921 vs 0.7825). | `19a0b95` |
+| E20 | Determinism of the E15 split construction | E14b labels + author corpus | Five interpreter hash seeds; sorted identifiers and stable sort | **Random Forest rows depended on the hash seed** (MCC 0.8583-0.8704). Deterministic construction: Whirlpool strict RF MCC 0.8685; every HGB, LR and rule figure unchanged. Whirlpool rounds take 12 distinct virtual sizes. | `003af0c` |
 
 ---
 
@@ -63,7 +67,7 @@ illicit seed set is restricted to training-period nodes.
    source, so SPTI = 0 for all 4,545 illicit nodes and for no licit node. The
    decision rule "SPTI == 0 ⇒ illicit" has precision 1.000 on labelled data and
    applies to the test split, where the label is supposed to be unavailable.
-   The paper's reported r = −0.9182 is reproduced exactly, confirming the
+   The initial design's r = −0.9182 is reproduced exactly, confirming that the
    audit targets the same computation.
 
 2. **Excluding self-seeding does not repair it.** Distance to the nearest
@@ -113,8 +117,8 @@ the signature of target leakage rather than of a strong feature. SPTI alone
 saturates every metric; the model only has to learn the rule "SPTI == 0"
 identified in E01. INR contributes a smaller but still illegitimate gain.
 
-**Consequence for the paper.** The initial headline numbers are not
-comparable to the literature and both features must be withdrawn. The
+**Consequence.** The initial headline numbers are not
+comparable to the literature and both features are removed. The
 leakage-free ceiling for a strong tabular baseline on the 165 distributed
 features is F1 ~ 0.62, which is the reference point every later experiment is
 measured against.
@@ -123,7 +127,7 @@ measured against.
 
 ## E03 — Label-free topological features
 
-**Question.** Can the withdrawn features be replaced by descriptors that are
+**Question.** Can the removed features be replaced by descriptors that are
 leakage-free by construction, and do they carry legitimate signal?
 
 **Method.** `research/src/features.py` computes 15 topological descriptors
@@ -136,7 +140,7 @@ cross-step edge exists for a path to traverse.
 **Verification.** Every label in the dataset was permuted and all features
 recomputed. All 15 are bit-identical (`atol = 0`), so the features are
 mechanically proven label-independent. Maximum absolute correlation with the
-target is 0.1223 (`topo_component_size`), against 0.9182 for the withdrawn
+target is 0.1223 (`topo_component_size`), against 0.9182 for the removed
 SPTI. Compute cost: 47.6 s for all 203,769 nodes.
 
 **Ablation (test split, mean over 5 seeds).**
@@ -159,8 +163,8 @@ is reversed in the test period. This is direct evidence of concept drift and
 motivates E04.
 
 **Decision.** The topological features are retained in the released code and
-reported as a negative control, not promoted as a contribution. The paper
-will not claim a novel feature contribution on Elliptic.
+reported as a negative control, not promoted as a contribution. The study
+claims no novel feature contribution on Elliptic.
 
 ---
 
@@ -168,7 +172,7 @@ will not claim a novel feature contribution on Elliptic.
 
 **Question.** Is the leakage-free baseline weak, or is the evaluation window
 unrepresentative? And how does performance behave across individual test time
-steps (the audit)?
+steps?
 
 **Method.** `research/experiments/exp04_temporal_drift.py`. The same Random
 Forest is evaluated under two protocols. Protocol A is this study's split
@@ -217,7 +221,7 @@ the model was fitted to. ROC-AUC stays well above chance (0.57–0.86) while F1
 is zero, showing the ranking retains some signal but the calibrated operating
 point transfers not at all.
 
-**Consequences for the paper.**
+**Consequences.**
 
 1. Pooled test metrics over steps 42–49 are dominated by a regime in which the
    training distribution no longer holds. Any single aggregate number for this
@@ -254,15 +258,15 @@ The equality holds for every one of the 5,884,387 rows. Positive rate 1.88 %
 variables, and those same two variables are among the structural features the
 initial DBSCAN detector clusters on. The initial experiment therefore measured
 how well clustering recovers a two-variable threshold rule, not how well it
-detects CoinJoin transactions. This confirms mechanically the circularity
-raised in the audit.
+detects CoinJoin transactions. This confirms the circularity
+mechanically.
 
 A further defect: `value_concentration_ratio`, one of the clustering features,
 is degenerate. Its median, 25th and 75th percentiles are all exactly 1.0
 (mean 0.99984, sd 0.0126), so it carries almost no information.
 
-**Decision.** The label cannot be called ground truth. The paper must
-state the rule explicitly, and the clustering experiment must be rebuilt
+**Decision.** The label cannot be called ground truth. The rule must be
+stated explicitly, and the clustering experiment must be rebuilt
 against a target that does not share its inputs.
 
 ---
@@ -271,11 +275,9 @@ against a target that does not share its inputs.
 
 **Question.** Does the corpus really contain no confirmed P2TR transactions?
 
-**Why it matters.** Initial stated that it does not, and used multi-input
-P2WPKH as a Taproot proxy. the audit asked for
-the Taproot claims to be moderated on that basis, calling a pre-Taproot
-validation "a substantial limitation for a paper centered on modern CoinJoin
-detection".
+**Why it matters.** Read through the script-type flags it does not, and the
+initial design therefore used multi-input P2WPKH as a Taproot proxy, which
+would be a substantial limitation for a study of modern CoinJoin detection.
 
 **Finding.** The premise is an artefact of broken columns. All six declared
 script-type booleans (`has_p2pk`, `has_p2pkh`, `has_p2sh`, `has_p2wpkh`,
@@ -309,9 +311,9 @@ Taproot by output, and nearly three quarters of its CoinJoin-like candidates
 involve a Taproot script. The initial limitation was a data-processing defect
 misread as a property of the blockchain.
 
-**Consequence.** Rather than moderating the Taproot claims as initially planned
-proposed, the study can now support them with direct evidence. This converts
-the paper's largest stated limitation into a genuine contribution:
+**Consequence.** Rather than resting on a proxy, the study can support its
+Taproot claims with direct evidence. This turns what would have been the
+largest limitation into a genuine contribution:
 script-aware CoinJoin analysis on a modern, majority-post-Taproot corpus.
 
 ---
@@ -324,15 +326,15 @@ chronologically separated?
 
 **Corrections applied.**
 
-1. *Chronological split.* Initial had no temporal separation. The corpus is
+1. *Chronological split.* The initial design had no temporal separation. The corpus is
    dense from 2022-07 to 2024-09, so the split is train up to 2023-12,
    validate to 2024-04, test from 2024-05, giving 600,000 training and 300,000
    test transactions at a 1.18 % positive rate.
-2. *Frozen cluster map* . Clusters are fitted on training rows
+2. *Frozen cluster map.* Clusters are fitted on training rows
    only, each cluster is scored by its training positive rate, the cut-off is
    selected on validation and frozen, and test rows are assigned by nearest
    fitted centroid without contributing to the map.
-3. *Scoring rule.* Initial used majority vote per cluster. Under a 1–2 %
+3. *Scoring rule.* The initial design used majority vote per cluster. Under a 1–2 %
    positive class majority vote makes almost every cluster negative, which
    reflects the imbalance rather than the clustering, so a validation-selected
    threshold on the cluster positive rate is used instead.
@@ -349,7 +351,7 @@ chronologically separated?
 **Interpretation.** With the label's own input columns present, a supervised
 learner reaches F1 0.9978, which is simply the learner recovering the
 threshold rule identified in E06. The frozen DBSCAN figure of 0.4832 is close
-to the 0.441 reported in initial, so the initial number is reproduced under a
+to the initial design's 0.441, so that number is reproduced under a
 corrected protocol; it is a conservative operating point, not superior
 detection. The column-disjoint regime appeared at first to show genuine
 residual signal at F1 0.9140. E08b shows that it does not.
@@ -404,7 +406,7 @@ division route closes, which identifies the mechanism rather than merely
 suggesting one. Regimes A to D therefore do not measure detection; they measure
 reconstruction of a threshold rule.
 
-**Consequence for the paper.** The author-curated corpus cannot support a
+**Consequence.** The author-curated corpus cannot support a
 non-circular benchmark for structural CoinJoin screening, because the label is
 a deterministic function of two counts that nearly every remaining column
 encodes. The honest residual figure, once every identified route is closed, is
@@ -444,7 +446,7 @@ CUDA process is detected.
 
 ## E05 — Main GNN experiment
 
-**Question.** With the leaked features withdrawn, how do the graph models
+**Question.** With the leaked features removed, how do the graph models
 compare, does the frozen self-supervised representation help, and does the
 transductive pre-training regime account for any of the result?
 
@@ -477,14 +479,14 @@ epoch, not ablated at inference.
 
 2. *The fused model is nevertheless not the best model.* GraphSAGE reaches
    0.5467 with 29,570 parameters, against 131,588 for the fusion model, and
-   with the lowest variance of any arm. The initial claim that self-supervised
-   pre-training is the primary performance driver is withdrawn and replaced by
-   the narrower claim that it improves the GAT arm specifically.
+   with the lowest variance of any arm. The initial view that self-supervised
+   pre-training is the primary performance driver is not supported; it gives
+   way to the narrower claim that it improves the GAT arm specifically.
 
 3. *The transductive regime does not account for the result.* Inductive and
    transductive fusion differ by 0.0011 F1, well inside one standard deviation.
    Restricting pre-training to the training-period subgraph costs essentially
-   nothing, which settles the audit: the reported gain is not an artefact of
+   nothing: the reported gain is not an artefact of
    letting the encoder observe later nodes.
 
 4. *Every graph model trails the tabular baseline.* The best GNN reaches
@@ -558,12 +560,12 @@ span roughly 0.09 F1 for every system, so differences below about 0.05 are not
 resolvable on a test split of 8,841 labelled nodes. Fusion is placed above
 GraphSAGE by 0.0430 with an interval excluding zero.
 
-**The two disagree, and the paper says so.** The bootstrap describes one
+**The two disagree, and both are reported.** The bootstrap describes one
 trained model across test samples; the paired test averages over twenty
 training runs. The primary seed happens to favour fusion and twenty seeds do
 not. The twenty-seed result is taken as the conclusion, since the question is
 whether an architecture is better in general. This is itself a demonstration of
-the single-run hazard noted in the audit.
+the single-run hazard.
 
 **Bug found and fixed.** E05 wrote the string `n/a` for models with no DGI
 regime. That value is in the pandas default NA list, so reading the CSV back
@@ -606,8 +608,8 @@ fused model that scores lower.
 
 ## E12 — Address-count columns and the Mixing Index
 
-**Question.** the audit asked how the outliers implied by a Mixing Index of
-mean 8.79 and standard deviation 689.27 were handled.
+**Question.** How should the outliers implied by an initial Mixing Index
+summary of mean 8.79 and standard deviation 689.27 be handled?
 
 **Finding.** The premise was wrong in a way that matters more than the
 question. The columns naming the input and output address sets count elements
@@ -628,8 +630,8 @@ with the parsed address lists for only 54.34 % of rows.
 **Decision.** The statistic is used under a log(1+x) transform, which reduces
 skewness from 69.2 to 7.9 and raises label correlation to 0.541. Winsorising
 at the 99.9th percentile is reported but not used, since it discards the
-high-multiplicity transactions of forensic interest. The previously reported
-figures match neither computation and are withdrawn.
+high-multiplicity transactions of forensic interest. The initial summary
+figures match neither computation and are discarded.
 
 This is the third column family in this corpus found to misreport its own
 contents, after the six script-type booleans of E07 and the degenerate
@@ -639,7 +641,7 @@ contents, after the six script-type booleans of E07 and the degenerate
 
 ## E13 — Training diagnostics regenerated
 
-**Question.** Three figures came from the superseded run. One carried a
+**Question.** Three diagnostic figures came from the initial run. One carried a
 substantive claim: that illicit nodes occupy geometrically distinct regions of
 the self-supervised embedding before any label is used. With a
 label-re-encoding feature in the input, that separation could have been an
@@ -860,7 +862,7 @@ measurement.
 
 ## E17 — Does the strict regime survive without the size family?
 
-**Raised by.** The audit: predictors that directly or
+**Motivation.** Predictors that directly or
 indirectly reproduce the verification criteria must be controlled, so that the
 models can be shown to learn forensic characteristics rather than to reproduce
 rule-based labels.
@@ -874,13 +876,13 @@ scaler fitted on training rows, threshold selected on validation and frozen,
 `results/e17_strict_regime_aggregate.csv`
 
 The strict regime is decomposed into four feature regimes per candidate group.
-`strict` is the published regime and is included for replication;
+`strict` is the E15 regime and is included for replication;
 `size_only` keeps `size`, `vsize`, `weight`; `strict_no_size` withholds them;
 `fee_timing` keeps fee and calendar fields alone.
 
 **Replication.** `whirlpool_strict` under HistGradientBoosting returns
-F1 0.9957, precision 0.9915, recall 1.0000, MCC 0.9559, identical to Table 12
-and to the abstract. The decomposition therefore measures the published result.
+F1 0.9957, precision 0.9915, recall 1.0000, MCC 0.9559, identical to E15.
+The decomposition therefore measures the reported result.
 
 **Whirlpool group, MCC.**
 
@@ -914,15 +916,15 @@ look-alikes at the same shape.
 Across 3,839 confirmed Whirlpool transactions virtual size takes 12 distinct
 values; across 298 look-alikes it takes 56.
 
-**Interpretation.** For Whirlpool the published result is carried entirely by
+**Interpretation.** For Whirlpool the strict-regime result is carried entirely by
 the size family. Three size columns alone exceed the full strict regime,
 0.9726 against 0.9559, and withholding them reduces MCC to 0.2669. The
 fingerprint probe explains why: Whirlpool constructs byte-identical
 transactions by design, so virtual size is a twelve-entry lookup for pool
-membership rather than a behavioural attribute. The paper's statement
+membership rather than a behavioural attribute. The argument
 that what remains in the strict regime does not appear in any detection rule,
 so that separation surviving there is not definitional, does not hold, because
-Section 3.4.2 of the same paper establishes that virtual size is an
+E08b establishes that virtual size is an
 affine function of the input and output counts and the Whirlpool rule requires
 a fixed shape.
 
@@ -931,21 +933,20 @@ detection, from 0.8030 to 0.9348 under HistGradientBoosting and from 0.9577 to
 0.9638 under Logistic Regression. WabiSabi admits variable denominations and
 participant counts, so no size template exists, and the surviving signal comes
 from address reuse, locktime, version, replace-by-fee signalling, OP_RETURN
-presence and timing. This is the regime that answers item 4 affirmatively.
+presence and timing. This is the regime in which the models demonstrably learn more than the rule.
 
 **Secondary finding.** With E15's hyperparameters copied verbatim, the Random
-Forest rows still differ from Table 12 (WabiSabi strict 0.8461 here against
-0.8491 in the paper, Whirlpool strict 0.8608 against 0.8136). Table 12's
-Random Forest rows are therefore carried over from a superseded run, which
-confirms the discrepancy recorded against `e15_aggregate.csv`.
+Forest rows still differ from the earlier E15 figures (WabiSabi strict 0.8461
+here against 0.8491, Whirlpool strict 0.8608 against 0.8136). E20 traces the
+difference to a split construction that depended on the interpreter hash seed.
 
 ## E18 — Does the frozen representation contribute structure, or capacity?
 
-**Raised by.** The audit: the fused model has more parameters
+**Motivation.** The fused model has more parameters
 than the arm it is compared against, and no control separates learned
 structural information from added capacity or from the regularising effect of a
-fixed extra input. A parameter-matched comparison including a randomly
-initialised frozen representation is requested.
+fixed extra input. This experiment adds a parameter-matched comparison and a
+randomly initialised frozen representation.
 
 **Script.** `experiments/exp18_representation_controls.py`
 **Input.** Elliptic Data Set, 203,769 nodes, 165 base features.
@@ -974,7 +975,7 @@ at p = 6.0e-5. It is not a generic regularising input either, since a frozen
 Gaussian matrix matched to the embedding's first two moments loses 0.0864. The
 representation must also correspond to the node it is attached to, because
 permuting its rows, which preserves the marginal distribution exactly, loses
-0.0656. Item 6's three alternative explanations are therefore excluded.
+0.0656. The three alternative explanations are therefore excluded.
 
 The self-supervised objective, however, contributes nothing measurable. An
 encoder that is randomly initialised and never trained performs identically,
@@ -988,12 +989,12 @@ modelling strategy is not supported by this architecture.
 
 ## E19 — Rolling-origin evaluation and the drift remedy
 
-**Raised by.** The audit. Item 5 asks for a strictly
+**Motivation.** Two questions. The first is a strictly
 prospective evaluation in which future graph nodes, edges and neighbourhood
 statistics cannot influence earlier predictions, through incremental graph
-construction. Item 8 observes that threshold recalibration is proposed as a
-remedy for the collapse after time step 42, on the grounds that ROC-AUC falls
-less sharply than F1, but is never tested.
+construction. The second is whether threshold recalibration remedies the
+collapse after time step 42, as the gentler fall in ROC-AUC than in F1
+suggests it might.
 
 **Script.** `experiments/exp19_rolling_origin.py`
 **Config.** Origins 42 to 49. At each origin the graph is rebuilt from time
@@ -1039,31 +1040,30 @@ step t is scored once. 5 seeds.
 | 48 | 0.8823 | 0.1356 | 36 | 471 |
 | 49 | 0.5036 | 0.0120 | 56 | 476 |
 
-**Interpretation, item 5.** Strict prospectivity costs nothing. At step 42 the
-incrementally constructed arm matches the paper's protocol, 0.7921 against
+**Interpretation, prospectivity.** Strict prospectivity costs nothing. At step 42 the
+incrementally constructed arm matches the main protocol, 0.7921 against
 0.7825, and across the post-shutdown steps it is better rather than worse.
 There is therefore no evidence that the reported figures were inflated by
 lookahead through graph construction. This is the expected outcome, because the
 Elliptic graph contains no cross-timestep edges and standardisation already
-used training rows only, but it had not previously been demonstrated.
+used training rows only, but it is now demonstrated rather than assumed.
 
-**Interpretation, item 8.** The paper's proposed remedy does not work.
+**Interpretation, recalibration.** The candidate remedy does not work.
 Reselecting the threshold on the most recent labelled step leaves F1 unchanged
 within noise, +0.0102 at p = 0.69, and moves MCC in the wrong direction,
 -0.0154 at p = 0.46. It buys recall at the cost of precision, 0.167 to 0.361
 overall, with no net gain in either balanced metric. Periodic retraining does
 help, +0.0856 F1 at p = 0.032, and beats recalibration more cleanly than it
 beats the frozen baseline. The operational recommendation is therefore a
-retraining schedule, not rethresholding, and the paper's current
-suggestion needs correcting.
+retraining schedule, not rethresholding.
 
-The inference that produced that suggestion is also invalid. ROC-AUC does not
+The inference behind that candidate is also invalid. ROC-AUC does not
 fall as sharply as F1, but a high ROC-AUC does not imply that a threshold
 exists which recovers usable precision: step 45 returns ROC-AUC 0.8275 with F1
 exactly zero under every arm, and step 46 returns 0.9397. ROC-AUC is nearly
 insensitive to the number of positives and F1 is not.
 
-**Power limitation, to be stated in the paper.** The post-shutdown window
+**Power limitation.** The post-shutdown window
 contains 169 labelled illicit nodes across seven time steps, between 2 and 56
 per step. Step 46's ROC-AUC of 0.9397 rests on two positives. Neither F1 nor
 MCC can be estimated with useful precision on steps of that size, so the
@@ -1074,12 +1074,12 @@ t-2 and so also has more recent data than the frozen arm, which trains up to
 step 34, so the gain is attributable to training-data recency and cannot be
 separated from prospectivity in this design.
 
-## E20 - Why Table 12's Random Forest rows could not be reproduced
+## E20 — Why E15's Random Forest rows could not be reproduced
 
-**Raised by.** Found while preparing E17. E16 and E17 agree with each other to
+**Motivation.** Found while preparing E17. E16 and E17 agree with each other to
 four decimal places and both disagree with E15 on every Random Forest row,
 while matching it exactly on HistGradientBoosting, LogisticRegression and the
-rule baseline. Table 12 of the paper matches none of the three.
+rule baseline. The earlier reported figures match none of the three.
 
 **Script.** `experiments/exp20_table12_determinism.py`
 **Output.** `results/e20_hashseed_probe.json`, `results/e20_table12.csv`,
@@ -1109,8 +1109,8 @@ this, which is why only the Random Forest rows disagreed.
 
 Five seeds, five distinct results, spanning 0.0121 of MCC. The test split size
 and class balance are stable at 933 positives in 1,035, so the variation is in
-which transactions land in which split, not in how many. The paper's
-published 0.8136 falls outside this span and comes from an earlier run again.
+which transactions land in which split, not in how many. The earlier
+reported 0.8136 falls outside this span and comes from an earlier run again.
 
 **Fix.** Identifiers are taken in sorted order and the chronological sort is
 stable (`kind="mergesort"`), so the split is a function of the data alone.
@@ -1133,11 +1133,10 @@ Everything else is E15's protocol unchanged.
 | | Logistic Regression | 0.9712 | 0.9752 | 0.9672 | 0.9577 |
 
 Every HistGradientBoosting, LogisticRegression and rule-baseline figure
-reproduces the paper exactly, which confirms the defect was confined to
+reproduces the earlier figures exactly, which confirms the defect was confined to
 the one learner sensitive to split membership and leaves the headline 0.9559
-untouched. The three LogisticRegression rows the published table omitted are
-restored, and the WabiSabi all-features block the surrounding text promises is
-added.
+untouched. All three learners are now reported for every group, including the WabiSabi
+all-features block.
 
 **Regime decomposition under the deterministic construction**, repeating E17.
 MCC, mean over five seeds.
@@ -1171,6 +1170,6 @@ template and not the count.
 **Interpretation.** This is the same class of defect the article documents
 elsewhere, found in the article's own code: a protocol choice that makes a
 reported figure depend on something other than the data. It is disclosed in
-Section 4.12 rather than corrected silently, and the diagnostic generalises:
+the paper rather than corrected silently, and the diagnostic generalises:
 any evaluation that derives a split from a sort on a column with ties should
 fix the pre-sort order and use a stable sort.

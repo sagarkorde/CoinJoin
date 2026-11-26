@@ -1,8 +1,8 @@
 """
 E11 - Computational cost on an idle device.
 
-the audit asked for training time, inference time, hardware specification,
-peak memory and complexity, for practical deployment.
+Training time, inference time, hardware specification, peak memory and
+complexity, for practical deployment.
 
 This is measured separately from E05 rather than reused from it. During part of
 the E05 run a duplicate process was active on the same GPU, so the per-model

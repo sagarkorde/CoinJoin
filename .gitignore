@@ -1,21 +1,38 @@
-# ── Large Dataset Files (download separately — see README) ───────────────────
-Datasets/Author_Dataset/Dataset.parquet
-Datasets/Elliptic_Dataset/elliptic_txs_features.csv
-Datasets/Elliptic_Dataset/elliptic_txs_classes.csv
-Datasets/Elliptic_Dataset/elliptic_txs_edgelist.csv
-Datasets/Blockchai_Dataset/
+# ── Data (download separately; see README) ───────────────────────────────────
+Datasets/
+Paper/Datasets/
 
-# ── Pipeline Intermediate Files (canonical code now lives at Paper/Implementation/) ──
+# ── Only code and results are published ─────────────────────────────────────
+# Everything under Paper/ except the initial pipeline's code and results.
+/Paper/*
+!/Paper/Implementation/
+# Documents of any kind: drafts, reports, forms, correspondence.
+*.docx
+*.doc
+*.dot
+*.dotx
+*.pdf
+*.tex
+*.bib
+*.md.bak
+*Submission*/
+*submission*/
+Ref*Papers*/
+Reference_Papers/
+zenodo_bundle/
+
+# ── Pipeline intermediates ───────────────────────────────────────────────────
 Paper/Implementation/data/
 Paper/Implementation/models/
 Paper/Implementation/figures/
 Paper/Implementation/logs/
-# Old root-level path, retired in favour of Paper/Implementation/ — kept in
-# case any local intermediate files reappear here. Anchored to root only
-# (no leading slash would also match Paper/Implementation/).
+!Paper/Implementation/results/.gitkeep
 /Implementation/
+research/cache/
+research/results/*.parquet
+research/results/e14_verified/
 
-# ── Python ────────────────────────────────────────────────────────────────────
+# ── Python ───────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.pyo
@@ -28,94 +45,27 @@ build/
 *.so
 .eggs/
 
-# ── Virtual Environments ──────────────────────────────────────────────────────
+# ── Virtual environments ─────────────────────────────────────────────────────
 venv/
 .venv/
 env/
 .env/
 ENV/
 
-# ── Jupyter ───────────────────────────────────────────────────────────────────
+# ── Notebooks and editors ────────────────────────────────────────────────────
 .ipynb_checkpoints/
 *.ipynb
-
-# ── IDE ───────────────────────────────────────────────────────────────────────
 .vscode/
 .idea/
+.claude/
 *.swp
 *.swo
 .DS_Store
 Thumbs.db
 
-# ── PyTorch Checkpoints ───────────────────────────────────────────────────────
+# ── Model checkpoints and logs ───────────────────────────────────────────────
 *.pt
 *.pth
 *.pkl
 *.joblib
-
-# ── Logs ─────────────────────────────────────────────────────────────────────
 *.log
-
-# Claude Code internal
-.claude/
-Reference_Papers/
-
-# ── Paper drafts and submission material (never publish pre-print text) ──
-*.docx
-*.doc
-Paper/main.tex
-Paper/references.bib
-Paper/README_PAPER.md
-Paper/compile.bat
-Paper/template.dot
-Paper/*.pdf
-Paper/Structure of the paper.jpeg
-CoinJoin_Litreture_Survey.pdf
-Paper/AI Report_*.pdf
-submission/
-Ref Papers Doc/
-
-# ── Non-canonical / backup figure variants ─────────────────────────────────────
-Paper/figures/*.drawio
-Paper/figures/*.drawio.bkp
-Paper/figures/*V1_original*
-Paper/figures/*V2*
-Paper/figures/* - Copy*
-Paper/figures/Arch.drawio.png
-Paper/figures/fig00_architecture.svg
-Paper/figures/MixTrace Multi-Modal Forensic Framework Architecture.svg
-Paper/figures/Figure_01_MixTrace_Architecture.png
-
-# ── Graphical abstract (submission artifact, not an article figure) ──────
-Paper/figures/Graphical Abstract.png
-Paper/figures/MixTrace_Graphical_Abstract.png
-
-# ── Large local datasets ───────────────────────────────────────────────────────
-Paper/Datasets/
-
-# ── Keep results directory structure but ignore large outputs ─────────────────
-!Paper/Implementation/results/.gitkeep
-
-# ── Audit revision pipeline ────────────────────────────────────────────────
-research/cache/
-research/results/*.parquet
-
-# LaTeX build artifacts
-Paper/*.aux
-Paper/*.out
-Paper/*.toc
-Paper/*.lof
-Paper/*.lot
-Paper/*.fls
-Paper/*.fdb_latexmk
-Paper/*.synctex.gz
-Paper/main_v2.log
-Paper/main_v2.pdf
-research/results/e14_verified/
-
-# Submission package binaries 
-submission/package/*.docx
-submission/package/*.pdf
-submission/package/Figures/
-submission/package/Supplementary/*.docx
-zenodo_bundle/

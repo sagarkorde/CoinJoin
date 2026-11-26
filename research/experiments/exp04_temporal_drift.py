@@ -3,13 +3,13 @@ E04 - Temporal behaviour: per-time-step performance and the dark-market shock.
 
 Two purposes.
 
-1. the audit asked for test performance broken out by Elliptic time step
-   rather than pooled, to expose concept drift.
+1. Report test performance broken out by Elliptic time step rather than
+   pooled, to expose concept drift.
 
 2. Sanity-check the leakage-free baseline against the published literature.
    E02/E03 put a strong tabular model at F1 ~ 0.62 on test steps 42-49, which
    is below the figures usually quoted for Random Forest on Elliptic. Before
-   building on that number the paper must establish whether the gap comes
+   building on that number the study must establish whether the gap comes
    from a weak baseline or from the evaluation window. This experiment
    therefore also reproduces the split used by Weber et al. (train 1-34,
    test 35-49), so the two protocols can be compared directly.

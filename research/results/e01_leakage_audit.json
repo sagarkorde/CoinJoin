@@ -13,7 +13,7 @@
     "illicit_nodes_total": 4545,
     "licit_nodes_with_spti_0": 0,
     "rule_spti0_implies_illicit_precision": 1.0,
-    "reproduces_manuscript_value": true,
+    "reproduces_reported_value": true,
     "interpretation": "SPTI == 0 holds for every illicit node and for no licit node, because each illicit node is its own BFS source. The feature is an exact re-encoding of the positive class label, including on the test split."
   },
   "Q1b_self_exclusion_variant": {

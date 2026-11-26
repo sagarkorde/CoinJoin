@@ -1,9 +1,9 @@
 """
-Central configuration for the MixTrace revision pipeline.
+Central configuration for the MixTrace audit pipeline.
 
 All experiment scripts import paths, split boundaries and seeds from here so
 that a change to the protocol propagates everywhere instead of drifting
-between scripts (a defect identified in the initial audit).
+between scripts.
 """
 from pathlib import Path
 
@@ -35,7 +35,7 @@ LABEL_LICIT    = 0
 LABEL_UNKNOWN  = -1
 
 # ── Reproducibility ───────────────────────────────────────────────────────────
-# Initial the audit asked for more than five seeds; we use twenty.
+# Twenty seeds; five are too few to separate model differences from noise.
 SEEDS = [42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
          52, 53, 54, 55, 56, 57, 58, 59, 60, 61]
 PRIMARY_SEED = 42

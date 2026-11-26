@@ -1,12 +1,12 @@
 """
 E17 - Does the strict-regime detection result survive without the size family?
 
-the audit (audit, item 4) asks that predictors which directly or indirectly
-reproduce the verification criteria be controlled. The strict regime of E15
-withholds every value and count column and keeps fee, size and timing, and the
-paper states that none of what remains "appears in any detection rule".
+Predictors that directly or indirectly reproduce the verification criteria
+must be controlled. The strict regime of E15
+withholds every value and count column and keeps fee, size and timing, and none of
+what remains appears verbatim in any detection rule.
 
-That statement is in tension with Section 3.4.2 of the same paper, which
+That is not enough on its own, because the screening analysis (E08b)
 establishes that virtual size is an affine function of the input and output
 counts (vsize ~ 20.51 + 90.75 n_in + 35.15 n_out, R-squared 0.817) and that
 weight is exactly four times vsize. The Whirlpool rule requires a fixed
@@ -20,14 +20,14 @@ numbers rather than argument, using E15's protocol exactly: chronological
 on validation and frozen, the same learners and seeds.
 
 Regimes, within each candidate group:
-  strict          the published strict regime, for replication
+  strict          the strict regime of E15, for replication
   size_only       size, vsize, weight alone: what the count proxy can do
   strict_no_size  the strict regime with the size family withheld
   fee_timing      fee and calendar fields only
 
 If strict_no_size holds up, the headline is not an artefact of shape leakage
-and the paper can say so with evidence. If it collapses to size_only, the
-claim needs rewriting.
+and that can be stated with evidence. If it collapses to size_only, the
+result is template recognition rather than detection.
 """
 from __future__ import annotations
 

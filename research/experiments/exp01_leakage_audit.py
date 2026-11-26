@@ -1,9 +1,10 @@
 """
 E01 - Leakage audit of the initial engineered features.
 
-Initial the audit questioned whether `illicit_neighbor_ratio` (INR) and
-`shortest_path_to_illicit` (SPTI) leak validation/test labels or future graph
-information. This experiment settles the question mechanically: it reproduces
+The initial MixTrace design engineered `illicit_neighbor_ratio` (INR) and
+`shortest_path_to_illicit` (SPTI). This experiment tests whether they leak
+validation/test labels or future graph information, and settles the question
+mechanically: it reproduces
 both features exactly as the initial code computed them, then tests whether a
 leakage-free reconstruction is even possible.
 
@@ -147,7 +148,7 @@ def main() -> None:
         "licit_nodes_with_spti_0": int((r1_spti[y == 0] == 0).sum()),
         "rule_spti0_implies_illicit_precision": round(float(
             (y[(r1_spti == 0) & lab_any] == LABEL_ILLICIT).mean()), 4),
-        "reproduces_manuscript_value": True,
+        "reproduces_reported_value": True,
         "interpretation": (
             "SPTI == 0 holds for every illicit node and for no licit node, because "
             "each illicit node is its own BFS source. The feature is an exact "

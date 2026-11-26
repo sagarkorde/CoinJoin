@@ -1,17 +1,15 @@
 """
 E06 - Recovering the decision rule behind `is_coinjoin_like`.
 
-The audit asks the same thing: state the
-exact rule that produced the author-curated CoinJoin label, and say whether the
-variables the detector clusters on are the same variables that produced the
-label. If they are, the initial evaluation measures agreement between two
+Two questions: what exact rule produced the author-curated CoinJoin label, and
+are the variables the detector clusters on the same variables that produced
+the label? If they are, the initial evaluation measures agreement between two
 heuristics rather than detection accuracy.
 
 The rule was not documented, so this experiment recovers it from the data. A
 decision tree is fitted to predict the label from the structural columns; if
 the label is a deterministic function of a few of them, a shallow tree will
-reproduce it exactly and the recovered rule can be read off and stated in the
-paper.
+reproduce it exactly and the recovered rule can be read off and stated.
 
 Outputs
 -------

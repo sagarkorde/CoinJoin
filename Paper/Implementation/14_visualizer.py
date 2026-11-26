@@ -1,9 +1,9 @@
 """
 14_visualizer.py  |  MixTrace Pipeline — Step 14: Publication-Quality Figures
 ===============================================================================
-Generates all figures for the SCI journal paper from the results produced
+Generates all figures for the initial pipeline from the results produced
 by Steps 4–13.  Figures are saved as high-resolution PDF (vector) and PNG
-(300 DPI raster) for maximum compatibility with journal submission systems.
+(300 DPI raster) for maximum compatibility.
 
 Figures Generated
 -----------------

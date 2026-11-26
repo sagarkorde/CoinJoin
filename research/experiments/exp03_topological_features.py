@@ -1,7 +1,7 @@
 """
 E03 - Leakage-free topological features: construction, verification, value.
 
-E01/E02 withdrew the two initial engineered features. This experiment builds a
+E01/E02 removed the two initial engineered features. This experiment builds a
 replacement set that is leakage-free by construction, verifies that property
 mechanically, and measures whether the features carry any legitimate signal.
 

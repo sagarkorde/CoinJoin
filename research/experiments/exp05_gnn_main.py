@@ -1,18 +1,18 @@
 """
 E05 - Main GNN experiment, leakage-free.
 
-Addresses initial comments 2, 8, 9, 10 and 11 in one consistent protocol.
+Applies the corrected protocol consistently across every arm.
 
-  * Features: the 165 distributed Elliptic features only. The two withdrawn
-    features (E01/E02) are gone; the topological set from E03 is available via
+  * Features: the 165 distributed Elliptic features only. The two label-derived
+    features (E01/E02) are excluded; the topological set from E03 is available via
     --topo for the ablation but is not part of the headline model.
-  * DGI regime: transductive and inductive are both run (comment 2).
+  * DGI regime: transductive and inductive are both run.
   * DGI ablation: the no-DGI arm is trained from scratch with the fused slot
-    zeroed, not ablated at inference (comment 9).
-  * Threshold: selected on validation per run, then frozen (comment 8).
-  * Seeds: 20 by default (comment 11 and the audit).
+    zeroed, not ablated at inference.
+  * Threshold: selected on validation per run, then frozen.
+  * Seeds: 20 by default.
   * Naming: the model is a fusion of a frozen self-supervised representation
-    with a supervised one, not "pre-training then fine-tuning" (comment 10).
+    with a supervised one, not "pre-training then fine-tuning".
 
 Usage
 -----

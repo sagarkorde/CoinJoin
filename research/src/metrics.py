@@ -1,7 +1,7 @@
 """
 Evaluation metrics and uncertainty quantification.
 
-Two protocol decisions are enforced here because initial drifted on both:
+Two protocol decisions are enforced here, because the initial design drifted on both:
 
 1. A decision threshold is always selected on the validation split and then
    frozen before the test split is touched. `select_threshold` is the only
@@ -10,8 +10,7 @@ Two protocol decisions are enforced here because initial drifted on both:
    threshold-dependent ones, so a conclusion never rests on a single
    operating point.
 
-Initial the audit also noted that five seeds measure training stochasticity,
-not generalisation. `bootstrap_metric_ci` and `paired_bootstrap_difference`
+Seeds measure training stochasticity, not generalisation. `bootstrap_metric_ci` and `paired_bootstrap_difference`
 resample the test set itself, which quantifies the complementary source of
 uncertainty.
 """
@@ -117,8 +116,8 @@ def paired_bootstrap_difference(y_true: np.ndarray, score_a: np.ndarray,
     Paired bootstrap on the difference metric(A) - metric(B).
 
     Both systems are scored on the same resampled test nodes, so the pairing
-    removes test-set composition as a source of variance. This answers the
-    initial concern that five seeds cannot support population-level claims.
+    removes test-set composition as a source of variance. Seeds alone
+    cannot support population-level claims.
     """
     rng = np.random.default_rng(seed)
     y_true = np.asarray(y_true).astype(int)

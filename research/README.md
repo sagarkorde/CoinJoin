@@ -1,19 +1,10 @@
-# MixTrace — Audit Pipeline
+# MixTrace audit pipeline
 
-Reproducible re-implementation of the MixTrace study, rebuilt from the raw data
-after the initial audit. The initial code is preserved unchanged in
-`Paper/Implementation/` and in Git history; nothing here overwrites it.
+Reproducible implementation of the audit, built from the raw data. The initial
+MixTrace pipeline is kept unchanged in `Paper/Implementation/`; nothing here
+overwrites it.
 
-## Why this directory exists
-
-The initial review raised two methodological concerns. Both were investigated
-mechanically and both were confirmed, one of them more severe than the report
-suggested. A third item — a stated limitation about Taproot — turned out to be
-a data-processing defect rather than a property of the blockchain. The findings
-are severe enough that editing the original scripts in place would have
-destroyed the evidence, so the revision is a separate, self-contained pipeline.
-
-Headline findings, each reproducible from a single script:
+## Headline findings
 
 | Finding | Evidence |
 |---|---|
@@ -22,7 +13,11 @@ Headline findings, each reproducible from a single script:
 | No leakage-free version can exist: the Elliptic edge set has 0 cross-time-step edges | `exp01_leakage_audit.py` |
 | `is_coinjoin_like == (input_count >= 4) AND (output_count >= 4)`, exactly, for all 5,884,387 rows | `exp06_coinjoin_label_recovery.py` |
 | All six script-type flags are identically False; the corpus is in fact 24.1 % P2TR by output | `exp07_script_types.py` |
-| Performance is bimodal: mean F1 0.858 on steps 35–42, 0.028 on steps 43–49 | `exp04_temporal_drift.py` |
+| Performance is bimodal: mean F1 0.858 on steps 35-42, 0.028 on steps 43-49 | `exp04_temporal_drift.py` |
+| 4,491 CoinJoin transactions confirmed from blockchain data; screening-label precision 4.07 % | `exp14b_verify_all.py` |
+| Whirlpool detection rests on serialised size alone; WabiSabi detection does not | `exp17_strict_regime_audit.py`, `exp20_table12_determinism.py` |
+| An untrained frozen encoder helps as much as the pre-trained one | `exp18_representation_controls.py` |
+| Retraining, not rethresholding, recovers part of the post-shock loss | `exp19_rolling_origin.py` |
 
 ## Environment
 
@@ -37,13 +32,6 @@ Headline findings, each reproducible from a single script:
 | CPU / RAM | Intel i9 (13th gen) / 64 GB |
 | OS | Windows 11 |
 
-All scripts are run with the absolute interpreter path, because the default
-`python` on this machine is 3.14 and has no PyTorch:
-
-```bash
-"C:/Program Files/Python310/python.exe" research/experiments/exp01_leakage_audit.py
-```
-
 ## Data
 
 Neither dataset is redistributed here.
@@ -53,7 +41,8 @@ Neither dataset is redistributed here.
   `Paper/Datasets/Elliptic_Dataset/`. 203,769 nodes, 234,355 edges, 165
   features, 49 time steps.
 * **Author-curated corpus** — `Paper/Datasets/Author_Dataset/Dataset.parquet`.
-  5,884,387 Bitcoin transactions, 53 columns, 2022-07-13 to 2025-07-01.
+  5,884,387 Bitcoin transactions, 53 columns, 2022-07-13 to 2025-07-01 (dense
+  from July 2022 to September 2024).
 
 `src/data.py` loads the Elliptic CSVs directly and caches to
 `research/cache/`, so every downstream artefact is reproducible from source.
@@ -74,9 +63,8 @@ Neither dataset is redistributed here.
 * **Author corpus** — `is_coinjoin_like` is **not** ground truth. It is the
   structural screening heuristic
   `(input_count >= 4) AND (output_count >= 4)`, recovered exactly in E06 and
-  verified against every row. The paper states this and does not evaluate
-  a detector on variables that the label is computed from without also
-  reporting a disjoint-feature regime.
+  verified against every row. No detector is evaluated on variables the label
+  is computed from without also reporting a disjoint-feature regime.
 
 ## Protocol rules enforced in code
 
@@ -91,6 +79,8 @@ Neither dataset is redistributed here.
    and listed in `src/config.py`.
 6. **Uncertainty** — seed variance and test-set bootstrap are reported as the
    distinct quantities they are.
+7. **Splits** are built from identifiers in sorted order with a stable sort, so
+   they depend on the data alone (E20).
 
 ## Layout
 
@@ -99,23 +89,38 @@ research/
   src/
     config.py      paths, split boundaries, seeds, hardware budget
     data.py        Elliptic loading and chronological masks
+    explorer.py    rate-limited block-explorer client with on-disk cache
     features.py    label-free topological features + permutation verification
     metrics.py     metric suite, threshold selection, bootstrap CIs
     models.py      DGI, GAT, FrozenDGIGATFusion, GCN, GraphSAGE
     gnn.py         graph construction, DGI and classifier training loops
-    plots.py       publication figures
+    plots.py       figures
   experiments/
-    exp01_leakage_audit.py          leakage audit of the initial features
-    exp02_feature_ablation.py       four-way ablation 
-    exp03_topological_features.py   leakage-free replacements (negative result)
-    exp04_temporal_drift.py         per-time-step analysis, protocol comparison
-    exp05_gnn_main.py               main GNN experiment, both DGI regimes
+    exp01_leakage_audit.py            leakage audit of the initial features
+    exp02_feature_ablation.py         four-way feature ablation
+    exp03_topological_features.py     leakage-free replacements (negative result)
+    exp04_temporal_drift.py           per-time-step analysis, protocol comparison
+    exp05_gnn_main.py                 main GNN experiment, both DGI regimes
     exp06_coinjoin_label_recovery.py  recovers the is_coinjoin_like rule
-    exp07_script_types.py           script-type reconstruction, Taproot
-    exp08_coinjoin_detection.py     non-circular CoinJoin detection
-  results/    machine-readable outputs (CSV / JSON)
-  figures/    publication figures
-  reports/    notes
+    exp07_script_types.py             script-type reconstruction, Taproot
+    exp08_coinjoin_detection.py       non-circular CoinJoin screening
+    exp08b_label_proxy_gradient.py    leakage gradient across feature regimes
+    exp09_explainability.py           attribution and failure analysis
+    exp10_statistical_analysis.py     seed-level tests and test-set bootstrap
+    exp11_compute_cost.py             cost on an idle device
+    exp12_address_columns.py          address-count columns, Mixing Index
+    exp13_training_diagnostics.py     loss curves, training curves, t-SNE
+    exp14_external_ground_truth.py    protocol rules on block-explorer data
+    exp14b_verify_all.py              every protocol-shaped candidate
+    exp15_confirmed_detection.py      detection against confirmed labels
+    exp16_detection_uncertainty.py    bootstrap on the detection result
+    exp17_strict_regime_audit.py      strict-regime decomposition
+    exp18_representation_controls.py  controls on the frozen representation
+    exp19_rolling_origin.py           rolling-origin evaluation, drift remedy
+    exp20_table12_determinism.py      split determinism, size fingerprint
+    make_fig_architecture.py          framework figure, generated from code
+  results/    machine-readable outputs (CSV / JSON / NPY)
+  figures/    figures
   EXPERIMENT_LOG.md   experiment ID -> change -> config -> result -> commit
 ```
 
@@ -124,25 +129,28 @@ research/
 Run in order; each script is independent apart from the noted dependencies.
 
 ```bash
-PY="C:/Program Files/Python310/python.exe"
-$PY research/experiments/exp01_leakage_audit.py          # writes features used by E02
-$PY research/experiments/exp02_feature_ablation.py       # needs E01
-$PY research/experiments/exp03_topological_features.py
-$PY research/experiments/exp04_temporal_drift.py
-$PY research/experiments/exp05_gnn_main.py               # GPU, ~2-3 h for 20 seeds
-$PY research/experiments/exp06_coinjoin_label_recovery.py
-$PY research/experiments/exp07_script_types.py
-$PY research/experiments/exp08_coinjoin_detection.py     # needs E06 context
-$PY research/experiments/exp08b_label_proxy_gradient.py
-$PY research/experiments/exp09_explainability.py         # GPU
-$PY research/experiments/exp10_statistical_analysis.py   # needs E05
-$PY research/experiments/exp11_compute_cost.py           # idle GPU required
-$PY research/experiments/exp12_address_columns.py
-$PY research/experiments/exp13_training_diagnostics.py   # GPU
-$PY research/experiments/exp14_external_ground_truth.py  # network; see below
-$PY research/experiments/exp14b_verify_all.py            # network; see below
-$PY research/experiments/exp15_confirmed_detection.py    # needs E14b
-$PY research/experiments/exp16_detection_uncertainty.py  # needs E14b
+python research/experiments/exp01_leakage_audit.py          # writes features used by E02
+python research/experiments/exp02_feature_ablation.py       # needs E01
+python research/experiments/exp03_topological_features.py
+python research/experiments/exp04_temporal_drift.py
+python research/experiments/exp05_gnn_main.py               # GPU, ~2-3 h for 20 seeds
+python research/experiments/exp06_coinjoin_label_recovery.py
+python research/experiments/exp07_script_types.py
+python research/experiments/exp08_coinjoin_detection.py     # needs E06 context
+python research/experiments/exp08b_label_proxy_gradient.py
+python research/experiments/exp09_explainability.py         # GPU
+python research/experiments/exp10_statistical_analysis.py   # needs E05
+python research/experiments/exp11_compute_cost.py           # idle GPU required
+python research/experiments/exp12_address_columns.py
+python research/experiments/exp13_training_diagnostics.py   # GPU
+python research/experiments/exp14_external_ground_truth.py  # network; see below
+python research/experiments/exp14b_verify_all.py            # network; see below
+python research/experiments/exp15_confirmed_detection.py    # needs E14b
+python research/experiments/exp16_detection_uncertainty.py  # needs E14b
+python research/experiments/exp17_strict_regime_audit.py    # needs E14b
+python research/experiments/exp18_representation_controls.py  # GPU
+python research/experiments/exp19_rolling_origin.py         # GPU
+python research/experiments/exp20_table12_determinism.py    # needs E14b
 ```
 
 `exp11_compute_cost.py` refuses to start if another process holds the GPU,
@@ -153,8 +161,7 @@ since contention invalidates its timings.
 ## Traceability
 
 `EXPERIMENT_LOG.md` links every experiment ID to its modification, data
-version, configuration, headline result and Git commit hash. No prior version
-is overwritten; superseded results remain reachable through Git history.
+version, configuration, headline result and Git commit hash.
 
 ## Network experiments, and how to avoid repeating them
 
@@ -164,12 +171,9 @@ time triggered rate limiting, which is why `src/explorer.py` spreads requests
 across endpoints, rests one that refuses, and caps the aggregate rate.
 
 **Do not re-run them unless the retrieval itself is what you are checking.**
-The responses are deposited:
-
-- Verification records, version DOI <https://doi.org/10.5281/zenodo.23275812>
-- All versions, concept DOI <https://doi.org/10.5281/zenodo.23275811>
-
-Download `d1_raw_api_responses_part*.jsonl.gz`, expand them into
+The responses are deposited on Zenodo, concept DOI
+<https://doi.org/10.5281/zenodo.23275811>, which resolves to the latest
+version. Download `d1_raw_api_responses_part*.jsonl.gz`, expand them into
 `research/results/e14_verified/` as one JSON file per transaction id, and both
 experiments will read from cache and issue no requests. `classify()` in
 `exp14_external_ground_truth.py` reproduces the verdicts from those responses
@@ -180,7 +184,7 @@ alone.
 | Source | Identifier | Notes |
 |---|---|---|
 | Author-curated corpus, 5,884,387 transactions | <https://doi.org/10.21227/bxmt-mn56> | IEEE DataPort, Academic Use licence |
-| Verification records, 6,269 responses | <https://doi.org/10.5281/zenodo.23275812> | CC BY 4.0 |
+| Verification records, 6,269 responses | <https://doi.org/10.5281/zenodo.23275811> | CC BY 4.0, all versions |
 | Elliptic Data Set | [Kaggle](https://www.kaggle.com/datasets/ellipticco/elliptic-data-set) | Distributed under its own terms |
 | Analysis code | <https://github.com/sagarkorde/CoinJoin> | MIT |
 

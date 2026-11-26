@@ -1,8 +1,7 @@
 """
 E09 - Explainability and error analysis.
 
-the audit asked for feature attribution or a GNN explanation method, and for
-an analysis of failure cases. Both are provided here, on the leakage-free
+Feature attribution and an analysis of failure cases. Both are provided here, on the leakage-free
 models only.
 
 Three parts

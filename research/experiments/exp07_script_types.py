@@ -1,10 +1,9 @@
 """
 E07 - Reconstructing script types, and the Taproot claim.
 
-Initial reported that the author-curated corpus contains no confirmed P2TR
-transactions and therefore used multi-input P2WPKH as a Taproot proxy. All
-the audit asked for the Taproot claims to be moderated on that basis
-.
+Read through its script-type flags, the author-curated corpus appears to
+contain no confirmed P2TR transactions, and the initial design therefore used
+multi-input P2WPKH as a Taproot proxy.
 
 The premise turns out to be an artefact. The dataset's five script-type
 booleans (`has_p2pk`, `has_p2pkh`, `has_p2sh`, `has_p2wpkh`, `has_p2wsh`,
@@ -14,8 +13,8 @@ booleans (`has_p2pk`, `has_p2pkh`, `has_p2sh`, `has_p2wpkh`, `has_p2wsh`,
 descriptors as reported by the node.
 
 This experiment rebuilds the flags from those columns and quantifies actual
-Taproot presence, so the paper can state the corpus composition correctly
-instead of moderating a claim that rested on a broken column.
+Taproot presence, so the corpus composition can be stated correctly
+instead of resting on a broken column.
 
 Outputs
 -------

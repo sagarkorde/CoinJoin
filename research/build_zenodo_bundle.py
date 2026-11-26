@@ -37,10 +37,10 @@ from pathlib import Path
 
 import pandas as pd
 
-REPO = Path(r"C:\Users\sagar\Desktop\CoinJoin")
+REPO = Path(__file__).resolve().parents[1]
 RESULTS = REPO / "research" / "results"
 CACHE = RESULTS / "e14_verified"
-OUT = REPO / "submission" / "deposit" / "ZENODO_BUNDLE"
+OUT = REPO / "zenodo_bundle"
 
 PART_TARGET_MB = 40          # uncompressed JSONL per part, as in the earlier record
 DATAPORT_DOI = "10.21227/bxmt-mn56"
@@ -136,7 +136,7 @@ def main() -> None:
     manifest = {
         "title": ("Blockchain verification records for CoinJoin confirmation, "
                   "Bitcoin 2022-2024, with raw explorer responses"),
-        "version": "1.0.0",
+        "version": "1.1.0",
         "date": date.today().isoformat(),
         "license": "CC-BY-4.0",
         "authors": [
@@ -169,7 +169,7 @@ def main() -> None:
 Bitcoin transactions, July 2022 to September 2024, with the raw block-explorer
 responses used to confirm CoinJoin status.
 
-**Version 1.0.0 · CC BY 4.0 · {date.today().isoformat()}**
+**Version 1.1.0 · CC BY 4.0 · {date.today().isoformat()}**
 
 Sagar D. Korde, K. J. Somaiya School of Engineering, Somaiya Vidyavihar
 University, Mumbai, India
@@ -217,9 +217,9 @@ published elsewhere.
 ## Detection rules
 
 CoinJoin status follows the conditions implemented in Dumplings
-(github.com/nopara73/Dumplings), the reference tool used to extract Wasabi,
-Whirlpool and JoinMarket transactions from mainnet in the measurement
-literature. They are applied here, not devised here.
+(github.com/nopara73/Dumplings), an open-source tool that produces
+reproducible CoinJoin statistics from blockchain data. The conditions are
+applied here, not devised here.
 
 *Whirlpool*: native SegWit throughout; equal input and output counts between
 five and ten; every output exactly equal; that value one of
